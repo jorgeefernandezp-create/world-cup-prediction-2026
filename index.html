@@ -29,16 +29,14 @@
         <input id="playerName" placeholder="Ejemplo: Jorge" />
         <button onclick="enterGame()" id="enterBtn">Entrar</button>
         <p class="welcome" id="welcomeText"></p>
+        <p class="status" id="saveStatus"></p>
       </div>
 
       <div class="card">
-        <h2 id="menuTitle">🏠 Menú principal</h2>
-        <div class="menu">
-          <div id="menuPred">⚽ Mis pronósticos</div>
-          <div id="menuRank">📊 Tabla de posiciones</div>
-          <div id="menuCalendar">📅 Calendario</div>
-          <div id="menuRules">📖 Reglas</div>
-        </div>
+        <h2 id="playersTitle">👥 Participantes registrados</h2>
+        <ul id="playersList">
+          <li>Cargando participantes...</li>
+        </ul>
       </div>
 
       <div class="card">
@@ -65,11 +63,10 @@
               <th id="scoreTh">Puntos</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="rankingBody">
             <tr><td>1</td><td>Tanaka</td><td>28</td></tr>
             <tr><td>2</td><td>Jorge</td><td>25</td></tr>
             <tr><td>3</td><td>João</td><td>22</td></tr>
-            <tr><td>4</td><td>Smith</td><td>18</td></tr>
           </tbody>
         </table>
         <p class="small" id="rankInfo">El ranking se actualizará después de cada partido.</p>
@@ -88,9 +85,7 @@
             <span>-</span>
             <input type="number" min="0" placeholder="0" />
           </div>
-          <div>
-            <strong>🇵🇪 Perú</strong>
-          </div>
+          <div><strong>🇵🇪 Perú</strong></div>
         </div>
 
         <div class="match">
@@ -103,9 +98,7 @@
             <span>-</span>
             <input type="number" min="0" placeholder="0" />
           </div>
-          <div>
-            <strong>🇩🇪 Alemania</strong>
-          </div>
+          <div><strong>🇩🇪 Alemania</strong></div>
         </div>
 
         <div class="match">
@@ -114,9 +107,7 @@
             <small id="startedText">Partido iniciado</small>
           </div>
           <div class="locked" id="closedText">🔒 Pronóstico cerrado. El partido ya comenzó.</div>
-          <div>
-            <strong>🇫🇷 Francia</strong>
-          </div>
+          <div><strong>🇫🇷 Francia</strong></div>
         </div>
 
         <button id="saveBtn">Guardar pronósticos</button>
@@ -124,6 +115,6 @@
     </section>
   </main>
 
-  <script src="app.js"></script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>

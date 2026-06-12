@@ -1,3 +1,27 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  serverTimestamp,
+  query,
+  orderBy,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCT7xdrWuQ-HRxi_MsPgeLVVkyNyGSO4_k",
+  authDomain: "world-cup-prediction-202-c21c7.firebaseapp.com",
+  projectId: "world-cup-prediction-202-c21c7",
+  storageBucket: "world-cup-prediction-202-c21c7.firebasestorage.app",
+  messagingSenderId: "799745348621",
+  appId: "1:799745348621:web:f444420211d86ae1e67144",
+  measurementId: "G-RRB3QSV828"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 const T = {
   es: {
     subtitle:"Polla Mundialista para compañeros de trabajo",
@@ -7,11 +31,10 @@ const T = {
     placeholder:"Ejemplo: Jorge",
     enterBtn:"Entrar",
     welcome:"Bienvenido",
-    menuTitle:"🏠 Menú principal",
-    menuPred:"⚽ Mis pronósticos",
-    menuRank:"📊 Tabla de posiciones",
-    menuCalendar:"📅 Calendario",
-    menuRules:"📖 Reglas",
+    saved:"✅ Participante guardado correctamente.",
+    error:"❌ No se pudo guardar. Revisa Firebase.",
+    playersTitle:"👥 Participantes registrados",
+    emptyPlayers:"Todavía no hay participantes.",
     rulesTitle:"📖 Reglas de puntos",
     ruleTh:"Acierto",
     pointsTh:"Puntos",
@@ -39,11 +62,10 @@ const T = {
     placeholder:"例：田中",
     enterBtn:"参加する",
     welcome:"ようこそ",
-    menuTitle:"🏠 メイン画面",
-    menuPred:"⚽ 自分の予想",
-    menuRank:"📊 順位表",
-    menuCalendar:"📅 試合日程",
-    menuRules:"📖 ルール",
+    saved:"✅ 参加者が正常に登録されました。",
+    error:"❌ 保存できませんでした。Firebaseを確認してください。",
+    playersTitle:"👥 登録済み参加者",
+    emptyPlayers:"まだ参加者はいません。",
     rulesTitle:"📖 得点ルール",
     ruleTh:"内容",
     pointsTh:"ポイント",
@@ -71,11 +93,10 @@ const T = {
     placeholder:"Example: Jorge",
     enterBtn:"Join",
     welcome:"Welcome",
-    menuTitle:"🏠 Main menu",
-    menuPred:"⚽ My predictions",
-    menuRank:"📊 Leaderboard",
-    menuCalendar:"📅 Calendar",
-    menuRules:"📖 Rules",
+    saved:"✅ Participant saved successfully.",
+    error:"❌ Could not save. Check Firebase.",
+    playersTitle:"👥 Registered participants",
+    emptyPlayers:"There are no participants yet.",
     rulesTitle:"📖 Scoring rules",
     ruleTh:"Prediction",
     pointsTh:"Points",
@@ -103,11 +124,10 @@ const T = {
     placeholder:"Exemplo: Jorge",
     enterBtn:"Entrar",
     welcome:"Bem-vindo",
-    menuTitle:"🏠 Menu principal",
-    menuPred:"⚽ Meus palpites",
-    menuRank:"📊 Classificação",
-    menuCalendar:"📅 Calendário",
-    menuRules:"📖 Regras",
+    saved:"✅ Participante salvo com sucesso.",
+    error:"❌ Não foi possível salvar. Verifique o Firebase.",
+    playersTitle:"👥 Participantes registrados",
+    emptyPlayers:"Ainda não há participantes.",
     rulesTitle:"📖 Regras de pontuação",
     ruleTh:"Acerto",
     pointsTh:"Pontos",
@@ -131,16 +151,16 @@ const T = {
 
 let currentLang = "es";
 
-function setLang(lang) {
+window.setLang = function(lang) {
   currentLang = lang;
   document.querySelectorAll(".langs button").forEach(b => b.classList.remove("active"));
   document.getElementById("btn-" + lang).classList.add("active");
   const t = T[lang];
 
   const ids = [
-    "subtitle","chooseLang","nameTitle","nameText","enterBtn","menuTitle","menuPred","menuRank",
-    "menuCalendar","menuRules","rulesTitle","ruleTh","pointsTh","lockInfo","rankingTitle",
-    "nameTh","scoreTh","rankInfo","predTitle","startedText","closedText","saveBtn"
+    "subtitle","chooseLang","nameTitle","nameText","enterBtn","playersTitle",
+    "rulesTitle","ruleTh","pointsTh","lockInfo","rankingTitle","nameTh","scoreTh",
+    "rankInfo","predTitle","startedText","closedText","saveBtn"
   ];
 
   ids.forEach(id => document.getElementById(id).textContent = t[id]);
@@ -150,13 +170,60 @@ function setLang(lang) {
     .map(row => `<tr><td>${row[0]}</td><td>${row[1]}</td></tr>`)
     .join("");
 
-  const name = document.getElementById("playerName").value;
+  const name = document.getElementById("playerName").value.trim();
   if (name) document.getElementById("welcomeText").textContent = `${t.welcome}, ${name}!`;
-}
+};
 
-function enterGame() {
-  const name = document.getElementById("playerName").value.trim() || "Jorge";
-  document.getElementById("welcomeText").textContent = `${T[currentLang].welcome}, ${name}!`;
+window.enterGame = async function() {
+  const nameInput = document.getElementById("playerName");
+  const status = document.getElementById("saveStatus");
+  const name = nameInput.value.trim();
+
+  if (!name) {
+    status.textContent = "⚠️ Escribe tu nombre.";
+    return;
+  }
+
+  try {
+    await addDoc(collection(db, "players"), {
+      name,
+      language: currentLang,
+      points: 0,
+      createdAt: serverTimestamp()
+    });
+
+    document.getElementById("welcomeText").textContent = `${T[currentLang].welcome}, ${name}!`;
+    status.textContent = T[currentLang].saved;
+    nameInput.value = "";
+  } catch (error) {
+    console.error(error);
+    status.textContent = T[currentLang].error;
+  }
+};
+
+function listenPlayers() {
+  const playersList = document.getElementById("playersList");
+  const q = query(collection(db, "players"), orderBy("createdAt", "desc"));
+
+  onSnapshot(q, (snapshot) => {
+    playersList.innerHTML = "";
+
+    if (snapshot.empty) {
+      playersList.innerHTML = `<li>${T[currentLang].emptyPlayers}</li>`;
+      return;
+    }
+
+    snapshot.forEach((doc) => {
+      const player = doc.data();
+      const li = document.createElement("li");
+      li.textContent = player.name;
+      playersList.appendChild(li);
+    });
+  }, (error) => {
+    console.error(error);
+    playersList.innerHTML = "<li>Error al cargar participantes.</li>";
+  });
 }
 
 setLang("es");
+listenPlayers();
