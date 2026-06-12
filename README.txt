@@ -1,18 +1,24 @@
-WORLD CUP PREDICTION 2026 - VERSION 2 FIREBASE
+WORLD CUP PREDICTION 2026 - VERSION 3
+
+NUEVO:
+- Guarda participantes en Firebase.
+- Guarda pronósticos en Firebase en la colección predictions.
+- Usa el nombre guardado en el celular para reconocer al participante.
+- Bloquea partidos si la hora de inicio ya pasó.
+- Tabla de posiciones lee datos desde Firebase.
 
 Archivos:
 - index.html
 - style.css
 - app.js
 
-Esta versión guarda participantes en Firebase Firestore.
-
 Cómo subir:
-1. En GitHub, abre tu repositorio.
-2. Borra o reemplaza los archivos actuales:
-   index.html, style.css, app.js, README.txt
-3. Sube estos nuevos archivos.
-4. Haz Commit changes.
-5. Espera el deploy automático en Vercel.
-6. Abre tu web y prueba escribiendo un nombre.
-7. Revisa Firebase > Firestore > colección players.
+1. Reemplaza index.html, style.css, app.js y README.txt en GitHub.
+2. Commit changes.
+3. Espera Vercel Ready.
+4. Entra a la web.
+5. Ingresa tu nombre.
+6. Coloca pronósticos.
+7. Revisa Firebase > Firestore:
+   - players
+   - predictions

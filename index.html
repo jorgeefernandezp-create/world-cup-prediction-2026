@@ -12,7 +12,6 @@
       <div class="badge">🏆 2026</div>
       <h1>WORLD CUP PREDICTION</h1>
       <p id="subtitle">Polla Mundialista para compañeros de trabajo</p>
-
       <p class="small" id="chooseLang">Elige tu idioma</p>
       <div class="langs">
         <button onclick="setLang('es')" id="btn-es" class="active">🇪🇸 Español</button>
@@ -34,20 +33,13 @@
 
       <div class="card">
         <h2 id="playersTitle">👥 Participantes registrados</h2>
-        <ul id="playersList">
-          <li>Cargando participantes...</li>
-        </ul>
+        <ul id="playersList"><li>Cargando...</li></ul>
       </div>
 
       <div class="card">
         <h2 id="rulesTitle">📖 Reglas de puntos</h2>
         <table>
-          <thead>
-            <tr>
-              <th id="ruleTh">Acierto</th>
-              <th id="pointsTh">Puntos</th>
-            </tr>
-          </thead>
+          <thead><tr><th id="ruleTh">Acierto</th><th id="pointsTh">Puntos</th></tr></thead>
           <tbody id="rulesBody"></tbody>
         </table>
         <p class="small" id="lockInfo">Los pronósticos se bloquean automáticamente cuando empieza el partido.</p>
@@ -56,61 +48,18 @@
       <div class="card">
         <h2 id="rankingTitle">📊 Tabla de posiciones</h2>
         <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th id="nameTh">Nombre</th>
-              <th id="scoreTh">Puntos</th>
-            </tr>
-          </thead>
-          <tbody id="rankingBody">
-            <tr><td>1</td><td>Tanaka</td><td>28</td></tr>
-            <tr><td>2</td><td>Jorge</td><td>25</td></tr>
-            <tr><td>3</td><td>João</td><td>22</td></tr>
-          </tbody>
+          <thead><tr><th>#</th><th id="nameTh">Nombre</th><th id="scoreTh">Puntos</th></tr></thead>
+          <tbody id="rankingBody"></tbody>
         </table>
         <p class="small" id="rankInfo">El ranking se actualizará después de cada partido.</p>
       </div>
 
       <div class="card wide">
         <h2 id="predTitle">⚽ Mis pronósticos</h2>
-
-        <div class="match">
-          <div>
-            <strong>🇯🇵 Japón</strong>
-            <small>19:00 JST</small>
-          </div>
-          <div class="score">
-            <input type="number" min="0" placeholder="0" />
-            <span>-</span>
-            <input type="number" min="0" placeholder="0" />
-          </div>
-          <div><strong>🇵🇪 Perú</strong></div>
-        </div>
-
-        <div class="match">
-          <div>
-            <strong>🇧🇷 Brasil</strong>
-            <small>22:00 JST</small>
-          </div>
-          <div class="score">
-            <input type="number" min="0" placeholder="0" />
-            <span>-</span>
-            <input type="number" min="0" placeholder="0" />
-          </div>
-          <div><strong>🇩🇪 Alemania</strong></div>
-        </div>
-
-        <div class="match">
-          <div>
-            <strong>🇦🇷 Argentina</strong>
-            <small id="startedText">Partido iniciado</small>
-          </div>
-          <div class="locked" id="closedText">🔒 Pronóstico cerrado. El partido ya comenzó.</div>
-          <div><strong>🇫🇷 Francia</strong></div>
-        </div>
-
-        <button id="saveBtn">Guardar pronósticos</button>
+        <p class="small" id="predHelp">Primero ingresa tu nombre. Luego coloca tus marcadores y guarda.</p>
+        <div id="matchesContainer"></div>
+        <button onclick="savePredictions()" id="saveBtn">Guardar pronósticos</button>
+        <p class="status" id="predictionStatus"></p>
       </div>
     </section>
   </main>
