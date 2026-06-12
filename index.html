@@ -19,6 +19,7 @@
         <button onclick="setLang('en')" id="btn-en">🇬🇧 English</button>
         <button onclick="setLang('pt')" id="btn-pt">🇧🇷 Português</button>
       </div>
+      <p class="small" id="dataStatus">Cargando calendario automático...</p>
       <p class="small">Admin: abre la web agregando <strong>?admin=jorge</strong> al final del enlace.</p>
     </section>
 
@@ -52,7 +53,7 @@
           <thead><tr><th>#</th><th id="nameTh">Nombre</th><th id="scoreTh">Puntos</th></tr></thead>
           <tbody id="rankingBody"></tbody>
         </table>
-        <p class="small" id="rankInfo">El ranking se actualiza con los resultados guardados.</p>
+        <p class="small" id="rankInfo">El ranking se actualiza con los resultados automáticos disponibles.</p>
       </div>
 
       <div class="card wide">
@@ -65,18 +66,17 @@
 
       <div class="card wide admin-card" id="adminPanel">
         <h2>👨‍💼 Panel administrador</h2>
-        <p class="small">Solo visible cuando abres la web con <strong>?admin=jorge</strong>.</p>
-        <h3>1. Cargar resultados finales</h3>
+        <p class="small">La web intenta traer partidos/resultados automáticamente. Este panel queda solo como respaldo.</p>
+        <h3>Resultados detectados / respaldo manual</h3>
         <div id="adminResults"></div>
         <button onclick="saveResultsAndCalculate()">Guardar resultados y recalcular ranking</button>
+        <button onclick="syncOpenFootball()">Sincronizar calendario/resultados ahora</button>
         <p class="status" id="adminStatus"></p>
 
-        <h3>2. Pronósticos guardados</h3>
+        <h3>Pronósticos guardados</h3>
         <div class="table-scroll">
           <table>
-            <thead>
-              <tr><th>Participante</th><th>Partido</th><th>Pronóstico</th><th>Puntos</th></tr>
-            </thead>
+            <thead><tr><th>Participante</th><th>Partido</th><th>Pronóstico</th><th>Puntos</th></tr></thead>
             <tbody id="adminPredictionsBody"></tbody>
           </table>
         </div>

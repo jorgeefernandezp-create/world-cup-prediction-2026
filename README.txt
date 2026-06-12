@@ -1,22 +1,20 @@
-WORLD CUP PREDICTION 2026 - VERSION 4
+WORLD CUP PREDICTION 2026 - VERSION 5
 
 NUEVO:
-- Panel administrador con ?admin=jorge
-- Guardar resultados finales
-- Recalcular puntos automáticamente
-- Actualizar ranking en Firebase
-- Ver pronósticos guardados y puntos por partido
+- Carga automática gratuita del calendario 2026 desde OpenFootball:
+  https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json
+- No usa API Key.
+- No usa Google Sheets.
+- Intenta leer resultados disponibles y recalcular ranking.
+- Si no puede cargar la fuente externa, usa partidos de respaldo.
+- Panel administrador queda como respaldo con ?admin=jorge.
 
-Cómo usar:
+IMPORTANTE:
+La fuente gratuita OpenFootball no es live minuto a minuto. Es pública y sin costo, pero depende de actualizaciones del repositorio. Para una polla entre compañeros es útil y gratuita.
+
+Cómo subir:
 1. Reemplaza index.html, style.css, app.js y README.txt en GitHub.
 2. Commit changes.
 3. Espera Vercel Ready.
-4. Abre tu web normal para jugadores.
-5. Abre tu web con ?admin=jorge para administrador.
-   Ejemplo:
-   https://TU-WEB.vercel.app/?admin=jorge
-
-Reglas:
-- Marcador exacto: 5 puntos
-- Ganador o empate correcto: 3 puntos
-- Fallo: 0 puntos
+4. Abre tu web.
+5. Verifica que aparezca "Calendario automático cargado".

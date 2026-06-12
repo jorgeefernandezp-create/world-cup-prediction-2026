@@ -15,7 +15,5 @@ table{width:100%;border-collapse:collapse}th,td{padding:12px;border-bottom:1px s
 .match,.admin-match{display:grid;grid-template-columns:1fr 240px 1fr;gap:15px;align-items:center;padding:18px 0;border-bottom:1px solid rgba(255,255,255,.12)}
 .match small,.admin-match small{display:block;opacity:.75;margin-top:4px}.score{display:grid;grid-template-columns:1fr 20px 1fr;gap:8px;align-items:center}.score input{text-align:center;margin:0}
 .locked{padding:14px;border-radius:14px;background:rgba(255,80,80,.18);border:1px solid rgba(255,120,120,.35);font-weight:800;text-align:center}
-.admin-card{display:none;border-color:rgba(245,200,75,.55);background:rgba(245,200,75,.09)}
-.admin-card.show{display:block}
-.table-scroll{overflow-x:auto}
+.admin-card{display:none;border-color:rgba(245,200,75,.55);background:rgba(245,200,75,.09)}.admin-card.show{display:block}.table-scroll{overflow-x:auto}
 @media(max-width:800px){.grid,.langs{grid-template-columns:1fr}.match,.admin-match{grid-template-columns:1fr}.wide{grid-column:auto}}
