@@ -40,3 +40,11 @@ VERSION 7.4:
 - Fondo del estadio ajustado para que se vea más la cancha verde.
 - Menos capa oscura.
 - Tarjetas un poco más transparentes.
+
+
+VERSION 8.0 FIREBASE FINAL:
+- Pronósticos se guardan en Firebase.
+- Al actualizar la página, el score guardado se recupera y aparece otra vez.
+- Se recuerda el partido y fecha seleccionados.
+- Ranking y ganador se calculan por partido desde Firebase.
+- Mantiene fondo de estadio verde y diseño móvil.
