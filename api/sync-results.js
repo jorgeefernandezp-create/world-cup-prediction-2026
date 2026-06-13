@@ -1,13 +1,8 @@
 // Vercel Serverless Function
 // Endpoint: /api/sync-results
-// Provider: API-FOOTBALL / API-SPORTS
-//
-// Required Vercel Environment Variables:
-// API_FOOTBALL_KEY = your API key
-// API_FOOTBALL_LEAGUE_ID = World Cup league id from API-FOOTBALL dashboard
-//
-// This function returns only final scores. It does not write to Firebase.
-// The browser app receives the result and writes it to Firestore.
+// Uses API-Football by DATE, no World Cup league id needed.
+// Reads API_FOOTBALL_KEY from Vercel Environment Variables.
+// Returns final scores matched to the local World Cup schedule.
 
 const TEAM_ALIASES = {
   MEX: ["Mexico", "México"],
@@ -60,79 +55,108 @@ const TEAM_ALIASES = {
   COL: ["Colombia"]
 };
 
-const STATIC_MATCHES = [
-  ["66456904","MEX","RSA"],["66456906","KOR","CZE"],["66456916","CAN","BIH"],["66456940","USA","PAR"],
-  ["66456918","QAT","SUI"],["66456928","BRA","MAR"],["66456930","HTI","SCO"],["66456942","AUS","TUR"],
-  ["66457070","GER","CUW"],["66456968","NED","JPN"],["66457072","CIV","ECU"],["66456970","SWE","TUN"],
-  ["66456994","ESP","CPV"],["66456982","BEL","EGY"],["66456996","KSA","URU"],["66456984","IRI","NZL"],
-  ["66457006","FRA","SEN"],["66457008","IRQ","NOR"],["66457018","ARG","DZA"],["66457020","AUT","JOR"],
-  ["66457030","POR","COD"],["66457042","ENG","CRO"],["66457044","GHA","PAN"],["66457032","UZB","COL"],
-  ["66456910","CZE","RSA"],["66456922","SUI","BIH"],["66456920","CAN","QAT"],["66456908","MEX","KOR"],
-  ["66456944","USA","AUS"],["66456934","SCO","MAR"],["66456932","BRA","HTI"],["66456946","TUR","PAR"],
-  ["66456972","NED","SWE"],["66457074","GER","CIV"],["66457076","ECU","CUW"],["66456974","TUN","JPN"],
-  ["66456998","ESP","KSA"],["66456986","BEL","IRI"],["66457000","URU","CPV"],["66456988","NZL","EGY"],
-  ["66457022","ARG","AUT"],["66457010","FRA","IRQ"],["66457012","NOR","SEN"],["66457024","JOR","DZA"],
-  ["66457034","POR","UZB"],["66457046","ENG","GHA"],["66457048","PAN","CRO"],["66457036","COL","COD"],
-  ["66456924","SUI","CAN"],["66456926","BIH","QAT"],["66456936","SCO","BRA"],["66456938","MAR","HTI"],
-  ["66456912","CZE","MEX"],["66456914","RSA","KOR"],["66457078","ECU","GER"],["66457080","CUW","CIV"],
-  ["66456976","TUN","NED"],["66456978","JPN","SWE"],["66456948","TUR","USA"],["66456950","PAR","AUS"],
-  ["66457014","NOR","FRA"],["66457016","SEN","IRQ"],["66457002","URU","ESP"],["66457004","CPV","KSA"],
-  ["66456990","NZL","BEL"],["66456992","EGY","IRI"],["66457050","PAN","ENG"],["66457052","CRO","GHA"],
-  ["66457038","COL","POR"],["66457040","COD","UZB"],["66457026","JOR","ARG"],["66457028","DZA","AUT"]
-];
+// Local schedule ids and UTC kickoff dates. These are the ids used by the web/Firebase.
+const LOCAL_MATCHES = [
+  ["66456904","MEX","RSA","2026-06-11T19:00:00Z"],["66456906","KOR","CZE","2026-06-12T02:00:00Z"],
+  ["66456916","CAN","BIH","2026-06-12T19:00:00Z"],["66456940","USA","PAR","2026-06-13T01:00:00Z"],
+  ["66456918","QAT","SUI","2026-06-13T19:00:00Z"],["66456928","BRA","MAR","2026-06-13T22:00:00Z"],
+  ["66456930","HTI","SCO","2026-06-14T01:00:00Z"],["66456942","AUS","TUR","2026-06-14T04:00:00Z"],
+  ["66457070","GER","CUW","2026-06-14T17:00:00Z"],["66456968","NED","JPN","2026-06-14T20:00:00Z"],
+  ["66457072","CIV","ECU","2026-06-14T23:00:00Z"],["66456970","SWE","TUN","2026-06-15T02:00:00Z"],
+  ["66456994","ESP","CPV","2026-06-15T16:00:00Z"],["66456982","BEL","EGY","2026-06-15T19:00:00Z"],
+  ["66456996","KSA","URU","2026-06-15T22:00:00Z"],["66456984","IRI","NZL","2026-06-16T01:00:00Z"],
+  ["66457006","FRA","SEN","2026-06-16T19:00:00Z"],["66457008","IRQ","NOR","2026-06-16T22:00:00Z"],
+  ["66457018","ARG","DZA","2026-06-17T01:00:00Z"],["66457020","AUT","JOR","2026-06-17T04:00:00Z"],
+  ["66457030","POR","COD","2026-06-17T17:00:00Z"],["66457042","ENG","CRO","2026-06-17T20:00:00Z"],
+  ["66457044","GHA","PAN","2026-06-17T23:00:00Z"],["66457032","UZB","COL","2026-06-18T02:00:00Z"],
+  ["66456910","CZE","RSA","2026-06-18T16:00:00Z"],["66456922","SUI","BIH","2026-06-18T19:00:00Z"],
+  ["66456920","CAN","QAT","2026-06-18T22:00:00Z"],["66456908","MEX","KOR","2026-06-19T01:00:00Z"],
+  ["66456944","USA","AUS","2026-06-19T19:00:00Z"],["66456934","SCO","MAR","2026-06-19T22:00:00Z"],
+  ["66456932","BRA","HTI","2026-06-20T00:30:00Z"],["66456946","TUR","PAR","2026-06-20T03:00:00Z"],
+  ["66456972","NED","SWE","2026-06-20T17:00:00Z"],["66457074","GER","CIV","2026-06-20T20:00:00Z"],
+  ["66457076","ECU","CUW","2026-06-21T00:00:00Z"],["66456974","TUN","JPN","2026-06-21T04:00:00Z"],
+  ["66456998","ESP","KSA","2026-06-21T16:00:00Z"],["66456986","BEL","IRI","2026-06-21T19:00:00Z"],
+  ["66457000","URU","CPV","2026-06-21T22:00:00Z"],["66456988","NZL","EGY","2026-06-22T01:00:00Z"],
+  ["66457022","ARG","AUT","2026-06-22T17:00:00Z"],["66457010","FRA","IRQ","2026-06-22T21:00:00Z"],
+  ["66457012","NOR","SEN","2026-06-23T00:00:00Z"],["66457024","JOR","DZA","2026-06-23T03:00:00Z"],
+  ["66457034","POR","UZB","2026-06-23T17:00:00Z"],["66457046","ENG","GHA","2026-06-23T20:00:00Z"],
+  ["66457048","PAN","CRO","2026-06-23T23:00:00Z"],["66457036","COL","COD","2026-06-24T02:00:00Z"],
+  ["66456924","SUI","CAN","2026-06-24T19:00:00Z"],["66456926","BIH","QAT","2026-06-24T19:00:00Z"],
+  ["66456936","SCO","BRA","2026-06-24T22:00:00Z"],["66456938","MAR","HTI","2026-06-24T22:00:00Z"],
+  ["66456912","CZE","MEX","2026-06-25T01:00:00Z"],["66456914","RSA","KOR","2026-06-25T01:00:00Z"],
+  ["66457078","ECU","GER","2026-06-25T20:00:00Z"],["66457080","CUW","CIV","2026-06-25T20:00:00Z"],
+  ["66456976","TUN","NED","2026-06-25T23:00:00Z"],["66456978","JPN","SWE","2026-06-25T23:00:00Z"],
+  ["66456948","TUR","USA","2026-06-26T02:00:00Z"],["66456950","PAR","AUS","2026-06-26T02:00:00Z"],
+  ["66457014","NOR","FRA","2026-06-26T19:00:00Z"],["66457016","SEN","IRQ","2026-06-26T19:00:00Z"],
+  ["66457002","URU","ESP","2026-06-27T00:00:00Z"],["66457004","CPV","KSA","2026-06-27T00:00:00Z"],
+  ["66456990","NZL","BEL","2026-06-27T03:00:00Z"],["66456992","EGY","IRI","2026-06-27T03:00:00Z"],
+  ["66457050","PAN","ENG","2026-06-27T21:00:00Z"],["66457052","CRO","GHA","2026-06-27T21:00:00Z"],
+  ["66457038","COL","POR","2026-06-27T23:30:00Z"],["66457040","COD","UZB","2026-06-27T23:30:00Z"],
+  ["66457026","JOR","ARG","2026-06-28T02:00:00Z"],["66457028","DZA","AUT","2026-06-28T02:00:00Z"]
+].map(([id, homeCode, awayCode, startUtc]) => ({ id, homeCode, awayCode, startUtc }));
 
 function norm(s) {
-  return String(s || "")
-    .toLowerCase()
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]/g, "");
+  return String(s || "").toLowerCase().normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
 }
-
 function teamMatches(apiName, code) {
   const aliases = TEAM_ALIASES[code] || [code];
   const n = norm(apiName);
   return aliases.some(a => n === norm(a) || n.includes(norm(a)) || norm(a).includes(n));
 }
-
-function findLocalMatch(homeName, awayName) {
-  for (const [id, homeCode, awayCode] of STATIC_MATCHES) {
-    if (teamMatches(homeName, homeCode) && teamMatches(awayName, awayCode)) {
-      return { id, homeCode, awayCode, reversed: false };
-    }
-    if (teamMatches(homeName, awayCode) && teamMatches(awayName, homeCode)) {
-      return { id, homeCode, awayCode, reversed: true };
+function ymd(date) {
+  return date.toISOString().slice(0, 10);
+}
+function daysBetween(a, b) {
+  return Math.abs(new Date(a).getTime() - new Date(b).getTime()) / 86400000;
+}
+function findLocalMatch(homeName, awayName, fixtureDate) {
+  const candidates = [];
+  for (const m of LOCAL_MATCHES) {
+    const normal = teamMatches(homeName, m.homeCode) && teamMatches(awayName, m.awayCode);
+    const reversed = teamMatches(homeName, m.awayCode) && teamMatches(awayName, m.homeCode);
+    if (normal || reversed) {
+      const dist = daysBetween(m.startUtc, fixtureDate);
+      if (dist <= 2) candidates.push({ ...m, reversed, dist });
     }
   }
-  return null;
+  candidates.sort((a, b) => a.dist - b.dist);
+  return candidates[0] || null;
+}
+async function fetchFixturesForDate(key, date) {
+  const url = `https://v3.football.api-sports.io/fixtures?date=${date}`;
+  const r = await fetch(url, { headers: { "x-apisports-key": key } });
+  if (!r.ok) throw new Error(`API-Football error ${r.status}`);
+  const data = await r.json();
+  return Array.isArray(data.response) ? data.response : [];
 }
 
 export default async function handler(req, res) {
   try {
     const key = process.env.API_FOOTBALL_KEY;
-    const league = process.env.API_FOOTBALL_LEAGUE_ID;
-    if (!key || !league) {
+    if (!key) {
       return res.status(200).json({
         ok: false,
-        message: "Missing API_FOOTBALL_KEY or API_FOOTBALL_LEAGUE_ID in Vercel Environment Variables.",
+        message: "Missing API_FOOTBALL_KEY in Vercel Environment Variables.",
         results: []
       });
     }
 
-    const season = process.env.API_FOOTBALL_SEASON || "2026";
-    const url = `https://v3.football.api-sports.io/fixtures?league=${league}&season=${season}`;
-    const apiRes = await fetch(url, {
-      headers: { "x-apisports-key": key }
-    });
+    const requestedDate = req.query.date;
+    const now = new Date();
+    const dates = requestedDate
+      ? [requestedDate]
+      : [ymd(new Date(now.getTime() - 86400000)), ymd(now), ymd(new Date(now.getTime() + 86400000))];
 
-    if (!apiRes.ok) {
-      return res.status(apiRes.status).json({ ok: false, message: "API provider error", results: [] });
+    const allFixtures = [];
+    for (const d of dates) {
+      const fixtures = await fetchFixturesForDate(key, d);
+      allFixtures.push(...fixtures);
     }
 
-    const data = await apiRes.json();
-    const fixtures = Array.isArray(data.response) ? data.response : [];
-
     const finals = [];
-    for (const f of fixtures) {
+    const seen = new Set();
+    for (const f of allFixtures) {
       const status = f.fixture?.status?.short || "";
       const isFinal = ["FT", "AET", "PEN"].includes(status);
       if (!isFinal) continue;
@@ -141,24 +165,35 @@ export default async function handler(req, res) {
       const awayName = f.teams?.away?.name;
       const gh = f.goals?.home;
       const ga = f.goals?.away;
-      if (homeName == null || awayName == null || gh == null || ga == null) continue;
+      const fixtureDate = f.fixture?.date;
+      if (homeName == null || awayName == null || gh == null || ga == null || !fixtureDate) continue;
 
-      const local = findLocalMatch(homeName, awayName);
-      if (!local) continue;
+      const local = findLocalMatch(homeName, awayName, fixtureDate);
+      if (!local || seen.has(local.id)) continue;
+      seen.add(local.id);
 
       finals.push({
         matchId: local.id,
         home: local.reversed ? Number(ga) : Number(gh),
         away: local.reversed ? Number(gh) : Number(ga),
         status,
+        provider: "api-football",
         providerFixtureId: f.fixture?.id || null,
         providerHome: homeName,
         providerAway: awayName,
+        fixtureDate,
         updatedAt: new Date().toISOString()
       });
     }
 
-    return res.status(200).json({ ok: true, provider: "api-football", count: finals.length, results: finals });
+    return res.status(200).json({
+      ok: true,
+      mode: "daily-fixtures",
+      checkedDates: dates,
+      fixtureCount: allFixtures.length,
+      count: finals.length,
+      results: finals
+    });
   } catch (err) {
     return res.status(500).json({ ok: false, message: err.message, results: [] });
   }

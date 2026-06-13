@@ -1391,7 +1391,7 @@ window.syncResultsFromApi = async function() {
     if (!data.ok) {
       const msg = data.message || "No se pudo sincronizar resultados.";
       if (adminStatus) adminStatus.textContent = "⚠️ " + msg;
-      if (dataStatus) dataStatus.textContent = "⚠️ API no configurada. Resultados manuales/precargados activos.";
+      if (dataStatus) dataStatus.textContent = "⚠️ API no configurada o sin resultados. Manual/precargado activo.";
       return;
     }
 
@@ -1414,7 +1414,7 @@ window.syncResultsFromApi = async function() {
 
     await updatePredictionPoints();
     if (adminStatus) adminStatus.textContent = `✅ API sincronizada. ${saved} resultados guardados.`;
-    if (dataStatus) dataStatus.textContent = `✅ Resultados API sincronizados: ${saved}`;
+    if (dataStatus) dataStatus.textContent = `✅ API sincronizada: ${saved}`;
     renderAll();
   } catch (err) {
     console.error(err);
@@ -1436,4 +1436,4 @@ listenPredictions();
 listenSettings();
 syncOpenFootball();
 setTimeout(() => syncResultsFromApi(), 1500);
-setInterval(() => syncResultsFromApi(), 10 * 60 * 1000);
+setInterval(() => syncResultsFromApi(), 15 * 60 * 1000);
