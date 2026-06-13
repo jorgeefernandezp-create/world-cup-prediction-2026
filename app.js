@@ -1,0 +1,105 @@
+
+history.scrollRestoration = "manual";
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    window.scrollTo(0, 0);
+    if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+  }, 50);
+});
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import { getFirestore, collection, serverTimestamp, query, orderBy, onSnapshot, doc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCT7xdrWuQ-HRxi_MsPgeLVVkyNyGSO4_k",
+  authDomain: "world-cup-prediction-202-c21c7.firebaseapp.com",
+  projectId: "world-cup-prediction-202-c21c7",
+  storageBucket: "world-cup-prediction-202-c21c7.firebasestorage.app",
+  messagingSenderId: "799745348621",
+  appId: "1:799745348621:web:f444420211d86ae1e67144",
+  measurementId: "G-RRB3QSV828"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const OPENFOOTBALL_URL = "https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json";
+
+let matches = [
+  { id:"m1", group:"Grupo A", home:"🇯🇵 Japón", away:"🇵🇪 Perú", start:"2026-06-12T19:00:00+09:00" },
+  { id:"m2", group:"Grupo B", home:"🇧🇷 Brasil", away:"🇩🇪 Alemania", start:"2026-06-12T22:00:00+09:00" },
+  { id:"m3", group:"Grupo C", home:"🇦🇷 Argentina", away:"🇫🇷 Francia", start:"2026-06-13T20:00:00+09:00" }
+];
+
+const T = {
+  es:{subtitle:"Polla Mundialista por partido",nameTitle:"👤 Ingresa tu nombre",placeholder:"Ejemplo: Jorge",enterBtn:"Entrar",welcome:"Bienvenido",saved:"✅ Participante guardado.",error:"❌ Error.",potTitle:"💰 Pozo y participantes",participants:"participantes",rulesTitle:"📖 Reglas",ruleTh:"Acierto",pointsTh:"Pts",rules:[["Marcador exacto","+5"],["Ganador/empate correcto","+3"],["Fallo","0"]],matchRankTitle:"🏆 Ganador del partido",rankNameTh:"Nombre",rankPredTh:"Score",rankPtsTh:"Pts",predTitle:"⚽ Partido",predHelp:"Elige fecha y partido.",saveBtn:"Guardar pronóstico",predSaved:"✅ Pronóstico guardado.",noName:"⚠️ Primero ingresa tu nombre.",closed:"🔒 Cerrado",matches:"partidos",winnerPending:"Aún no hay resultado final.",noPreds:"Aún no hay pronósticos para este partido.",score:"Score",countdown:"Cierra en",viewParticipants:"Ver participantes ▼",hideParticipants:"Ocultar participantes ▲"},
+  ja:{subtitle:"試合ごとのワールドカップ予想",nameTitle:"👤 お名前を入力してください",placeholder:"例：田中",enterBtn:"参加する",welcome:"ようこそ",saved:"✅ 参加者が登録されました。",error:"❌ エラー。",potTitle:"💰 合計と参加者",participants:"参加者",rulesTitle:"📖 ルール",ruleTh:"内容",pointsTh:"点",rules:[["スコア完全的中","5点"],["勝敗・引き分け的中","3点"],["不的中","0"]],matchRankTitle:"🏆 この試合の勝者",rankNameTh:"名前",rankPredTh:"予想",rankPtsTh:"点",predTitle:"⚽ 試合",predHelp:"日付と試合を選んでください。",saveBtn:"予想を保存",predSaved:"✅ 保存しました。",noName:"⚠️ 先にお名前を入力してください。",closed:"🔒 受付終了",matches:"試合",winnerPending:"まだ試合結果がありません。",noPreds:"この試合の予想はまだありません。",score:"スコア",countdown:"締切まで",viewParticipants:"参加者を見る ▼",hideParticipants:"参加者を隠す ▲"},
+  en:{subtitle:"Prediction pool by match",nameTitle:"👤 Enter your name",placeholder:"Example: Jorge",enterBtn:"Join",welcome:"Welcome",saved:"✅ Participant saved.",error:"❌ Error.",potTitle:"💰 Pot and participants",participants:"participants",rulesTitle:"📖 Rules",ruleTh:"Prediction",pointsTh:"Pts",rules:[["Exact score","+5"],["Correct winner/draw","+3"],["Wrong","0"]],matchRankTitle:"🏆 Match winner",rankNameTh:"Name",rankPredTh:"Score",rankPtsTh:"Pts",predTitle:"⚽ Match",predHelp:"Choose date and match.",saveBtn:"Save prediction",predSaved:"✅ Prediction saved.",noName:"⚠️ Enter your name first.",closed:"🔒 Closed",matches:"matches",winnerPending:"No final result yet.",noPreds:"No predictions for this match yet.",score:"Score",countdown:"Closes in",viewParticipants:"View participants ▼",hideParticipants:"Hide participants ▲"},
+  pt:{subtitle:"Bolão por partida",nameTitle:"👤 Digite seu nome",placeholder:"Exemplo: Jorge",enterBtn:"Entrar",welcome:"Bem-vindo",saved:"✅ Participante salvo.",error:"❌ Erro.",potTitle:"💰 Prêmio e participantes",participants:"participantes",rulesTitle:"📖 Regras",ruleTh:"Acerto",pointsTh:"Pts",rules:[["Placar exato","+5"],["Vencedor/empate correto","+3"],["Erro","0"]],matchRankTitle:"🏆 Vencedor da partida",rankNameTh:"Nome",rankPredTh:"Score",rankPtsTh:"Pts",predTitle:"⚽ Partida",predHelp:"Escolha data e partida.",saveBtn:"Salvar palpite",predSaved:"✅ Palpite salvo.",noName:"⚠️ Primeiro digite seu nome.",closed:"🔒 Encerrado",matches:"partidas",winnerPending:"Ainda não há resultado final.",noPreds:"Ainda não há palpites para esta partida.",score:"Score",countdown:"Fecha em",viewParticipants:"Ver participantes ▼",hideParticipants:"Ocultar participantes ▲"}
+};
+
+let currentLang="es", currentPlayerName=localStorage.getItem("playerName")||"";
+let resultsCache={}, predictionsCache=[], selectedDayKey=localStorage.getItem("selectedDayKey")||null, selectedMatchId=localStorage.getItem("selectedMatchId")||null, stakeAmount=100, lastWinnerKey="";
+let participantsOpen=false;
+
+function isLocked(start){return new Date()>=new Date(start)}
+function safeId(name){return name.toLowerCase().trim().replace(/[^a-z0-9áéíóúñãõç一-龯ぁ-んァ-ン]/gi,"_")}
+function localDayKey(start){return new Date(start).toLocaleDateString("sv-SE",{timeZone:"Asia/Tokyo"})}
+function timeJst(start){return new Date(start).toLocaleTimeString(currentLang==="ja"?"ja-JP":"es-ES",{hour:"2-digit",minute:"2-digit",timeZone:"Asia/Tokyo"})}
+function dateShort(start){return new Date(start).toLocaleDateString("es-ES",{day:"2-digit",month:"short",timeZone:"Asia/Tokyo"}).replace(".","")}
+function weekday(start){const loc=currentLang==="ja"?"ja-JP":currentLang==="en"?"en-US":currentLang==="pt"?"pt-BR":"es-ES";return new Date(start).toLocaleDateString(loc,{weekday:"short",timeZone:"Asia/Tokyo"})}
+function dateLong(start){const loc=currentLang==="ja"?"ja-JP":currentLang==="en"?"en-US":currentLang==="pt"?"pt-BR":"es-ES";return new Date(start).toLocaleDateString(loc,{weekday:"long",year:"numeric",month:"long",day:"numeric",timeZone:"Asia/Tokyo"})}
+function flagFor(team){const map={"Japan":"🇯🇵","Peru":"🇵🇪","Brazil":"🇧🇷","Germany":"🇩🇪","Argentina":"🇦🇷","France":"🇫🇷","Spain":"🇪🇸","England":"🏴","Mexico":"🇲🇽","South Africa":"🇿🇦","South Korea":"🇰🇷","Czechia":"🇨🇿","United States":"🇺🇸","Canada":"🇨🇦","Portugal":"🇵🇹","Netherlands":"🇳🇱","Morocco":"🇲🇦","Uruguay":"🇺🇾","Colombia":"🇨🇴","Ecuador":"🇪🇨"};return `${map[team]||"⚽"} ${team}`}
+function parseOpenFootballDate(date,time){const parsed=new Date(`${date} ${(time||"00:00").replace(" UTC"," GMT")}`);return !isNaN(parsed.getTime())?parsed.toISOString():`${date}T00:00:00Z`}
+function buildGroups(){const sorted=[...matches].sort((a,b)=>new Date(a.start)-new Date(b.start));const g={};for(const m of sorted){(g[localDayKey(m.start)] ||= []).push(m)}return g}
+function selectedMatch(){return matches.find(m=>m.id===selectedMatchId)||matches[0]}
+
+function currentPredictionFor(matchId){
+  if(!currentPlayerName) return null;
+  const playerId = safeId(currentPlayerName);
+  return predictionsCache.find(p => p.matchId === matchId && p.playerId === playerId) || null;
+}
+function saveSelectedPosition(){
+  if(selectedDayKey) localStorage.setItem("selectedDayKey", selectedDayKey);
+  if(selectedMatchId) localStorage.setItem("selectedMatchId", selectedMatchId);
+}
+
+function calcPoints(pred,res){if(!res||res.home==null||res.away==null||res.home===""||res.away==="")return 0;const ph=Number(pred.predictedHome),pa=Number(pred.predictedAway),rh=Number(res.home),ra=Number(res.away);if(ph===rh&&pa===ra)return 5;const ps=ph===pa?"D":ph>pa?"H":"A",rs=rh===ra?"D":rh>ra?"H":"A";return ps===rs?3:0}
+function countdownText(start){const diff=new Date(start).getTime()-Date.now();if(diff<=0)return T[currentLang].closed;const d=Math.floor(diff/86400000),h=Math.floor((diff%86400000)/3600000),m=Math.floor((diff%3600000)/60000),s=Math.floor((diff%60000)/1000);return `${T[currentLang].countdown}: ${d>0?d+"d ":""}${h}h ${m}m ${s}s`}
+
+window.syncOpenFootball=async function(){const status=document.getElementById("dataStatus");try{status.textContent="Sincronizando calendario gratuito...";const r=await fetch(OPENFOOTBALL_URL,{cache:"no-store"});if(!r.ok)throw new Error();const data=await r.json();if(!Array.isArray(data.matches))throw new Error();matches=data.matches.map((m,i)=>{const id=`wc2026_${i+1}`;if(m.score?.ft){resultsCache[id]={matchId:id,home:Number(m.score.ft[0]),away:Number(m.score.ft[1]),homeTeam:flagFor(m.team1),awayTeam:flagFor(m.team2)};setDoc(doc(db,"results",id),resultsCache[id],{merge:true})}return{id,group:m.group||m.round||"",home:flagFor(m.team1||"TBD"),away:flagFor(m.team2||"TBD"),start:parseOpenFootballDate(m.date,m.time),ground:m.ground||""}}).sort((a,b)=>new Date(a.start)-new Date(b.start));selectedDayKey=selectedDayKey || localDayKey(matches[0].start);selectedMatchId=selectedMatchId || matches[0].id;saveSelectedPosition();renderAll();status.textContent=`✅ Calendario automático cargado: ${matches.length} partidos.`}catch(e){if(!selectedDayKey){selectedDayKey=localDayKey(matches[0].start);selectedMatchId=matches[0].id}renderAll();status.textContent="⚠️ Usando partidos de respaldo."}}
+
+window.setLang=function(lang){currentLang=lang;document.querySelectorAll(".langs button").forEach(b=>b.classList.remove("active"));document.getElementById("btn-"+lang).classList.add("active");const t=T[lang];["subtitle","nameTitle","enterBtn","potTitle","rulesTitle","ruleTh","pointsTh","matchRankTitle","rankNameTh","rankPredTh","rankPtsTh","predTitle","predHelp","saveBtn"].forEach(id=>document.getElementById(id).textContent=t[id]);document.getElementById("playerName").placeholder=t.placeholder;document.getElementById("rulesBody").innerHTML=t.rules.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join("");if(currentPlayerName)document.getElementById("welcomeText").textContent=`${t.welcome}, ${currentPlayerName}!`;renderAll()}
+
+window.enterGame=async function(){const name=document.getElementById("playerName").value.trim();const status=document.getElementById("saveStatus");if(!name){status.textContent=T[currentLang].noName;return}try{await setDoc(doc(db,"players",safeId(name)),{name,language:currentLang,updatedAt:serverTimestamp()},{merge:true});currentPlayerName=name;localStorage.setItem("playerName",name);document.getElementById("welcomeText").textContent=`${T[currentLang].welcome}, ${name}!`;status.textContent=T[currentLang].saved;document.getElementById("playerName").value="";renderAll()}catch(e){status.textContent=T[currentLang].error}}
+
+window.selectDateTab=function(dayKey){selectedDayKey=dayKey;const list=buildGroups()[dayKey]||[];selectedMatchId=list[0]?.id||selectedMatchId;saveSelectedPosition();renderAll()}
+window.selectMatchTab=function(matchId){selectedMatchId=matchId;saveSelectedPosition();renderAll()}
+window.toggleParticipants=function(){participantsOpen=!participantsOpen;renderMatchRanking()}
+
+function renderAll(){renderTabs();renderSelectedMatch();renderMatchRanking();renderAdminResults()}
+function renderTabs(){const groups=buildGroups();const keys=Object.keys(groups);if(!selectedDayKey||!groups[selectedDayKey])selectedDayKey=keys[0];if(!selectedMatchId)selectedMatchId=groups[selectedDayKey]?.[0]?.id;document.getElementById("dateTabs").innerHTML=keys.map(k=>{const list=groups[k],first=list[0];return `<button class="${k===selectedDayKey?"active-date":""}" onclick="selectDateTab('${k}')"><span class="tab-day">${weekday(first.start)}</span><span class="tab-date">${dateShort(first.start)}</span><span class="tab-count">${list.length} ${T[currentLang].matches}</span></button>`}).join("");const list=groups[selectedDayKey]||[];document.getElementById("matchTabs").innerHTML=list.map(m=>`<button class="${m.id===selectedMatchId?"active-match":""}" onclick="selectMatchTab('${m.id}')"><span class="match-tab-time">${timeJst(m.start)}</span><span class="match-tab-teams">${m.home.split(" ").slice(0,2).join(" ")} vs ${m.away.split(" ").slice(0,2).join(" ")}</span></button>`).join("")}
+function renderSelectedMatch(){const m=selectedMatch();if(!m)return;const res=resultsCache[m.id],locked=isLocked(m.start),savedPred=currentPredictionFor(m.id);const resultText=res?`<span class="result-badge">Resultado final: ${res.home} - ${res.away}</span>`:"";document.getElementById("selectedMatchBox").innerHTML=`<div class="selected-match"><div class="teams-line">${m.home} vs ${m.away}</div><div class="match-meta">📅 ${dateLong(m.start)} · 🕒 ${timeJst(m.start)} JST<br>${m.group} ${m.ground?"· "+m.ground:""}</div><div class="countdown" id="countdownBox">${countdownText(m.start)}</div><br>${resultText}${locked?`<div class="locked">${T[currentLang].closed}</div>`:`<div class="score"><input id="selected_home" type="number" min="0" placeholder="0" value="${savedPred ? savedPred.predictedHome : ""}"><span>-</span><input id="selected_away" type="number" min="0" placeholder="0" value="${savedPred ? savedPred.predictedAway : ""}"></div>`}</div>`}
+window.saveSelectedPrediction=async function(){const status=document.getElementById("predictionStatus"),m=selectedMatch();if(!currentPlayerName){status.textContent=T[currentLang].noName;return}if(!m||isLocked(m.start)){status.textContent=T[currentLang].closed;return}const home=document.getElementById("selected_home")?.value,away=document.getElementById("selected_away")?.value;if(home===""||away===""){status.textContent="⚠️ Completa el marcador.";return}const playerId=safeId(currentPlayerName);await setDoc(doc(db,"predictions",`${playerId}_${m.id}`),{playerId,playerName:currentPlayerName,matchId:m.id,homeTeam:m.home,awayTeam:m.away,predictedHome:Number(home),predictedAway:Number(away),points:calcPoints({predictedHome:Number(home),predictedAway:Number(away)},resultsCache[m.id]),matchStart:m.start,updatedAt:serverTimestamp()},{merge:true});status.textContent=T[currentLang].predSaved;renderAll()}
+
+function selectedRows(){const m=selectedMatch();if(!m)return[];return predictionsCache.filter(p=>p.matchId===m.id).map(p=>({...p,points:calcPoints(p,resultsCache[m.id])})).sort((a,b)=>b.points-a.points)}
+function renderPotAndParticipants(rows){const count=rows.length,total=count*stakeAmount;document.getElementById("potBox").innerHTML=`¥${total.toLocaleString()}<span class="pot-detail">${count} ${T[currentLang].participants} × ¥${stakeAmount}</span>`;document.getElementById("matchParticipantsSummary").textContent=`${count} ${T[currentLang].participants} · Total ¥${total.toLocaleString()}`;document.getElementById("toggleParticipantsBtn").textContent=participantsOpen?T[currentLang].hideParticipants:T[currentLang].viewParticipants;const list=document.getElementById("matchParticipantsList");list.className=`participants-scroll ${participantsOpen?"open":""}`;if(!rows.length){list.innerHTML=`<div class="participant-empty">${T[currentLang].noPreds}</div>`;return}list.innerHTML=rows.map((r,i)=>`<div class="participant-row"><span class="participant-name">${i+1}. ${r.playerName}</span><span class="participant-score">${r.predictedHome} - ${r.predictedAway}</span></div>`).join("")}
+function renderMatchRanking(){const m=selectedMatch(),body=document.getElementById("matchRankingBody"),box=document.getElementById("winnerBox");if(!m){body.innerHTML="";return}const rows=selectedRows();renderPotAndParticipants(rows);const res=resultsCache[m.id];if(!res){box.innerHTML=T[currentLang].winnerPending}else if(!rows.length){box.innerHTML=T[currentLang].noPreds}else{const top=rows[0].points,winners=rows.filter(r=>r.points===top&&top>0);if(winners.length){const names=winners.map(r=>r.playerName).join(", "),score=winners[0].predictedHome+" - "+winners[0].predictedAway,key=`${m.id}_${names}_${score}_${top}`;box.innerHTML=`🏆 <span class="winner-name">${names}</span><span class="winner-score">${T[currentLang].score}: ${score} · ${top} pts</span>`;if(lastWinnerKey!==key){lastWinnerKey=key;launchConfetti()}}else box.innerHTML=T[currentLang].noPreds}if(!rows.length){body.innerHTML=`<tr><td colspan="4">${T[currentLang].noPreds}</td></tr>`;return}body.innerHTML=rows.map((r,i)=>`<tr><td>${i+1}</td><td>${r.playerName}</td><td>${r.predictedHome} - ${r.predictedAway}</td><td>${r.points}</td></tr>`).join("")}
+function renderAdminResults(){const panel=document.getElementById("adminPanel");if(new URLSearchParams(location.search).get("admin")==="jorge")panel.classList.add("show");const stakeInput=document.getElementById("stakeAmount");if(stakeInput)stakeInput.value=stakeAmount;const box=document.getElementById("adminResults");if(!box)return;box.innerHTML=matches.map(m=>{const r=resultsCache[m.id]||{};return `<div class="admin-match"><strong>${m.home} vs ${m.away}</strong><div class="score"><input id="res_${m.id}_home" type="number" min="0" value="${r.home??""}" placeholder="-"><span>-</span><input id="res_${m.id}_away" type="number" min="0" value="${r.away??""}" placeholder="-"></div></div>`}).join("")}
+window.saveStakeAmount=async function(){stakeAmount=Number(document.getElementById("stakeAmount").value||100);await setDoc(doc(db,"settings","stake"),{amount:stakeAmount,updatedAt:serverTimestamp()},{merge:true});renderMatchRanking()}
+window.saveResultsAndCalculate=async function(){for(const m of matches){const h=document.getElementById(`res_${m.id}_home`)?.value,a=document.getElementById(`res_${m.id}_away`)?.value;if(h===""||a===""||h==null||a==null)continue;await setDoc(doc(db,"results",m.id),{matchId:m.id,homeTeam:m.home,awayTeam:m.away,home:Number(h),away:Number(a),updatedAt:serverTimestamp()},{merge:true})}await updatePredictionPoints();document.getElementById("adminStatus").textContent="✅ Resultados guardados."}
+async function updatePredictionPoints(){const snap=await getDocs(collection(db,"predictions"));const updates=[];snap.forEach(d=>{const p=d.data();updates.push(setDoc(doc(db,"predictions",d.id),{points:calcPoints(p,resultsCache[p.matchId])},{merge:true}))});await Promise.all(updates)}
+function launchConfetti(){const layer=document.getElementById("confettiLayer"),colors=["#ffd34d","#31d27c","#e9354f","#ffffff","#2aa7ff"];for(let i=0;i<80;i++){const el=document.createElement("div");el.className="confetti";el.style.left=Math.random()*100+"vw";el.style.background=colors[Math.floor(Math.random()*colors.length)];el.style.animationDelay=(Math.random()*0.8)+"s";layer.appendChild(el);setTimeout(()=>el.remove(),3600)}}
+function listenResults(){onSnapshot(collection(db,"results"),s=>{s.forEach(d=>resultsCache[d.id]=d.data());renderAll()})}
+function listenPredictions(){onSnapshot(collection(db,"predictions"),s=>{predictionsCache=[];s.forEach(d=>predictionsCache.push(d.data()));renderMatchRanking();renderSelectedMatch()})}
+function listenSettings(){onSnapshot(doc(db,"settings","stake"),snap=>{if(snap.exists()&&snap.data().amount!=null)stakeAmount=Number(snap.data().amount);renderMatchRanking();renderSelectedMatch()})}
+
+setInterval(() => {
+  const m = selectedMatch();
+  const countdownBox = document.getElementById("countdownBox");
+  if (m && countdownBox) {
+    countdownBox.textContent = countdownText(m.start);
+  }
+}, 1000);
+
+if(currentPlayerName)document.getElementById("welcomeText").textContent=`${T[currentLang].welcome}, ${currentPlayerName}!`;
+setLang("es");listenResults();listenPredictions();listenSettings();syncOpenFootball();
