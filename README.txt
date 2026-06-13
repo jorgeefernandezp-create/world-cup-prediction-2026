@@ -1,22 +1,32 @@
-WORLD CUP PREDICTION 2026 - VERSION 8.3 FINAL SCORES IN TABS
+WORLD CUP PREDICTION 2026 - VERSION 8.4 AUTO API SYNC
 
 NUEVO:
-- Las pestañas pequeñas muestran marcador final cuando existe resultado.
-  Ejemplo: FT 🇲🇽 2 - 0 🇿🇦
-- La tarjeta grande muestra Resultado final para cualquier partido con marcador.
-- Ranking y ganador usan resultado manual de Firebase o resultado inicial cargado.
-- Resultados iniciales incluidos:
-  México 2-0 Sudáfrica
-  Corea del Sur 2-1 Chequia
-  Canadá 1-1 Bosnia y Herzegovina
-  Estados Unidos 4-1 Paraguay
-- Mantiene UTC real, JST Japón, Firebase, traducciones de equipos y diseño móvil.
+- Agrega /api/sync-results como Vercel Function.
+- Consulta API-FOOTBALL / API-SPORTS desde servidor.
+- No expone la API key en app.js.
+- Guarda resultados finales automáticamente en Firebase.
+- Cruza resultado final vs pronósticos.
+- Calcula puntos, ranking y ganador por partido.
+- Mantiene el panel admin como respaldo.
 
-IMPORTANTE:
-Si quieres corregir un resultado, entra al panel admin y guarda el marcador. Ese resultado manual tendrá prioridad.
+NECESARIO EN VERCEL:
+Project Settings > Environment Variables
+
+API_FOOTBALL_KEY = tu clave de API-FOOTBALL
+API_FOOTBALL_LEAGUE_ID = ID de la competición World Cup en API-FOOTBALL
+API_FOOTBALL_SEASON = 2026
+
+Luego:
+1. Save variables.
+2. Redeploy.
+3. Abrir /?admin=jorge.
+4. Presionar "Actualizar resultados API".
+5. Si funciona, la web también sincroniza sola cada 10 minutos.
 
 Subir:
-1. Reemplaza app.js, index.html, style.css, README.txt y assets.
-2. Commit changes.
-3. Espera Vercel Ready.
-4. Abre en celular con ?v=83scores
+- index.html
+- style.css
+- app.js
+- README.txt
+- assets
+- carpeta api con sync-results.js

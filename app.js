@@ -1378,6 +1378,51 @@ function listenResults() { onSnapshot(collection(db, "results"), s => { s.forEac
 function listenPredictions() { onSnapshot(collection(db, "predictions"), s => { predictionsCache = []; s.forEach(d => predictionsCache.push(d.data())); renderMatchRanking(); renderSelectedMatch(); }); }
 function listenSettings() { onSnapshot(doc(db, "settings", "stake"), snap => { if (snap.exists() && snap.data().amount != null) stakeAmount = Number(snap.data().amount); renderMatchRanking(); }); }
 
+
+window.syncResultsFromApi = async function() {
+  const adminStatus = document.getElementById("adminStatus");
+  const dataStatus = document.getElementById("dataStatus");
+  try {
+    if (adminStatus) adminStatus.textContent = "⏳ Consultando API de resultados...";
+    if (dataStatus) dataStatus.textContent = "⏳ Actualizando resultados...";
+    const r = await fetch("/api/sync-results?ts=" + Date.now(), { cache: "no-store" });
+    const data = await r.json();
+
+    if (!data.ok) {
+      const msg = data.message || "No se pudo sincronizar resultados.";
+      if (adminStatus) adminStatus.textContent = "⚠️ " + msg;
+      if (dataStatus) dataStatus.textContent = "⚠️ API no configurada. Resultados manuales/precargados activos.";
+      return;
+    }
+
+    let saved = 0;
+    for (const item of data.results || []) {
+      await setDoc(doc(db, "results", item.matchId), {
+        matchId: item.matchId,
+        home: Number(item.home),
+        away: Number(item.away),
+        status: item.status || "FT",
+        provider: data.provider || "api",
+        providerFixtureId: item.providerFixtureId || null,
+        providerHome: item.providerHome || "",
+        providerAway: item.providerAway || "",
+        apiUpdatedAt: item.updatedAt || new Date().toISOString(),
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+      saved++;
+    }
+
+    await updatePredictionPoints();
+    if (adminStatus) adminStatus.textContent = `✅ API sincronizada. ${saved} resultados guardados.`;
+    if (dataStatus) dataStatus.textContent = `✅ Resultados API sincronizados: ${saved}`;
+    renderAll();
+  } catch (err) {
+    console.error(err);
+    if (adminStatus) adminStatus.textContent = "❌ Error sincronizando API.";
+    if (dataStatus) dataStatus.textContent = "⚠️ No se pudo sincronizar API.";
+  }
+};
+
 setInterval(() => {
   const m = selectedMatch();
   const countdownBox = document.getElementById("countdownBox");
@@ -1390,3 +1435,5 @@ listenResults();
 listenPredictions();
 listenSettings();
 syncOpenFootball();
+setTimeout(() => syncResultsFromApi(), 1500);
+setInterval(() => syncResultsFromApi(), 10 * 60 * 1000);
