@@ -20,3 +20,17 @@ Subir a GitHub:
 VERSION 7.1 FIX:
 - Corrige el problema donde el score se borraba mientras el usuario escribía.
 - La cuenta regresiva ahora actualiza solo el texto del contador, no toda la tarjeta.
+
+
+VERSION 7.2:
+- Diseño más limpio para celular.
+- Menos azul, fondo más claro y premium.
+- Se eliminaron efectos pesados para que no se vea recargado.
+- Mantiene la lógica de score corregida.
+
+
+VERSION 7.3 FINAL:
+- Fondo real de estadio usando la imagen enviada por Jorge.
+- Diseño deportivo y limpio para celular.
+- Arreglo para que al abrir siempre comience arriba, no en el pozo.
+- Mantiene fix para que el score no se borre mientras escribes.

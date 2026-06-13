@@ -1,3 +1,12 @@
+
+history.scrollRestoration = "manual";
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    window.scrollTo(0, 0);
+    if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+  }, 50);
+});
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import { getFirestore, collection, serverTimestamp, query, orderBy, onSnapshot, doc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
