@@ -34,3 +34,9 @@ VERSION 7.3 FINAL:
 - Diseño deportivo y limpio para celular.
 - Arreglo para que al abrir siempre comience arriba, no en el pozo.
 - Mantiene fix para que el score no se borre mientras escribes.
+
+
+VERSION 7.4:
+- Fondo del estadio ajustado para que se vea más la cancha verde.
+- Menos capa oscura.
+- Tarjetas un poco más transparentes.
