@@ -1,18 +1,17 @@
-WORLD CUP PREDICTION 2026 - VERSION 6.3
+WORLD CUP PREDICTION 2026 - VERSION 7 MOBILE APP
 
 NUEVO:
-- Lista de participantes por partido con scroll.
-- Encima de la lista aparece el total del pozo referencial.
-- Muestra nombre y pronóstico de cada participante.
-- Pozo = participantes del partido x monto configurado.
-- Mantiene estadio, confeti, cuenta regresiva y ganador por partido.
+- Diseño móvil tipo app.
+- Encabezado más compacto.
+- Pozo y participantes en una sola sección.
+- Se elimina la tarjeta separada del pozo.
+- Lista de participantes desplegable con scroll.
+- Barra inferior fija para navegación.
+- Fondo más limpio tipo estadio.
+- Mantiene cuenta regresiva, confeti y ganador por partido.
 
-IMPORTANTE:
-La web no procesa pagos ni administra dinero. Solo muestra un cálculo referencial por partido para organizar el juego.
-Revisa las reglas de tu empresa y las normas locales antes de usar aportes reales.
-
-Cómo subir:
-1. Reemplaza index.html, style.css, app.js y README.txt en GitHub.
+Subir a GitHub:
+1. Reemplaza index.html, style.css, app.js y README.txt.
 2. Commit changes.
 3. Espera Vercel Ready.
-4. Abre la web desde celular.
+4. Abre desde celular.
