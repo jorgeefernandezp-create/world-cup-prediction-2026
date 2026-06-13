@@ -1,20 +1,14 @@
 *{box-sizing:border-box}
-:root{
-  --blue:#071a3a;
-  --blue2:#0b3d74;
-  --gold:#ffd34d;
-  --red:#e9354f;
-  --green:#31d27c;
-  --white:#ffffff;
-}
+:root{--blue:#071a3a;--blue2:#0b3d74;--gold:#ffd34d;--red:#e9354f;--green:#31d27c;--white:#fff}
 body{
   margin:0;
   font-family:Arial,"Hiragino Sans","Yu Gothic",sans-serif;
   color:white;
   background:
-    radial-gradient(circle at 15% 18%, rgba(255,211,77,.20), transparent 22%),
-    radial-gradient(circle at 85% 12%, rgba(233,53,79,.18), transparent 22%),
-    linear-gradient(180deg, rgba(4,12,28,.35), rgba(4,12,28,.9)),
+    linear-gradient(180deg, rgba(4,12,28,.22), rgba(4,12,28,.96)),
+    radial-gradient(ellipse at 50% 100%, rgba(49,210,124,.45), transparent 28%),
+    radial-gradient(circle at 20% 10%, rgba(255,211,77,.22), transparent 18%),
+    radial-gradient(circle at 80% 10%, rgba(233,53,79,.20), transparent 18%),
     linear-gradient(135deg,#06152f,#0c3c70 55%,#071526);
   min-height:100vh;
 }
@@ -23,49 +17,61 @@ body:before{
   position:fixed;
   inset:0;
   pointer-events:none;
-  opacity:.28;
+  opacity:.25;
   background:
-    radial-gradient(ellipse at 50% 100%, rgba(49,210,124,.45), transparent 38%),
-    linear-gradient(to top, rgba(255,255,255,.14) 0 1px, transparent 1px 26px),
-    linear-gradient(to right, rgba(255,255,255,.10) 0 1px, transparent 1px 32px);
-  mask-image:linear-gradient(to bottom, transparent 0%, black 40%, black 100%);
+    repeating-linear-gradient(90deg, transparent 0 28px, rgba(255,255,255,.18) 29px 30px),
+    repeating-linear-gradient(0deg, transparent 0 22px, rgba(255,255,255,.14) 23px 24px);
+  mask-image:linear-gradient(to bottom, transparent 0%, black 42%, black 100%);
 }
-.page{width:min(1100px,94%);margin:auto;padding:22px 0 50px}
-.hero{
-  position:relative;
-  overflow:hidden;
-  text-align:center;
-  padding:32px 16px;
-  border-radius:28px;
-  background:
-    linear-gradient(135deg,rgba(7,26,58,.86),rgba(11,61,116,.74)),
-    radial-gradient(circle at center bottom, rgba(49,210,124,.35), transparent 48%);
-  border:1px solid rgba(255,255,255,.18);
-  box-shadow:0 18px 60px rgba(0,0,0,.45)
-}
-.stadium-lights:before,.stadium-lights:after{
+body:after{
   content:"";
-  position:absolute;
-  top:-40px;
-  width:180px;height:180px;
-  border-radius:50%;
-  background:radial-gradient(circle,rgba(255,255,255,.55),rgba(255,255,255,.08) 35%,transparent 65%);
+  position:fixed;
+  left:0;right:0;bottom:-8px;height:160px;
+  pointer-events:none;
+  background:
+    radial-gradient(ellipse at center bottom, rgba(49,210,124,.72), rgba(49,210,124,.18) 42%, transparent 70%);
+  opacity:.75;
 }
-.stadium-lights:before{left:-55px}.stadium-lights:after{right:-55px}
-.badge{display:inline-block;padding:8px 16px;background:var(--gold);color:#071526;font-weight:900;border-radius:999px;margin-bottom:12px}
-h1{font-size:clamp(30px,6vw,58px);margin:0;letter-spacing:.8px}
+#confettiLayer{position:fixed;inset:0;pointer-events:none;z-index:999}
+.confetti{
+  position:absolute;
+  top:-12px;
+  width:9px;height:14px;
+  border-radius:2px;
+  animation:fall 2.8s linear forwards;
+}
+@keyframes fall{
+  to{transform:translateY(110vh) rotate(720deg);opacity:.1}
+}
+.page{width:min(1100px,94%);margin:auto;padding:22px 0 50px;position:relative;z-index:1}
+.hero{
+  position:relative;overflow:hidden;text-align:center;padding:32px 16px;border-radius:28px;
+  background:
+    linear-gradient(135deg,rgba(7,26,58,.88),rgba(11,61,116,.76)),
+    radial-gradient(circle at center bottom, rgba(49,210,124,.35), transparent 48%);
+  border:1px solid rgba(255,255,255,.18);box-shadow:0 18px 60px rgba(0,0,0,.45)
+}
+.stadium-roof{
+  position:absolute;left:4%;right:4%;top:-42px;height:95px;border-radius:0 0 50% 50%;
+  border-bottom:8px solid rgba(255,255,255,.16);
+  background:radial-gradient(circle at 50% 100%, rgba(255,255,255,.18), transparent 60%);
+}
+.hero:before,.hero:after{
+  content:"";position:absolute;top:-42px;width:180px;height:180px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.52),rgba(255,255,255,.08) 35%,transparent 65%);
+}
+.hero:before{left:-55px}.hero:after{right:-55px}
+.badge{display:inline-block;padding:8px 16px;background:var(--gold);color:#071526;font-weight:900;border-radius:999px;margin-bottom:12px;position:relative}
+h1{font-size:clamp(30px,6vw,58px);margin:0;letter-spacing:.8px;position:relative}
 .hero p{margin:10px 0 0}.small{font-size:13px;opacity:.82}.status{font-size:14px;color:#9df6bf;font-weight:800}
-.langs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:760px;margin:18px auto 0}
+.langs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:760px;margin:18px auto 0;position:relative}
 button{border:none;border-radius:15px;padding:13px;font-weight:900;cursor:pointer;background:var(--gold);color:#071526}
 .langs button{background:rgba(255,255,255,.10);color:white;border:1px solid rgba(255,255,255,.22);padding:11px 8px}
 .langs button.active{background:white;color:#071526}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:20px}
 .card{
-  background:rgba(255,255,255,.10);
-  backdrop-filter:blur(8px);
-  border:1px solid rgba(255,255,255,.16);
-  border-radius:24px;
-  padding:20px;
+  background:rgba(255,255,255,.10);backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.16);border-radius:24px;padding:20px;
   box-shadow:0 14px 36px rgba(0,0,0,.28)
 }
 .card h2{margin:0 0 10px;font-size:20px}
@@ -74,9 +80,8 @@ input{width:100%;padding:14px;border:none;border-radius:14px;margin:8px 0 12px;f
 table{width:100%;border-collapse:collapse}
 th,td{padding:9px;border-bottom:1px solid rgba(255,255,255,.12);text-align:left}
 th{color:var(--gold)}
-.small-table{font-size:13px}
-.rules-card{font-size:13px}
-.wide{grid-column:1/-1}.welcome{font-weight:900;color:var(--gold)}#playersList{padding-left:18px;line-height:1.7;margin-bottom:0}
+.small-table{font-size:13px}.rules-card{font-size:13px}
+.wide{grid-column:1/-1}.welcome{font-weight:900;color:var(--gold)}
 .date-tabs,.match-tabs{display:flex;gap:10px;overflow-x:auto;padding:10px 2px 16px;margin:8px 0;scroll-snap-type:x mandatory}
 .date-tabs button,.match-tabs button{
   min-width:112px;background:rgba(255,255,255,.10);color:white;border:1px solid rgba(255,255,255,.18);
@@ -86,33 +91,31 @@ th{color:var(--gold)}
 .tab-day{display:block;font-size:12px;opacity:.85}.tab-date{display:block;font-size:20px;font-weight:900}.tab-count{display:block;font-size:11px;opacity:.78}
 .match-tab-teams{display:block;font-size:12px;font-weight:900}.match-tab-time{display:block;font-size:18px;font-weight:900}
 .selected-match{
-  border:1px solid rgba(255,211,77,.34);
-  border-radius:22px;
-  padding:18px;
-  background:
-    linear-gradient(135deg, rgba(255,211,77,.10), rgba(233,53,79,.08)),
-    rgba(0,0,0,.18);
-  margin-top:8px
+  border:1px solid rgba(255,211,77,.34);border-radius:22px;padding:18px;
+  background:linear-gradient(135deg, rgba(255,211,77,.12), rgba(233,53,79,.09)),rgba(0,0,0,.18);margin-top:8px
 }
 .teams-line{font-size:22px;font-weight:900;margin-bottom:8px}
 .match-meta{opacity:.78;font-size:13px;margin-bottom:14px;line-height:1.4}
+.countdown{
+  display:inline-block;margin:8px 0 12px;padding:8px 12px;border-radius:999px;
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);font-weight:900;color:var(--gold)
+}
 .score{display:grid;grid-template-columns:1fr 20px 1fr;gap:8px;align-items:center;max-width:260px}
 .score input{text-align:center;margin:0;font-weight:900}
 .locked{padding:14px;border-radius:14px;background:rgba(233,53,79,.20);border:1px solid rgba(233,53,79,.44);font-weight:900;text-align:center}
 .result-badge{display:inline-block;margin-top:6px;padding:6px 10px;border-radius:999px;background:rgba(49,210,124,.18);border:1px solid rgba(49,210,124,.40);font-size:13px}
-.winner-box{
-  padding:15px;border-radius:18px;
-  background:linear-gradient(135deg,rgba(255,211,77,.25),rgba(49,210,124,.14));
-  border:1px solid rgba(255,211,77,.40);
-  font-weight:900;
-  margin-bottom:12px;
-  line-height:1.45
+.winner-box,.pot-box{
+  padding:15px;border-radius:18px;background:linear-gradient(135deg,rgba(255,211,77,.25),rgba(49,210,124,.14));
+  border:1px solid rgba(255,211,77,.40);font-weight:900;margin-bottom:12px;line-height:1.45
 }
 .winner-name{display:block;font-size:22px;color:var(--gold)}
 .winner-score{display:block;font-size:14px;opacity:.95}
+.pot-box{font-size:30px;color:var(--gold);text-align:center}
+.pot-detail{display:block;font-size:13px;color:white;opacity:.92;margin-top:4px}
 .admin-card{display:none;border-color:rgba(255,211,77,.55);background:rgba(255,211,77,.09)}
 .admin-card.show{display:block}
 .admin-match{display:grid;grid-template-columns:1fr 240px;gap:15px;align-items:center;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.10)}
+.admin-controls{padding:12px;border-radius:16px;background:rgba(0,0,0,.16);margin-bottom:16px}
 @media(max-width:800px){
   .page{width:95%;padding-top:12px}
   .hero{padding:26px 14px;border-radius:24px}
@@ -120,12 +123,9 @@ th{color:var(--gold)}
   .grid,.langs{grid-template-columns:1fr}
   .wide{grid-column:auto}
   .card{padding:16px;border-radius:20px}
-  .compact-card,.rules-card,.winner-card{padding:15px}
+  .compact-card,.rules-card,.winner-card,.pot-card{padding:15px}
   .card h2{font-size:18px}
-  .date-tabs button{min-width:104px}
-  .match-tabs button{min-width:150px}
+  .date-tabs button{min-width:104px}.match-tabs button{min-width:150px}
   .teams-line{font-size:20px}
-  .winner-card{order:3}
-  .rules-card{order:4}
-  .prediction-card{order:5}
+  .pot-card{order:3}.winner-card{order:4}.rules-card{order:5}.prediction-card{order:6}
 }

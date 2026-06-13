@@ -7,9 +7,11 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div id="confettiLayer"></div>
+
   <main class="page">
     <section class="hero">
-      <div class="stadium-lights"></div>
+      <div class="stadium-roof"></div>
       <div class="badge">🏆 2026</div>
       <h1>WORLD CUP PREDICTION</h1>
       <p id="subtitle">Polla Mundialista por partido</p>
@@ -32,9 +34,10 @@
         <p class="status" id="saveStatus"></p>
       </div>
 
-      <div class="card compact-card">
-        <h2 id="playersTitle">👥 Participantes</h2>
-        <ul id="playersList"><li>Cargando...</li></ul>
+      <div class="card pot-card">
+        <h2 id="potTitle">💰 Pozo del partido</h2>
+        <div id="potBox" class="pot-box">¥0</div>
+        <p class="small" id="potInfo">Fase de grupos: ¥100 por participante.</p>
       </div>
 
       <div class="card rules-card">
@@ -68,6 +71,11 @@
       <div class="card wide admin-card" id="adminPanel">
         <h2>👨‍💼 Panel administrador</h2>
         <p class="small">Admin: agrega <strong>?admin=jorge</strong> al final del enlace.</p>
+        <div class="admin-controls">
+          <label>Fase de grupos / monto por participante</label>
+          <input id="stakeAmount" type="number" min="0" value="100" />
+          <button onclick="saveStakeAmount()">Guardar monto</button>
+        </div>
         <div id="adminResults"></div>
         <button onclick="saveResultsAndCalculate()">Guardar resultados y actualizar ganadores</button>
         <button onclick="syncOpenFootball()">Sincronizar calendario/resultados ahora</button>
