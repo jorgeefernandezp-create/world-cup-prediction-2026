@@ -34,7 +34,10 @@ const STATIC_MATCHES = [
     "awayCode": "RSA",
     "homeKey": "Mexico",
     "awayKey": "South Africa",
-    "startUtc": "2026-06-11T19:00:00Z"
+    "startUtc": "2026-06-11T19:00:00Z",
+    "finalHome": 2,
+    "finalAway": 0,
+    "status": "complete"
   },
   {
     "id": "66456906",
@@ -43,7 +46,10 @@ const STATIC_MATCHES = [
     "awayCode": "CZE",
     "homeKey": "South Korea",
     "awayKey": "Czechia",
-    "startUtc": "2026-06-12T02:00:00Z"
+    "startUtc": "2026-06-12T02:00:00Z",
+    "finalHome": 2,
+    "finalAway": 1,
+    "status": "complete"
   },
   {
     "id": "66456916",
@@ -52,7 +58,10 @@ const STATIC_MATCHES = [
     "awayCode": "BIH",
     "homeKey": "Canada",
     "awayKey": "Bosnia and Herzegovina",
-    "startUtc": "2026-06-12T19:00:00Z"
+    "startUtc": "2026-06-12T19:00:00Z",
+    "finalHome": 1,
+    "finalAway": 1,
+    "status": "complete"
   },
   {
     "id": "66456940",
@@ -61,7 +70,10 @@ const STATIC_MATCHES = [
     "awayCode": "PAR",
     "homeKey": "United States",
     "awayKey": "Paraguay",
-    "startUtc": "2026-06-13T01:00:00Z"
+    "startUtc": "2026-06-13T01:00:00Z",
+    "finalHome": 4,
+    "finalAway": 1,
+    "status": "complete"
   },
   {
     "id": "66456918",
@@ -1040,7 +1052,10 @@ let matches = STATIC_MATCHES.map(m => ({
   awayKey: m.awayKey,
   homeCode: m.homeCode,
   awayCode: m.awayCode,
-  start: m.startUtc
+  start: m.startUtc,
+  finalHome: m.finalHome,
+  finalAway: m.finalAway,
+  status: m.status || "scheduled"
 }));
 
 function safeId(name) {
@@ -1083,6 +1098,29 @@ function buildGroups() {
   return g;
 }
 function selectedMatch() { return matches.find(m => m.id === selectedMatchId) || matches[0]; }
+
+function officialResultFor(match) {
+  if (!match) return null;
+  const manual = resultsCache[match.id];
+  if (manual && manual.home != null && manual.away != null && manual.home !== "" && manual.away !== "") return manual;
+  if (match.finalHome != null && match.finalAway != null) {
+    return { matchId: match.id, home: Number(match.finalHome), away: Number(match.finalAway), source: "static" };
+  }
+  return null;
+}
+function hasOfficialResult(match) {
+  return !!officialResultFor(match);
+}
+function flagOnly(key) {
+  const data = TEAM_NAMES[key] || [key,key,key,key,"⚽"];
+  return data[4];
+}
+function tabScoreLabel(match) {
+  const res = officialResultFor(match);
+  if (!res) return `<span class="match-tab-time">${timeJst(match.start)}</span><span class="match-tab-teams">${teamShort(match.homeKey)} vs ${teamShort(match.awayKey)}</span>`;
+  return `<span class="match-tab-time">FT</span><span class="match-tab-teams">${flagOnly(match.homeKey)} ${res.home} - ${res.away} ${flagOnly(match.awayKey)}</span>`;
+}
+
 function saveSelectedPosition() {
   if (selectedDayKey) localStorage.setItem("selectedDayKey", selectedDayKey);
   if (selectedMatchId) localStorage.setItem("selectedMatchId", selectedMatchId);
@@ -1185,14 +1223,14 @@ function renderTabs() {
   }).join("");
   const list = groups[selectedDayKey] || [];
   document.getElementById("matchTabs").innerHTML = list.map(m =>
-    `<button class="${m.id===selectedMatchId?"active-match":""}" onclick="selectMatchTab('${m.id}')"><span class="match-tab-time">${timeJst(m.start)}</span><span class="match-tab-teams">${teamShort(m.homeKey)} vs ${teamShort(m.awayKey)}</span></button>`
+    `<button class="${m.id===selectedMatchId?"active-match":""}" onclick="selectMatchTab('${m.id}')">${tabScoreLabel(m)}</button>`
   ).join("");
 }
 function renderSelectedMatch() {
   const m = selectedMatch();
   if (!m) return;
-  const res = resultsCache[m.id];
-  const locked = isLocked(m.start);
+  const res = officialResultFor(m);
+  const locked = isLocked(m.start) || hasOfficialResult(m);
   const savedPred = currentPredictionFor(m.id);
   const resultText = res ? `<span class="result-badge">Resultado final: ${res.home} - ${res.away}</span>` : "";
   document.getElementById("selectedMatchBox").innerHTML = `
@@ -1222,7 +1260,7 @@ window.saveSelectedPrediction = async function() {
     awayKey: m.awayKey,
     predictedHome: Number(home),
     predictedAway: Number(away),
-    points: calcPoints({predictedHome:Number(home), predictedAway:Number(away)}, resultsCache[m.id]),
+    points: calcPoints({predictedHome:Number(home), predictedAway:Number(away)}, officialResultFor(m)),
     matchStart: m.start,
     updatedAt: serverTimestamp()
   }, { merge: true });
@@ -1235,7 +1273,7 @@ function selectedRows() {
   if (!m) return [];
   return predictionsCache
     .filter(p => p.matchId === m.id)
-    .map(p => ({ ...p, points: calcPoints(p, resultsCache[m.id]) }))
+    .map(p => ({ ...p, points: calcPoints(p, officialResultFor(m)) }))
     .sort((a,b) => b.points - a.points);
 }
 function renderPotAndParticipants(rows) {
@@ -1259,7 +1297,7 @@ function renderMatchRanking() {
   if (!m) { body.innerHTML = ""; return; }
   const rows = selectedRows();
   renderPotAndParticipants(rows);
-  const res = resultsCache[m.id];
+  const res = officialResultFor(m);
   if (!res) box.innerHTML = T[currentLang].winnerPending;
   else if (!rows.length) box.innerHTML = T[currentLang].noPreds;
   else {
@@ -1287,7 +1325,7 @@ function renderAdminResults() {
   const box = document.getElementById("adminResults");
   if (!box) return;
   box.innerHTML = matches.map(m => {
-    const r = resultsCache[m.id] || {};
+    const r = officialResultFor(m) || {};
     return `<div class="admin-match"><strong>${teamLabel(m.homeKey)} vs ${teamLabel(m.awayKey)}</strong><div class="score"><input id="res_${m.id}_home" type="number" min="0" value="${r.home ?? ""}" placeholder="-"><span>-</span><input id="res_${m.id}_away" type="number" min="0" value="${r.away ?? ""}" placeholder="-"></div></div>`;
   }).join("");
 }
@@ -1318,7 +1356,8 @@ async function updatePredictionPoints() {
   const updates = [];
   snap.forEach(d => {
     const p = d.data();
-    updates.push(setDoc(doc(db, "predictions", d.id), { points: calcPoints(p, resultsCache[p.matchId]) }, { merge: true }));
+    const match = matches.find(m => m.id === p.matchId);
+    updates.push(setDoc(doc(db, "predictions", d.id), { points: calcPoints(p, match ? officialResultFor(match) : resultsCache[p.matchId]) }, { merge: true }));
   });
   await Promise.all(updates);
 }

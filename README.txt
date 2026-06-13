@@ -1,18 +1,22 @@
-WORLD CUP PREDICTION 2026 - VERSION 8.2 UTC + TEAMS FINAL
+WORLD CUP PREDICTION 2026 - VERSION 8.3 FINAL SCORES IN TABS
 
 NUEVO:
-- Horarios internos fijos en UTC para evitar diferencias entre PC y celular.
-- La web muestra todo en hora de Japón (JST).
-- El bloqueo usa Date.now() contra UTC real.
-- Equipos traducidos por idioma:
-  Español, japonés, inglés y portugués.
-- Corrige nombres como:
-  Ivory Coast -> Costa de Marfil / コートジボワール / Costa do Marfim
-  Cape Verde -> Cabo Verde / カーボベルデ
-- Mantiene Firebase, ranking por partido, pozo, participantes y fondo de estadio.
+- Las pestañas pequeñas muestran marcador final cuando existe resultado.
+  Ejemplo: FT 🇲🇽 2 - 0 🇿🇦
+- La tarjeta grande muestra Resultado final para cualquier partido con marcador.
+- Ranking y ganador usan resultado manual de Firebase o resultado inicial cargado.
+- Resultados iniciales incluidos:
+  México 2-0 Sudáfrica
+  Corea del Sur 2-1 Chequia
+  Canadá 1-1 Bosnia y Herzegovina
+  Estados Unidos 4-1 Paraguay
+- Mantiene UTC real, JST Japón, Firebase, traducciones de equipos y diseño móvil.
+
+IMPORTANTE:
+Si quieres corregir un resultado, entra al panel admin y guarda el marcador. Ese resultado manual tendrá prioridad.
 
 Subir:
 1. Reemplaza app.js, index.html, style.css, README.txt y assets.
 2. Commit changes.
 3. Espera Vercel Ready.
-4. Abre en celular con ?v=82utc
+4. Abre en celular con ?v=83scores
