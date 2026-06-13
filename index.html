@@ -11,8 +11,7 @@
     <section class="hero">
       <div class="badge">🏆 2026</div>
       <h1>WORLD CUP PREDICTION</h1>
-      <p id="subtitle">Polla Mundialista para compañeros de trabajo</p>
-      <p class="small" id="chooseLang">Elige tu idioma</p>
+      <p id="subtitle">Polla Mundialista por partido</p>
       <div class="langs">
         <button onclick="setLang('es')" id="btn-es" class="active">🇪🇸 Español</button>
         <button onclick="setLang('ja')" id="btn-ja">🇯🇵 日本語</button>
@@ -20,7 +19,7 @@
         <button onclick="setLang('pt')" id="btn-pt">🇧🇷 Português</button>
       </div>
       <p class="small" id="dataStatus">Cargando calendario automático...</p>
-      <p class="small">Admin: abre la web agregando <strong>?admin=jorge</strong> al final del enlace.</p>
+      <p class="small">Admin: agrega <strong>?admin=jorge</strong> al final del enlace.</p>
     </section>
 
     <section class="grid">
@@ -34,58 +33,42 @@
       </div>
 
       <div class="card">
-        <h2 id="playersTitle">👥 Participantes registrados</h2>
+        <h2 id="playersTitle">👥 Participantes</h2>
         <ul id="playersList"><li>Cargando...</li></ul>
       </div>
 
       <div class="card">
-        <h2 id="rulesTitle">📖 Reglas de puntos</h2>
-        <table>
-          <thead><tr><th id="ruleTh">Acierto</th><th id="pointsTh">Puntos</th></tr></thead>
-          <tbody id="rulesBody"></tbody>
-        </table>
-        <p class="small" id="lockInfo">Los pronósticos se bloquean automáticamente cuando empieza el partido.</p>
+        <h2 id="rulesTitle">📖 Reglas por partido</h2>
+        <table><thead><tr><th id="ruleTh">Acierto</th><th id="pointsTh">Puntos</th></tr></thead><tbody id="rulesBody"></tbody></table>
+        <p class="small" id="lockInfo">Cada partido tiene su propio ganador.</p>
       </div>
 
       <div class="card">
-        <h2 id="rankingTitle">📊 Tabla de posiciones</h2>
-        <table>
-          <thead><tr><th>#</th><th id="nameTh">Nombre</th><th id="scoreTh">Puntos</th></tr></thead>
-          <tbody id="rankingBody"></tbody>
-        </table>
-        <p class="small" id="rankInfo">El ranking se actualiza con los resultados automáticos disponibles.</p>
+        <h2 id="matchRankTitle">🏆 Ganador del partido</h2>
+        <div id="winnerBox" class="winner-box">Selecciona un partido.</div>
+        <table><thead><tr><th>#</th><th id="rankNameTh">Nombre</th><th id="rankPredTh">Pronóstico</th><th id="rankPtsTh">Pts</th></tr></thead><tbody id="matchRankingBody"></tbody></table>
       </div>
 
       <div class="card wide">
-        <h2 id="predTitle">📅 Mis pronósticos por fecha</h2>
-        <p class="small" id="predHelp">Elige una fecha arriba y coloca tus marcadores.</p>
+        <h2 id="predTitle">📅 Fechas y partidos</h2>
+        <p class="small" id="predHelp">Elige la fecha, luego el partido. Solo se muestra ese partido.</p>
         <div id="dateTabs" class="date-tabs"></div>
-        <div id="selectedDateTitle" class="selected-date-title"></div>
-        <div id="matchesContainer"></div>
-        <button onclick="savePredictions()" id="saveBtn">Guardar pronósticos</button>
+        <div id="matchTabs" class="match-tabs"></div>
+        <div id="selectedMatchBox"></div>
+        <button onclick="saveSelectedPrediction()" id="saveBtn">Guardar pronóstico de este partido</button>
         <p class="status" id="predictionStatus"></p>
       </div>
 
       <div class="card wide admin-card" id="adminPanel">
         <h2>👨‍💼 Panel administrador</h2>
-        <p class="small">La web intenta traer partidos/resultados automáticamente. Este panel queda solo como respaldo.</p>
-        <h3>Resultados detectados / respaldo manual</h3>
+        <p class="small">Puedes colocar el resultado final de cada partido como respaldo.</p>
         <div id="adminResults"></div>
-        <button onclick="saveResultsAndCalculate()">Guardar resultados y recalcular ranking</button>
+        <button onclick="saveResultsAndCalculate()">Guardar resultados y actualizar ganadores</button>
         <button onclick="syncOpenFootball()">Sincronizar calendario/resultados ahora</button>
         <p class="status" id="adminStatus"></p>
-
-        <h3>Pronósticos guardados</h3>
-        <div class="table-scroll">
-          <table>
-            <thead><tr><th>Participante</th><th>Partido</th><th>Pronóstico</th><th>Puntos</th></tr></thead>
-            <tbody id="adminPredictionsBody"></tbody>
-          </table>
-        </div>
       </div>
     </section>
   </main>
-
   <script type="module" src="app.js"></script>
 </body>
 </html>

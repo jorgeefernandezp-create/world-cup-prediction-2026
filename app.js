@@ -1,299 +1,48 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import {
-  getFirestore, collection, serverTimestamp, query, orderBy, onSnapshot,
-  doc, setDoc, getDocs, updateDoc
-} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+import { getFirestore, collection, serverTimestamp, query, orderBy, onSnapshot, doc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCT7xdrWuQ-HRxi_MsPgeLVVkyNyGSO4_k",
-  authDomain: "world-cup-prediction-202-c21c7.firebaseapp.com",
-  projectId: "world-cup-prediction-202-c21c7",
-  storageBucket: "world-cup-prediction-202-c21c7.firebasestorage.app",
-  messagingSenderId: "799745348621",
-  appId: "1:799745348621:web:f444420211d86ae1e67144",
-  measurementId: "G-RRB3QSV828"
-};
-
+const firebaseConfig = {apiKey:"AIzaSyCT7xdrWuQ-HRxi_MsPgeLVVkyNyGSO4_k",authDomain:"world-cup-prediction-202-c21c7.firebaseapp.com",projectId:"world-cup-prediction-202-c21c7",storageBucket:"world-cup-prediction-202-c21c7.firebasestorage.app",messagingSenderId:"799745348621",appId:"1:799745348621:web:f444420211d86ae1e67144",measurementId:"G-RRB3QSV828"};
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
 const OPENFOOTBALL_URL = "https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json";
+let matches=[{id:"m1",group:"Grupo A",home:"🇯🇵 Japón",away:"🇵🇪 Perú",start:"2026-06-12T19:00:00+09:00"},{id:"m2",group:"Grupo B",home:"🇧🇷 Brasil",away:"🇩🇪 Alemania",start:"2026-06-12T22:00:00+09:00"},{id:"m3",group:"Grupo C",home:"🇦🇷 Argentina",away:"🇫🇷 Francia",start:"2026-06-13T20:00:00+09:00"}];
 
-let matches = [
-  { id:"m1", group:"Grupo A", home:"🇯🇵 Japón", away:"🇵🇪 Perú", start:"2026-06-12T19:00:00+09:00" },
-  { id:"m2", group:"Grupo B", home:"🇧🇷 Brasil", away:"🇩🇪 Alemania", start:"2026-06-12T22:00:00+09:00" },
-  { id:"m3", group:"Grupo C", home:"🇦🇷 Argentina", away:"🇫🇷 Francia", start:"2026-06-13T20:00:00+09:00" },
-  { id:"m4", group:"Grupo D", home:"🇪🇸 España", away:"🇬🇧 Inglaterra", start:"2026-06-14T21:00:00+09:00" }
-];
+const T={
+es:{subtitle:"Polla Mundialista por partido",nameTitle:"👤 Ingresa tu nombre",nameText:"Solo necesitas escribir tu nombre para participar.",placeholder:"Ejemplo: Jorge",enterBtn:"Entrar",welcome:"Bienvenido",saved:"✅ Participante guardado.",error:"❌ Error. Revisa Firebase.",playersTitle:"👥 Participantes",emptyPlayers:"Todavía no hay participantes.",rulesTitle:"📖 Reglas por partido",ruleTh:"Acierto",pointsTh:"Puntos",rules:[["Marcador exacto","+5"],["Ganador o empate correcto","+3"],["Fallo","0"]],lockInfo:"Cada partido tiene su propio ganador.",matchRankTitle:"🏆 Ganador del partido",rankNameTh:"Nombre",rankPredTh:"Pronóstico",rankPtsTh:"Pts",predTitle:"📅 Fechas y partidos",predHelp:"Elige la fecha, luego el partido. Solo se muestra ese partido.",saveBtn:"Guardar pronóstico de este partido",predSaved:"✅ Pronóstico guardado.",noName:"⚠️ Primero ingresa tu nombre.",closed:"🔒 Cerrado",matches:"partidos",winnerPending:"Aún no hay resultado final.",noPreds:"Aún no hay pronósticos para este partido.",winner:"Ganador"},
+ja:{subtitle:"試合ごとのワールドカップ予想",nameTitle:"👤 お名前を入力してください",nameText:"参加するには、お名前の入力だけで完了です。",placeholder:"例：田中",enterBtn:"参加する",welcome:"ようこそ",saved:"✅ 参加者が登録されました。",error:"❌ エラー。Firebaseを確認してください。",playersTitle:"👥 参加者",emptyPlayers:"まだ参加者はいません。",rulesTitle:"📖 試合ごとのルール",ruleTh:"内容",pointsTh:"ポイント",rules:[["スコアを完全的中","5ポイント"],["勝敗（勝ち・引き分け）を的中","3ポイント"],["不的中","0"]],lockInfo:"各試合ごとに勝者が決まります。",matchRankTitle:"🏆 この試合の勝者",rankNameTh:"名前",rankPredTh:"予想",rankPtsTh:"点",predTitle:"📅 日付と試合",predHelp:"日付を選び、次に試合を選んでください。",saveBtn:"この試合の予想を保存する",predSaved:"✅ 予想が保存されました。",noName:"⚠️ 先にお名前を入力してください。",closed:"🔒 受付終了",matches:"試合",winnerPending:"まだ試合結果がありません。",noPreds:"この試合の予想はまだありません。",winner:"勝者"},
+en:{subtitle:"Prediction pool by match",nameTitle:"👤 Enter your name",nameText:"You only need to enter your name to join.",placeholder:"Example: Jorge",enterBtn:"Join",welcome:"Welcome",saved:"✅ Participant saved.",error:"❌ Error. Check Firebase.",playersTitle:"👥 Participants",emptyPlayers:"There are no participants yet.",rulesTitle:"📖 Rules by match",ruleTh:"Prediction",pointsTh:"Points",rules:[["Exact score","+5"],["Correct winner or draw","+3"],["Wrong","0"]],lockInfo:"Each match has its own winner.",matchRankTitle:"🏆 Match winner",rankNameTh:"Name",rankPredTh:"Prediction",rankPtsTh:"Pts",predTitle:"📅 Dates and matches",predHelp:"Choose a date, then choose a match.",saveBtn:"Save prediction for this match",predSaved:"✅ Prediction saved.",noName:"⚠️ Enter your name first.",closed:"🔒 Closed",matches:"matches",winnerPending:"No final result yet.",noPreds:"No predictions for this match yet.",winner:"Winner"},
+pt:{subtitle:"Bolão por partida",nameTitle:"👤 Digite seu nome",nameText:"Você só precisa digitar seu nome para participar.",placeholder:"Exemplo: Jorge",enterBtn:"Entrar",welcome:"Bem-vindo",saved:"✅ Participante salvo.",error:"❌ Erro. Verifique o Firebase.",playersTitle:"👥 Participantes",emptyPlayers:"Ainda não há participantes.",rulesTitle:"📖 Regras por partida",ruleTh:"Acerto",pointsTh:"Pontos",rules:[["Placar exato","+5"],["Vencedor ou empate correto","+3"],["Erro","0"]],lockInfo:"Cada partida tem seu próprio vencedor.",matchRankTitle:"🏆 Vencedor da partida",rankNameTh:"Nome",rankPredTh:"Palpite",rankPtsTh:"Pts",predTitle:"📅 Datas e partidas",predHelp:"Escolha a data e depois a partida.",saveBtn:"Salvar palpite desta partida",predSaved:"✅ Palpite salvo.",noName:"⚠️ Primeiro digite seu nome.",closed:"🔒 Encerrado",matches:"partidas",winnerPending:"Ainda não há resultado final.",noPreds:"Ainda não há palpites para esta partida.",winner:"Vencedor"}};
 
-const T = {
-  es:{subtitle:"Polla Mundialista para compañeros de trabajo",chooseLang:"Elige tu idioma",nameTitle:"👤 Ingresa tu nombre",nameText:"Solo necesitas escribir tu nombre para participar.",placeholder:"Ejemplo: Jorge",enterBtn:"Entrar",welcome:"Bienvenido",saved:"✅ Participante guardado correctamente.",error:"❌ No se pudo guardar. Revisa Firebase.",playersTitle:"👥 Participantes registrados",emptyPlayers:"Todavía no hay participantes.",rulesTitle:"📖 Reglas de puntos",ruleTh:"Acierto",pointsTh:"Puntos",rules:[["Ganador o empate correcto","+3"],["Marcador exacto","+5"],["Campeón del Mundial","+10"],["Máximo goleador","+5"]],lockInfo:"Los pronósticos se bloquean automáticamente cuando empieza el partido.",rankingTitle:"📊 Tabla de posiciones",nameTh:"Nombre",scoreTh:"Puntos",rankInfo:"El ranking se actualiza con los resultados automáticos disponibles.",predTitle:"📅 Mis pronósticos por fecha",predHelp:"Elige una fecha arriba y coloca tus marcadores.",saveBtn:"Guardar pronósticos",predSaved:"✅ Pronósticos guardados correctamente.",noName:"⚠️ Primero ingresa tu nombre.",closed:"🔒 Cerrado",matches:"partidos"},
-  ja:{subtitle:"職場の仲間で楽しむワールドカップ予想大会",chooseLang:"言語を選択してください",nameTitle:"👤 お名前を入力してください",nameText:"参加するには、お名前の入力だけで完了です。",placeholder:"例：田中",enterBtn:"参加する",welcome:"ようこそ",saved:"✅ 参加者が正常に登録されました。",error:"❌ 保存できませんでした。Firebaseを確認してください。",playersTitle:"👥 登録済み参加者",emptyPlayers:"まだ参加者はいません。",rulesTitle:"📖 得点ルール",ruleTh:"内容",pointsTh:"ポイント",rules:[["勝敗（勝ち・引き分け）を的中","3ポイント"],["スコアを完全的中","5ポイント"],["ワールドカップ優勝国を的中","10ポイント"],["大会得点王を的中","5ポイント"]],lockInfo:"試合開始時刻を過ぎると、その試合の予想は自動的に締め切られます。",rankingTitle:"📊 順位表",nameTh:"名前",scoreTh:"ポイント",rankInfo:"順位表は自動取得された結果に基づいて更新されます。",predTitle:"📅 日付別の予想",predHelp:"上の日付を選んで、スコアを入力してください。",saveBtn:"予想を保存する",predSaved:"✅ 予想が正常に保存されました。",noName:"⚠️ 先にお名前を入力してください。",closed:"🔒 受付終了",matches:"試合"},
-  en:{subtitle:"Prediction game for coworkers",chooseLang:"Choose your language",nameTitle:"👤 Enter your name",nameText:"You only need to enter your name to join.",placeholder:"Example: Jorge",enterBtn:"Join",welcome:"Welcome",saved:"✅ Participant saved successfully.",error:"❌ Could not save. Check Firebase.",playersTitle:"👥 Registered participants",emptyPlayers:"There are no participants yet.",rulesTitle:"📖 Scoring rules",ruleTh:"Prediction",pointsTh:"Points",rules:[["Correct winner or draw","+3"],["Exact score","+5"],["Correct World Cup champion","+10"],["Correct top scorer","+5"]],lockInfo:"Predictions are automatically locked when the match starts.",rankingTitle:"📊 Leaderboard",nameTh:"Name",scoreTh:"Points",rankInfo:"The ranking updates with available automatic results.",predTitle:"📅 My predictions by date",predHelp:"Choose a date above and enter your scores.",saveBtn:"Save predictions",predSaved:"✅ Predictions saved successfully.",noName:"⚠️ Enter your name first.",closed:"🔒 Closed",matches:"matches"},
-  pt:{subtitle:"Bolão de palpites para colegas de trabalho",chooseLang:"Escolha seu idioma",nameTitle:"👤 Digite seu nome",nameText:"Você só precisa digitar seu nome para participar.",placeholder:"Exemplo: Jorge",enterBtn:"Entrar",welcome:"Bem-vindo",saved:"✅ Participante salvo com sucesso.",error:"❌ Não foi possível salvar. Verifique o Firebase.",playersTitle:"👥 Participantes registrados",emptyPlayers:"Ainda não há participantes.",rulesTitle:"📖 Regras de pontuação",ruleTh:"Acerto",pointsTh:"Pontos",rules:[["Acertar vencedor ou empate","+3"],["Acertar o placar exato","+5"],["Acertar o campeão da Copa","+10"],["Acertar o artilheiro","+5"]],lockInfo:"Os palpites são bloqueados automaticamente quando a partida começa.",rankingTitle:"📊 Classificação",nameTh:"Nome",scoreTh:"Pontos",rankInfo:"A classificação é atualizada com os resultados automáticos disponíveis.",predTitle:"📅 Meus palpites por data",predHelp:"Escolha uma data acima e coloque os placares.",saveBtn:"Salvar palpites",predSaved:"✅ Palpites salvos com sucesso.",noName:"⚠️ Primeiro digite seu nome.",closed:"🔒 Encerrado",matches:"partidas"}
-};
+let currentLang="es", currentPlayerName=localStorage.getItem("playerName")||"", resultsCache={}, predictionsCache=[], selectedDayKey=null, selectedMatchId=null;
+function isLocked(start){return new Date()>=new Date(start)}
+function safeId(name){return name.toLowerCase().trim().replace(/[^a-z0-9áéíóúñãõç一-龯ぁ-んァ-ン]/gi,"_")}
+function localDayKey(start){return new Date(start).toLocaleDateString("sv-SE",{timeZone:"Asia/Tokyo"})}
+function timeJst(start){return new Date(start).toLocaleTimeString(currentLang==="ja"?"ja-JP":"es-ES",{hour:"2-digit",minute:"2-digit",timeZone:"Asia/Tokyo"})}
+function dateShort(start){return new Date(start).toLocaleDateString("es-ES",{day:"2-digit",month:"short",timeZone:"Asia/Tokyo"}).replace(".","")}
+function weekday(start){const loc=currentLang==="ja"?"ja-JP":currentLang==="en"?"en-US":currentLang==="pt"?"pt-BR":"es-ES";return new Date(start).toLocaleDateString(loc,{weekday:"short",timeZone:"Asia/Tokyo"})}
+function dateLong(start){const loc=currentLang==="ja"?"ja-JP":currentLang==="en"?"en-US":currentLang==="pt"?"pt-BR":"es-ES";return new Date(start).toLocaleDateString(loc,{weekday:"long",year:"numeric",month:"long",day:"numeric",timeZone:"Asia/Tokyo"})}
+function parseOpenFootballDate(date,time){const parsed=new Date(`${date} ${(time||"00:00").replace(" UTC"," GMT")}`);return !isNaN(parsed.getTime())?parsed.toISOString():`${date}T00:00:00Z`}
+function flagFor(team){const map={Japan:"🇯🇵",Peru:"🇵🇪",Brazil:"🇧🇷",Germany:"🇩🇪",Argentina:"🇦🇷",France:"🇫🇷",Spain:"🇪🇸",England:"🏴",Mexico:"🇲🇽","South Africa":"🇿🇦","South Korea":"🇰🇷",Czechia:"🇨🇿","United States":"🇺🇸",Canada:"🇨🇦",Portugal:"🇵🇹",Netherlands:"🇳🇱",Morocco:"🇲🇦",Uruguay:"🇺🇾",Colombia:"🇨🇴",Ecuador:"🇪🇨"};return `${map[team]||"⚽"} ${team}`}
+function buildGroups(){const sorted=[...matches].sort((a,b)=>new Date(a.start)-new Date(b.start));const g={};for(const m of sorted){(g[localDayKey(m.start)] ||= []).push(m)}return g}
+function selectedMatch(){return matches.find(m=>m.id===selectedMatchId)||matches[0]}
+function calcPoints(pred,res){if(!res||res.home==null||res.away==null||res.home===""||res.away==="")return 0;const ph=Number(pred.predictedHome),pa=Number(pred.predictedAway),rh=Number(res.home),ra=Number(res.away);if(ph===rh&&pa===ra)return 5;const ps=ph===pa?"D":ph>pa?"H":"A",rs=rh===ra?"D":rh>ra?"H":"A";return ps===rs?3:0}
 
-let currentLang = "es";
-let currentPlayerName = localStorage.getItem("playerName") || "";
-let resultsCache = {};
-let predictionsCache = [];
-let selectedDayKey = null;
+window.syncOpenFootball=async function(){const status=document.getElementById("dataStatus");try{status.textContent="Sincronizando calendario gratuito...";const r=await fetch(OPENFOOTBALL_URL,{cache:"no-store"});if(!r.ok)throw new Error();const data=await r.json();if(!Array.isArray(data.matches))throw new Error();matches=data.matches.map((m,i)=>{const id=`wc2026_${i+1}`;if(m.score?.ft){resultsCache[id]={matchId:id,home:Number(m.score.ft[0]),away:Number(m.score.ft[1]),homeTeam:flagFor(m.team1),awayTeam:flagFor(m.team2)};setDoc(doc(db,"results",id),resultsCache[id],{merge:true})}return{id,group:m.group||m.round||"",home:flagFor(m.team1||"TBD"),away:flagFor(m.team2||"TBD"),start:parseOpenFootballDate(m.date,m.time),ground:m.ground||""}}).sort((a,b)=>new Date(a.start)-new Date(b.start));selectedDayKey=localDayKey(matches[0].start);selectedMatchId=matches[0].id;renderAll();status.textContent=`✅ Calendario automático cargado: ${matches.length} partidos.`}catch(e){if(!selectedDayKey){selectedDayKey=localDayKey(matches[0].start);selectedMatchId=matches[0].id}renderAll();status.textContent="⚠️ Usando partidos de respaldo."}}
 
-function isLocked(start){ return new Date() >= new Date(start); }
-function safeId(name){ return name.toLowerCase().trim().replace(/[^a-z0-9áéíóúñãõç一-龯ぁ-んァ-ン]/gi,"_"); }
-function matchLabel(id){ const m=matches.find(x=>x.id===id); return m ? `${m.home} vs ${m.away}` : id; }
-function localDayKey(start){ return new Date(start).toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" }); }
-function dayTitle(start){
-  const locale = currentLang === "ja" ? "ja-JP" : currentLang === "en" ? "en-US" : currentLang === "pt" ? "pt-BR" : "es-ES";
-  return new Date(start).toLocaleDateString(locale, { weekday:"long", year:"numeric", month:"long", day:"numeric", timeZone:"Asia/Tokyo" });
-}
-function tabDay(start){
-  const locale = currentLang === "ja" ? "ja-JP" : currentLang === "en" ? "en-US" : currentLang === "pt" ? "pt-BR" : "es-ES";
-  return new Date(start).toLocaleDateString(locale, { weekday:"short", timeZone:"Asia/Tokyo" });
-}
-function tabDate(start){
-  return new Date(start).toLocaleDateString("es-ES", { day:"2-digit", month:"short", timeZone:"Asia/Tokyo" }).replace(".","");
-}
-function timeJst(start){ return new Date(start).toLocaleTimeString(currentLang==="ja"?"ja-JP":"es-ES", {hour:"2-digit", minute:"2-digit", timeZone:"Asia/Tokyo"}); }
-
-function parseOpenFootballDate(date, time){
-  const cleanTime = (time || "00:00").replace(" UTC", " GMT");
-  const parsed = new Date(`${date} ${cleanTime}`);
-  if(!isNaN(parsed.getTime())) return parsed.toISOString();
-  return `${date}T00:00:00Z`;
-}
-
-function flagFor(team){
-  const map = {"Japan":"🇯🇵","Peru":"🇵🇪","Brazil":"🇧🇷","Germany":"🇩🇪","Argentina":"🇦🇷","France":"🇫🇷","Spain":"🇪🇸","England":"🏴","Mexico":"🇲🇽","South Africa":"🇿🇦","South Korea":"🇰🇷","Czech Republic":"🇨🇿","United States":"🇺🇸","Canada":"🇨🇦","Portugal":"🇵🇹","Netherlands":"🇳🇱","Morocco":"🇲🇦","Uruguay":"🇺🇾","Colombia":"🇨🇴","Ecuador":"🇪🇨","Chile":"🇨🇱"};
-  return `${map[team] || "⚽"} ${team}`;
-}
-
-function calcPoints(pred, res){
-  if(!res || res.home === "" || res.away === "" || res.home == null || res.away == null) return 0;
-  const ph = Number(pred.predictedHome), pa = Number(pred.predictedAway);
-  const rh = Number(res.home), ra = Number(res.away);
-  if(ph === rh && pa === ra) return 5;
-  const predSign = ph === pa ? "D" : ph > pa ? "H" : "A";
-  const realSign = rh === ra ? "D" : rh > ra ? "H" : "A";
-  return predSign === realSign ? 3 : 0;
-}
-
-window.syncOpenFootball = async function(){
-  const status = document.getElementById("dataStatus");
-  const adminStatus = document.getElementById("adminStatus");
-  try{
-    if(status) status.textContent = "Sincronizando calendario gratuito...";
-    const res = await fetch(OPENFOOTBALL_URL, { cache: "no-store" });
-    if(!res.ok) throw new Error("No se pudo leer OpenFootball");
-    const data = await res.json();
-    if(!data.matches || !Array.isArray(data.matches)) throw new Error("Formato no válido");
-
-    matches = data.matches.map((m, index) => {
-      const id = `wc2026_${index+1}`;
-      if(m.score?.ft){
-        resultsCache[id] = { matchId:id, home:Number(m.score.ft[0]), away:Number(m.score.ft[1]), homeTeam:flagFor(m.team1), awayTeam:flagFor(m.team2) };
-        setDoc(doc(db,"results",id), resultsCache[id], {merge:true});
-      }
-      return {id, group: m.group || m.round || "", home: flagFor(m.team1 || "TBD"), away: flagFor(m.team2 || "TBD"), start: parseOpenFootballDate(m.date, m.time), ground: m.ground || ""};
-    }).sort((a,b)=>new Date(a.start)-new Date(b.start));
-
-    if(!selectedDayKey && matches.length) selectedDayKey = localDayKey(matches[0].start);
-    renderMatches(); renderAdminResults(); await recalculateRanking();
-    if(status) status.textContent = `✅ Calendario automático cargado: ${matches.length} partidos.`;
-    if(adminStatus) adminStatus.textContent = `✅ Sincronizado: ${matches.length} partidos.`;
-  }catch(e){
-    console.error(e);
-    if(!selectedDayKey && matches.length) selectedDayKey = localDayKey(matches[0].start);
-    renderMatches();
-    if(status) status.textContent = "⚠️ No se pudo cargar la fuente gratuita. Usando partidos de respaldo.";
-    if(adminStatus) adminStatus.textContent = "⚠️ No se pudo sincronizar. Usando respaldo.";
-  }
-};
-
-window.setLang = function(lang){
-  currentLang = lang;
-  document.querySelectorAll(".langs button").forEach(b=>b.classList.remove("active"));
-  document.getElementById("btn-"+lang).classList.add("active");
-  const t=T[lang];
-  ["subtitle","chooseLang","nameTitle","nameText","enterBtn","playersTitle","rulesTitle","ruleTh","pointsTh","lockInfo","rankingTitle","nameTh","scoreTh","rankInfo","predTitle","predHelp","saveBtn"].forEach(id=>document.getElementById(id).textContent=t[id]);
-  document.getElementById("playerName").placeholder=t.placeholder;
-  document.getElementById("rulesBody").innerHTML=t.rules.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join("");
-  renderMatches();
-  if(currentPlayerName) document.getElementById("welcomeText").textContent=`${t.welcome}, ${currentPlayerName}!`;
-};
-
-window.enterGame = async function(){
-  const input=document.getElementById("playerName");
-  const status=document.getElementById("saveStatus");
-  const name=input.value.trim();
-  if(!name){ status.textContent=T[currentLang].noName; return; }
-  try{
-    await setDoc(doc(db,"players",safeId(name)),{name,language:currentLang,points:0,updatedAt:serverTimestamp()},{merge:true});
-    currentPlayerName=name; localStorage.setItem("playerName",name);
-    document.getElementById("welcomeText").textContent=`${T[currentLang].welcome}, ${name}!`;
-    status.textContent=T[currentLang].saved; input.value="";
-  }catch(e){ console.error(e); status.textContent=T[currentLang].error; }
-};
-
-window.selectDateTab = function(dayKey){
-  selectedDayKey = dayKey;
-  renderMatches();
-};
-
-function buildGroups(){
-  const sorted=[...matches].sort((a,b)=>new Date(a.start)-new Date(b.start));
-  const groups={};
-  for(const m of sorted){ const k=localDayKey(m.start); (groups[k] ||= []).push(m); }
-  return groups;
-}
-
-function renderMatches(){
-  const box=document.getElementById("matchesContainer");
-  const tabs=document.getElementById("dateTabs");
-  const title=document.getElementById("selectedDateTitle");
-  if(!box || !tabs) return;
-
-  const groups=buildGroups();
-  const keys=Object.keys(groups);
-  if(!selectedDayKey || !groups[selectedDayKey]) selectedDayKey = keys[0];
-
-  tabs.innerHTML = keys.map(k=>{
-    const list = groups[k];
-    const first = list[0];
-    return `<button class="${k===selectedDayKey ? "active-date" : ""}" onclick="selectDateTab('${k}')">
-      <span class="tab-day">${tabDay(first.start)}</span>
-      <span class="tab-date">${tabDate(first.start)}</span>
-      <span class="tab-count">${list.length} ${T[currentLang].matches}</span>
-    </button>`;
-  }).join("");
-
-  const list = groups[selectedDayKey] || [];
-  title.textContent = list.length ? `📅 ${dayTitle(list[0].start)} · ${list.length} ${T[currentLang].matches}` : "";
-
-  box.innerHTML = list.map(m=>{
-    const locked=isLocked(m.start);
-    const res = resultsCache[m.id];
-    const resultText = res ? `<span class="result-badge">Resultado: ${res.home} - ${res.away}</span>` : "";
-    if(locked){
-      return `<div class="match"><div class="match-time">${timeJst(m.start)}</div><div class="match-teams"><strong>${m.home} vs ${m.away}</strong><small>${m.group}<br>${m.ground || ""}</small>${resultText}</div><div class="locked">${T[currentLang].closed}</div></div>`;
-    }
-    return `<div class="match" data-match="${m.id}">
-      <div class="match-time">${timeJst(m.start)}</div>
-      <div class="match-teams"><strong>${m.home} vs ${m.away}</strong><small>${m.group}<br>${m.ground || ""}</small>${resultText}</div>
-      <div class="score"><input id="${m.id}_home" type="number" min="0" placeholder="0"><span>-</span><input id="${m.id}_away" type="number" min="0" placeholder="0"></div>
-    </div>`;
-  }).join("");
-}
-
-window.savePredictions = async function(){
-  const status=document.getElementById("predictionStatus");
-  if(!currentPlayerName){ status.textContent=T[currentLang].noName; return; }
-  try{
-    const playerId=safeId(currentPlayerName);
-    const groups=buildGroups();
-    const visibleMatches = groups[selectedDayKey] || matches;
-    for(const m of visibleMatches){
-      if(isLocked(m.start)) continue;
-      const home=document.getElementById(`${m.id}_home`)?.value;
-      const away=document.getElementById(`${m.id}_away`)?.value;
-      if(home==="" || away==="") continue;
-      await setDoc(doc(db,"predictions",`${playerId}_${m.id}`),{
-        playerId, playerName:currentPlayerName, matchId:m.id, homeTeam:m.home, awayTeam:m.away,
-        predictedHome:Number(home), predictedAway:Number(away),
-        points: calcPoints({predictedHome:Number(home), predictedAway:Number(away)}, resultsCache[m.id]),
-        matchStart:m.start, updatedAt:serverTimestamp()
-      },{merge:true});
-    }
-    status.textContent=T[currentLang].predSaved;
-  }catch(e){ console.error(e); status.textContent=T[currentLang].error; }
-};
-
-function renderAdminResults(){
-  const panel = document.getElementById("adminPanel");
-  const isAdmin = new URLSearchParams(location.search).get("admin") === "jorge";
-  if(isAdmin) panel.classList.add("show");
-  const box=document.getElementById("adminResults"); if(!box) return;
-  box.innerHTML = matches.map(m=>{
-    const r = resultsCache[m.id] || {};
-    return `<div class="admin-match"><div><strong>${m.home} vs ${m.away}</strong><small>${m.group}<br>${m.start}<br>${m.ground || ""}</small></div><div class="score"><input id="res_${m.id}_home" type="number" min="0" placeholder="-" value="${r.home ?? ""}"><span>-</span><input id="res_${m.id}_away" type="number" min="0" placeholder="-" value="${r.away ?? ""}"></div><div></div></div>`;
-  }).join("");
-}
-
-window.saveResultsAndCalculate = async function(){
-  const status = document.getElementById("adminStatus");
-  try{
-    for(const m of matches){
-      const h = document.getElementById(`res_${m.id}_home`)?.value;
-      const a = document.getElementById(`res_${m.id}_away`)?.value;
-      if(h === "" || a === "" || h == null || a == null) continue;
-      await setDoc(doc(db,"results",m.id),{matchId:m.id, homeTeam:m.home, awayTeam:m.away, home:Number(h), away:Number(a), updatedAt:serverTimestamp()},{merge:true});
-    }
-    await recalculateRanking();
-    status.textContent = "✅ Resultados guardados y ranking recalculado.";
-  }catch(e){ console.error(e); status.textContent = "❌ Error al guardar resultados."; }
-};
-
-async function recalculateRanking(){
-  const predictionsSnap = await getDocs(collection(db,"predictions"));
-  const scores = {}; const updates = [];
-  predictionsSnap.forEach(d=>{
-    const p = d.data();
-    const pts = calcPoints(p, resultsCache[p.matchId]);
-    scores[p.playerId] = (scores[p.playerId] || 0) + pts;
-    updates.push(setDoc(doc(db,"predictions",d.id),{points:pts},{merge:true}));
-  });
-  await Promise.all(updates);
-  const playersSnap = await getDocs(collection(db,"players"));
-  const playerUpdates = [];
-  playersSnap.forEach(d=> playerUpdates.push(updateDoc(doc(db,"players",d.id),{points:scores[d.id] || 0, updatedAt:serverTimestamp()})));
-  await Promise.all(playerUpdates);
-}
-
-function listenPlayers(){
-  const playersList=document.getElementById("playersList");
-  const rankingBody=document.getElementById("rankingBody");
-  const q=query(collection(db,"players"),orderBy("points","desc"));
-  onSnapshot(q,(snapshot)=>{
-    playersList.innerHTML=""; rankingBody.innerHTML="";
-    if(snapshot.empty){
-      playersList.innerHTML=`<li>${T[currentLang].emptyPlayers}</li>`;
-      rankingBody.innerHTML=`<tr><td>-</td><td>${T[currentLang].emptyPlayers}</td><td>0</td></tr>`;
-      return;
-    }
-    let i=1;
-    snapshot.forEach(d=>{
-      const p=d.data();
-      const li=document.createElement("li"); li.textContent=p.name; playersList.appendChild(li);
-      rankingBody.innerHTML += `<tr><td>${i}</td><td>${p.name}</td><td>${p.points || 0}</td></tr>`;
-      i++;
-    });
-  });
-}
-
-function listenResults(){
-  onSnapshot(collection(db,"results"),(snapshot)=>{
-    snapshot.forEach(d=>{ resultsCache[d.id] = d.data(); });
-    renderMatches(); renderAdminResults(); renderAdminPredictions();
-  });
-}
-
-function listenPredictions(){
-  onSnapshot(collection(db,"predictions"),(snapshot)=>{
-    predictionsCache = [];
-    snapshot.forEach(d=> predictionsCache.push(d.data()));
-    renderAdminPredictions();
-  });
-}
-
-function renderAdminPredictions(){
-  const body = document.getElementById("adminPredictionsBody");
-  if(!body) return;
-  if(!predictionsCache.length){ body.innerHTML = `<tr><td colspan="4">Aún no hay pronósticos.</td></tr>`; return; }
-  body.innerHTML = predictionsCache.map(p=>{
-    const pts = calcPoints(p, resultsCache[p.matchId]);
-    return `<tr><td>${p.playerName}</td><td>${matchLabel(p.matchId)}</td><td>${p.predictedHome} - ${p.predictedAway}</td><td>${pts}</td></tr>`;
-  }).join("");
-}
-
-if(currentPlayerName){ document.getElementById("welcomeText").textContent=`${T[currentLang].welcome}, ${currentPlayerName}!`; }
-setLang("es"); listenPlayers(); listenResults(); listenPredictions(); syncOpenFootball();
+window.setLang=function(lang){currentLang=lang;document.querySelectorAll(".langs button").forEach(b=>b.classList.remove("active"));document.getElementById("btn-"+lang).classList.add("active");const t=T[lang];["subtitle","nameTitle","nameText","enterBtn","playersTitle","rulesTitle","ruleTh","pointsTh","lockInfo","matchRankTitle","rankNameTh","rankPredTh","rankPtsTh","predTitle","predHelp","saveBtn"].forEach(id=>document.getElementById(id).textContent=t[id]);document.getElementById("playerName").placeholder=t.placeholder;document.getElementById("rulesBody").innerHTML=t.rules.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join("");if(currentPlayerName)document.getElementById("welcomeText").textContent=`${t.welcome}, ${currentPlayerName}!`;renderAll()}
+window.enterGame=async function(){const name=document.getElementById("playerName").value.trim(),status=document.getElementById("saveStatus");if(!name){status.textContent=T[currentLang].noName;return}try{await setDoc(doc(db,"players",safeId(name)),{name,language:currentLang,updatedAt:serverTimestamp()},{merge:true});currentPlayerName=name;localStorage.setItem("playerName",name);document.getElementById("welcomeText").textContent=`${T[currentLang].welcome}, ${name}!`;status.textContent=T[currentLang].saved;document.getElementById("playerName").value=""}catch(e){status.textContent=T[currentLang].error}}
+window.selectDateTab=function(dayKey){selectedDayKey=dayKey;const list=buildGroups()[dayKey]||[];selectedMatchId=list[0]?.id||selectedMatchId;renderAll()}
+window.selectMatchTab=function(matchId){selectedMatchId=matchId;renderAll()}
+function renderAll(){renderTabs();renderSelectedMatch();renderMatchRanking();renderAdminResults()}
+function renderTabs(){const groups=buildGroups(),keys=Object.keys(groups);if(!selectedDayKey||!groups[selectedDayKey])selectedDayKey=keys[0];if(!selectedMatchId)selectedMatchId=groups[selectedDayKey]?.[0]?.id;document.getElementById("dateTabs").innerHTML=keys.map(k=>{const list=groups[k],first=list[0];return `<button class="${k===selectedDayKey?"active-date":""}" onclick="selectDateTab('${k}')"><span class="tab-day">${weekday(first.start)}</span><span class="tab-date">${dateShort(first.start)}</span><span class="tab-count">${list.length} ${T[currentLang].matches}</span></button>`}).join("");const list=groups[selectedDayKey]||[];document.getElementById("matchTabs").innerHTML=list.map(m=>`<button class="${m.id===selectedMatchId?"active-match":""}" onclick="selectMatchTab('${m.id}')"><span class="match-tab-time">${timeJst(m.start)}</span><span class="match-tab-teams">${m.home.split(" ").slice(0,2).join(" ")} vs ${m.away.split(" ").slice(0,2).join(" ")}</span></button>`).join("")}
+function renderSelectedMatch(){const m=selectedMatch();if(!m)return;const res=resultsCache[m.id],locked=isLocked(m.start);const resultText=res?`<span class="result-badge">Resultado final: ${res.home} - ${res.away}</span>`:"";document.getElementById("selectedMatchBox").innerHTML=`<div class="selected-match"><div class="teams-line">${m.home} vs ${m.away}</div><div class="match-meta">📅 ${dateLong(m.start)} · 🕒 ${timeJst(m.start)} JST<br>${m.group} ${m.ground?"· "+m.ground:""}</div>${resultText}${locked?`<div class="locked">${T[currentLang].closed}</div>`:`<div class="score"><input id="selected_home" type="number" min="0" placeholder="0"><span>-</span><input id="selected_away" type="number" min="0" placeholder="0"></div>`}</div>`}
+window.saveSelectedPrediction=async function(){const status=document.getElementById("predictionStatus"),m=selectedMatch();if(!currentPlayerName){status.textContent=T[currentLang].noName;return}if(!m||isLocked(m.start)){status.textContent=T[currentLang].closed;return}const home=document.getElementById("selected_home")?.value,away=document.getElementById("selected_away")?.value;if(home===""||away===""){status.textContent="⚠️ Completa el marcador.";return}const playerId=safeId(currentPlayerName);await setDoc(doc(db,"predictions",`${playerId}_${m.id}`),{playerId,playerName:currentPlayerName,matchId:m.id,homeTeam:m.home,awayTeam:m.away,predictedHome:Number(home),predictedAway:Number(away),points:calcPoints({predictedHome:Number(home),predictedAway:Number(away)},resultsCache[m.id]),matchStart:m.start,updatedAt:serverTimestamp()},{merge:true});status.textContent=T[currentLang].predSaved}
+function renderMatchRanking(){const m=selectedMatch(),body=document.getElementById("matchRankingBody"),box=document.getElementById("winnerBox");if(!m){body.innerHTML="";return}const rows=predictionsCache.filter(p=>p.matchId===m.id).map(p=>({...p,points:calcPoints(p,resultsCache[m.id])})).sort((a,b)=>b.points-a.points);const res=resultsCache[m.id];if(!res)box.textContent=T[currentLang].winnerPending;else if(!rows.length)box.textContent=T[currentLang].noPreds;else{const top=rows[0].points,winners=rows.filter(r=>r.points===top&&top>0).map(r=>r.playerName).join(", ");box.textContent=winners?`🏆 ${T[currentLang].winner}: ${winners} (${top} pts)`:T[currentLang].noPreds}if(!rows.length){body.innerHTML=`<tr><td colspan="4">${T[currentLang].noPreds}</td></tr>`;return}body.innerHTML=rows.map((r,i)=>`<tr><td>${i+1}</td><td>${r.playerName}</td><td>${r.predictedHome} - ${r.predictedAway}</td><td>${r.points}</td></tr>`).join("")}
+function renderAdminResults(){const panel=document.getElementById("adminPanel");if(new URLSearchParams(location.search).get("admin")==="jorge")panel.classList.add("show");const box=document.getElementById("adminResults");if(!box)return;box.innerHTML=matches.map(m=>{const r=resultsCache[m.id]||{};return `<div class="admin-match"><div><strong>${m.home} vs ${m.away}</strong><small>${m.group}<br>${m.start}</small></div><div class="score"><input id="res_${m.id}_home" type="number" min="0" value="${r.home??""}" placeholder="-"><span>-</span><input id="res_${m.id}_away" type="number" min="0" value="${r.away??""}" placeholder="-"></div></div>`}).join("")}
+window.saveResultsAndCalculate=async function(){const status=document.getElementById("adminStatus");for(const m of matches){const h=document.getElementById(`res_${m.id}_home`)?.value,a=document.getElementById(`res_${m.id}_away`)?.value;if(h===""||a===""||h==null||a==null)continue;await setDoc(doc(db,"results",m.id),{matchId:m.id,homeTeam:m.home,awayTeam:m.away,home:Number(h),away:Number(a),updatedAt:serverTimestamp()},{merge:true})}await updatePredictionPoints();status.textContent="✅ Resultados guardados. Ganadores actualizados."}
+async function updatePredictionPoints(){const snap=await getDocs(collection(db,"predictions"));const updates=[];snap.forEach(d=>{const p=d.data();updates.push(setDoc(doc(db,"predictions",d.id),{points:calcPoints(p,resultsCache[p.matchId])},{merge:true}))});await Promise.all(updates)}
+function listenPlayers(){onSnapshot(query(collection(db,"players"),orderBy("updatedAt","desc")),s=>{const ul=document.getElementById("playersList");ul.innerHTML="";if(s.empty){ul.innerHTML=`<li>${T[currentLang].emptyPlayers}</li>`;return}s.forEach(d=>{const li=document.createElement("li");li.textContent=d.data().name;ul.appendChild(li)})})}
+function listenResults(){onSnapshot(collection(db,"results"),s=>{s.forEach(d=>resultsCache[d.id]=d.data());renderAll()})}
+function listenPredictions(){onSnapshot(collection(db,"predictions"),s=>{predictionsCache=[];s.forEach(d=>predictionsCache.push(d.data()));renderMatchRanking()})}
+if(currentPlayerName)document.getElementById("welcomeText").textContent=`${T[currentLang].welcome}, ${currentPlayerName}!`;
+setLang("es");listenPlayers();listenResults();listenPredictions();syncOpenFootball();
