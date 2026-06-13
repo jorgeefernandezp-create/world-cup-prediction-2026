@@ -12,10 +12,12 @@ button{border:none;border-radius:15px;padding:13px;font-weight:800;cursor:pointe
 .card h2{margin-top:0}input{width:100%;padding:14px;border:none;border-radius:14px;margin:8px 0 12px;font-size:16px}.card button{width:100%;margin-top:10px}
 table{width:100%;border-collapse:collapse}th,td{padding:12px;border-bottom:1px solid rgba(255,255,255,.12);text-align:left}th{color:#f5c84b}
 .wide{grid-column:1/-1}.welcome{font-weight:800;color:#f5c84b}#playersList{padding-left:18px;line-height:1.9}
-.day-group{margin:18px 0;border:1px solid rgba(255,255,255,.14);border-radius:22px;overflow:hidden;background:rgba(0,0,0,.12)}
-.day-header{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:16px 18px;background:rgba(245,200,75,.16);border-bottom:1px solid rgba(255,255,255,.12)}
-.day-title{font-size:18px;font-weight:900;color:#f5c84b}.day-count{font-size:13px;opacity:.82}
-.match,.admin-match{display:grid;grid-template-columns:120px 1fr 240px;gap:15px;align-items:center;padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.10)}
+.date-tabs{display:flex;gap:10px;overflow-x:auto;padding:10px 2px 16px;margin:8px 0 8px;scroll-snap-type:x mandatory}
+.date-tabs button{min-width:116px;background:rgba(255,255,255,.10);color:white;border:1px solid rgba(255,255,255,.18);padding:10px;border-radius:16px;scroll-snap-align:start}
+.date-tabs button.active-date{background:#f5c84b;color:#071526;border-color:#f5c84b}
+.tab-day{display:block;font-size:12px;opacity:.85}.tab-date{display:block;font-size:20px;font-weight:900}.tab-count{display:block;font-size:11px;opacity:.78}
+.selected-date-title{font-size:18px;font-weight:900;color:#f5c84b;margin:8px 0 14px;padding:12px 14px;border-radius:16px;background:rgba(245,200,75,.12);border:1px solid rgba(245,200,75,.24)}
+.match,.admin-match{display:grid;grid-template-columns:120px 1fr 240px;gap:15px;align-items:center;padding:16px 0;border-bottom:1px solid rgba(255,255,255,.10)}
 .match:last-child,.admin-match:last-child{border-bottom:none}
 .match-time{font-weight:900;color:#f5c84b}.match-teams strong{display:block}.match small,.admin-match small{display:block;opacity:.75;margin-top:4px}
 .score{display:grid;grid-template-columns:1fr 20px 1fr;gap:8px;align-items:center}.score input{text-align:center;margin:0}
@@ -24,7 +26,7 @@ table{width:100%;border-collapse:collapse}th,td{padding:12px;border-bottom:1px s
 .admin-card{display:none;border-color:rgba(245,200,75,.55);background:rgba(245,200,75,.09)}.admin-card.show{display:block}.table-scroll{overflow-x:auto}
 @media(max-width:800px){
   .grid,.langs{grid-template-columns:1fr}.wide{grid-column:auto}
-  .day-header{display:block}
   .match,.admin-match{grid-template-columns:1fr;gap:8px}
   .match-time{font-size:18px}
+  .date-tabs button{min-width:104px}
 }

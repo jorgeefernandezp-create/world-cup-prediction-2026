@@ -27,16 +27,17 @@ let matches = [
 ];
 
 const T = {
-  es:{subtitle:"Polla Mundialista para compañeros de trabajo",chooseLang:"Elige tu idioma",nameTitle:"👤 Ingresa tu nombre",nameText:"Solo necesitas escribir tu nombre para participar.",placeholder:"Ejemplo: Jorge",enterBtn:"Entrar",welcome:"Bienvenido",saved:"✅ Participante guardado correctamente.",error:"❌ No se pudo guardar. Revisa Firebase.",playersTitle:"👥 Participantes registrados",emptyPlayers:"Todavía no hay participantes.",rulesTitle:"📖 Reglas de puntos",ruleTh:"Acierto",pointsTh:"Puntos",rules:[["Ganador o empate correcto","+3"],["Marcador exacto","+5"],["Campeón del Mundial","+10"],["Máximo goleador","+5"]],lockInfo:"Los pronósticos se bloquean automáticamente cuando empieza el partido.",rankingTitle:"📊 Tabla de posiciones",nameTh:"Nombre",scoreTh:"Puntos",rankInfo:"El ranking se actualiza con los resultados automáticos disponibles.",predTitle:"📅 Mis pronósticos por día",predHelp:"Primero ingresa tu nombre. Luego coloca tus marcadores y guarda.",saveBtn:"Guardar pronósticos",predSaved:"✅ Pronósticos guardados correctamente.",noName:"⚠️ Primero ingresa tu nombre.",closed:"🔒 Cerrado",matches:"partidos"},
-  ja:{subtitle:"職場の仲間で楽しむワールドカップ予想大会",chooseLang:"言語を選択してください",nameTitle:"👤 お名前を入力してください",nameText:"参加するには、お名前の入力だけで完了です。",placeholder:"例：田中",enterBtn:"参加する",welcome:"ようこそ",saved:"✅ 参加者が正常に登録されました。",error:"❌ 保存できませんでした。Firebaseを確認してください。",playersTitle:"👥 登録済み参加者",emptyPlayers:"まだ参加者はいません。",rulesTitle:"📖 得点ルール",ruleTh:"内容",pointsTh:"ポイント",rules:[["勝敗（勝ち・引き分け）を的中","3ポイント"],["スコアを完全的中","5ポイント"],["ワールドカップ優勝国を的中","10ポイント"],["大会得点王を的中","5ポイント"]],lockInfo:"試合開始時刻を過ぎると、その試合の予想は自動的に締め切られます。",rankingTitle:"📊 順位表",nameTh:"名前",scoreTh:"ポイント",rankInfo:"順位表は自動取得された結果に基づいて更新されます。",predTitle:"📅 日付別の予想",predHelp:"最初にお名前を入力してください。その後、スコアを入力して保存します。",saveBtn:"予想を保存する",predSaved:"✅ 予想が正常に保存されました。",noName:"⚠️ 先にお名前を入力してください。",closed:"🔒 受付終了",matches:"試合"},
-  en:{subtitle:"Prediction game for coworkers",chooseLang:"Choose your language",nameTitle:"👤 Enter your name",nameText:"You only need to enter your name to join.",placeholder:"Example: Jorge",enterBtn:"Join",welcome:"Welcome",saved:"✅ Participant saved successfully.",error:"❌ Could not save. Check Firebase.",playersTitle:"👥 Registered participants",emptyPlayers:"There are no participants yet.",rulesTitle:"📖 Scoring rules",ruleTh:"Prediction",pointsTh:"Points",rules:[["Correct winner or draw","+3"],["Exact score","+5"],["Correct World Cup champion","+10"],["Correct top scorer","+5"]],lockInfo:"Predictions are automatically locked when the match starts.",rankingTitle:"📊 Leaderboard",nameTh:"Name",scoreTh:"Points",rankInfo:"The ranking updates with available automatic results.",predTitle:"📅 My predictions by day",predHelp:"First enter your name. Then enter your scores and save.",saveBtn:"Save predictions",predSaved:"✅ Predictions saved successfully.",noName:"⚠️ Enter your name first.",closed:"🔒 Closed",matches:"matches"},
-  pt:{subtitle:"Bolão de palpites para colegas de trabalho",chooseLang:"Escolha seu idioma",nameTitle:"👤 Digite seu nome",nameText:"Você só precisa digitar seu nome para participar.",placeholder:"Exemplo: Jorge",enterBtn:"Entrar",welcome:"Bem-vindo",saved:"✅ Participante salvo com sucesso.",error:"❌ Não foi possível salvar. Verifique o Firebase.",playersTitle:"👥 Participantes registrados",emptyPlayers:"Ainda não há participantes.",rulesTitle:"📖 Regras de pontuação",ruleTh:"Acerto",pointsTh:"Pontos",rules:[["Acertar vencedor ou empate","+3"],["Acertar o placar exato","+5"],["Acertar o campeão da Copa","+10"],["Acertar o artilheiro","+5"]],lockInfo:"Os palpites são bloqueados automaticamente quando a partida começa.",rankingTitle:"📊 Classificação",nameTh:"Nome",scoreTh:"Pontos",rankInfo:"A classificação é atualizada com os resultados automáticos disponíveis.",predTitle:"📅 Meus palpites por dia",predHelp:"Primeiro digite seu nome. Depois coloque os placares e salve.",saveBtn:"Salvar palpites",predSaved:"✅ Palpites salvos com sucesso.",noName:"⚠️ Primeiro digite seu nome.",closed:"🔒 Encerrado",matches:"partidas"}
+  es:{subtitle:"Polla Mundialista para compañeros de trabajo",chooseLang:"Elige tu idioma",nameTitle:"👤 Ingresa tu nombre",nameText:"Solo necesitas escribir tu nombre para participar.",placeholder:"Ejemplo: Jorge",enterBtn:"Entrar",welcome:"Bienvenido",saved:"✅ Participante guardado correctamente.",error:"❌ No se pudo guardar. Revisa Firebase.",playersTitle:"👥 Participantes registrados",emptyPlayers:"Todavía no hay participantes.",rulesTitle:"📖 Reglas de puntos",ruleTh:"Acierto",pointsTh:"Puntos",rules:[["Ganador o empate correcto","+3"],["Marcador exacto","+5"],["Campeón del Mundial","+10"],["Máximo goleador","+5"]],lockInfo:"Los pronósticos se bloquean automáticamente cuando empieza el partido.",rankingTitle:"📊 Tabla de posiciones",nameTh:"Nombre",scoreTh:"Puntos",rankInfo:"El ranking se actualiza con los resultados automáticos disponibles.",predTitle:"📅 Mis pronósticos por fecha",predHelp:"Elige una fecha arriba y coloca tus marcadores.",saveBtn:"Guardar pronósticos",predSaved:"✅ Pronósticos guardados correctamente.",noName:"⚠️ Primero ingresa tu nombre.",closed:"🔒 Cerrado",matches:"partidos"},
+  ja:{subtitle:"職場の仲間で楽しむワールドカップ予想大会",chooseLang:"言語を選択してください",nameTitle:"👤 お名前を入力してください",nameText:"参加するには、お名前の入力だけで完了です。",placeholder:"例：田中",enterBtn:"参加する",welcome:"ようこそ",saved:"✅ 参加者が正常に登録されました。",error:"❌ 保存できませんでした。Firebaseを確認してください。",playersTitle:"👥 登録済み参加者",emptyPlayers:"まだ参加者はいません。",rulesTitle:"📖 得点ルール",ruleTh:"内容",pointsTh:"ポイント",rules:[["勝敗（勝ち・引き分け）を的中","3ポイント"],["スコアを完全的中","5ポイント"],["ワールドカップ優勝国を的中","10ポイント"],["大会得点王を的中","5ポイント"]],lockInfo:"試合開始時刻を過ぎると、その試合の予想は自動的に締め切られます。",rankingTitle:"📊 順位表",nameTh:"名前",scoreTh:"ポイント",rankInfo:"順位表は自動取得された結果に基づいて更新されます。",predTitle:"📅 日付別の予想",predHelp:"上の日付を選んで、スコアを入力してください。",saveBtn:"予想を保存する",predSaved:"✅ 予想が正常に保存されました。",noName:"⚠️ 先にお名前を入力してください。",closed:"🔒 受付終了",matches:"試合"},
+  en:{subtitle:"Prediction game for coworkers",chooseLang:"Choose your language",nameTitle:"👤 Enter your name",nameText:"You only need to enter your name to join.",placeholder:"Example: Jorge",enterBtn:"Join",welcome:"Welcome",saved:"✅ Participant saved successfully.",error:"❌ Could not save. Check Firebase.",playersTitle:"👥 Registered participants",emptyPlayers:"There are no participants yet.",rulesTitle:"📖 Scoring rules",ruleTh:"Prediction",pointsTh:"Points",rules:[["Correct winner or draw","+3"],["Exact score","+5"],["Correct World Cup champion","+10"],["Correct top scorer","+5"]],lockInfo:"Predictions are automatically locked when the match starts.",rankingTitle:"📊 Leaderboard",nameTh:"Name",scoreTh:"Points",rankInfo:"The ranking updates with available automatic results.",predTitle:"📅 My predictions by date",predHelp:"Choose a date above and enter your scores.",saveBtn:"Save predictions",predSaved:"✅ Predictions saved successfully.",noName:"⚠️ Enter your name first.",closed:"🔒 Closed",matches:"matches"},
+  pt:{subtitle:"Bolão de palpites para colegas de trabalho",chooseLang:"Escolha seu idioma",nameTitle:"👤 Digite seu nome",nameText:"Você só precisa digitar seu nome para participar.",placeholder:"Exemplo: Jorge",enterBtn:"Entrar",welcome:"Bem-vindo",saved:"✅ Participante salvo com sucesso.",error:"❌ Não foi possível salvar. Verifique o Firebase.",playersTitle:"👥 Participantes registrados",emptyPlayers:"Ainda não há participantes.",rulesTitle:"📖 Regras de pontuação",ruleTh:"Acerto",pointsTh:"Pontos",rules:[["Acertar vencedor ou empate","+3"],["Acertar o placar exato","+5"],["Acertar o campeão da Copa","+10"],["Acertar o artilheiro","+5"]],lockInfo:"Os palpites são bloqueados automaticamente quando a partida começa.",rankingTitle:"📊 Classificação",nameTh:"Nome",scoreTh:"Pontos",rankInfo:"A classificação é atualizada com os resultados automáticos disponíveis.",predTitle:"📅 Meus palpites por data",predHelp:"Escolha uma data acima e coloque os placares.",saveBtn:"Salvar palpites",predSaved:"✅ Palpites salvos com sucesso.",noName:"⚠️ Primeiro digite seu nome.",closed:"🔒 Encerrado",matches:"partidas"}
 };
 
 let currentLang = "es";
 let currentPlayerName = localStorage.getItem("playerName") || "";
 let resultsCache = {};
 let predictionsCache = [];
+let selectedDayKey = null;
 
 function isLocked(start){ return new Date() >= new Date(start); }
 function safeId(name){ return name.toLowerCase().trim().replace(/[^a-z0-9áéíóúñãõç一-龯ぁ-んァ-ン]/gi,"_"); }
@@ -45,6 +46,13 @@ function localDayKey(start){ return new Date(start).toLocaleDateString("sv-SE", 
 function dayTitle(start){
   const locale = currentLang === "ja" ? "ja-JP" : currentLang === "en" ? "en-US" : currentLang === "pt" ? "pt-BR" : "es-ES";
   return new Date(start).toLocaleDateString(locale, { weekday:"long", year:"numeric", month:"long", day:"numeric", timeZone:"Asia/Tokyo" });
+}
+function tabDay(start){
+  const locale = currentLang === "ja" ? "ja-JP" : currentLang === "en" ? "en-US" : currentLang === "pt" ? "pt-BR" : "es-ES";
+  return new Date(start).toLocaleDateString(locale, { weekday:"short", timeZone:"Asia/Tokyo" });
+}
+function tabDate(start){
+  return new Date(start).toLocaleDateString("es-ES", { day:"2-digit", month:"short", timeZone:"Asia/Tokyo" }).replace(".","");
 }
 function timeJst(start){ return new Date(start).toLocaleTimeString(currentLang==="ja"?"ja-JP":"es-ES", {hour:"2-digit", minute:"2-digit", timeZone:"Asia/Tokyo"}); }
 
@@ -89,11 +97,14 @@ window.syncOpenFootball = async function(){
       return {id, group: m.group || m.round || "", home: flagFor(m.team1 || "TBD"), away: flagFor(m.team2 || "TBD"), start: parseOpenFootballDate(m.date, m.time), ground: m.ground || ""};
     }).sort((a,b)=>new Date(a.start)-new Date(b.start));
 
+    if(!selectedDayKey && matches.length) selectedDayKey = localDayKey(matches[0].start);
     renderMatches(); renderAdminResults(); await recalculateRanking();
     if(status) status.textContent = `✅ Calendario automático cargado: ${matches.length} partidos.`;
     if(adminStatus) adminStatus.textContent = `✅ Sincronizado: ${matches.length} partidos.`;
   }catch(e){
     console.error(e);
+    if(!selectedDayKey && matches.length) selectedDayKey = localDayKey(matches[0].start);
+    renderMatches();
     if(status) status.textContent = "⚠️ No se pudo cargar la fuente gratuita. Usando partidos de respaldo.";
     if(adminStatus) adminStatus.textContent = "⚠️ No se pudo sincronizar. Usando respaldo.";
   }
@@ -124,27 +135,53 @@ window.enterGame = async function(){
   }catch(e){ console.error(e); status.textContent=T[currentLang].error; }
 };
 
-function renderMatches(){
-  const box=document.getElementById("matchesContainer");
-  if(!box) return;
+window.selectDateTab = function(dayKey){
+  selectedDayKey = dayKey;
+  renderMatches();
+};
+
+function buildGroups(){
   const sorted=[...matches].sort((a,b)=>new Date(a.start)-new Date(b.start));
   const groups={};
   for(const m of sorted){ const k=localDayKey(m.start); (groups[k] ||= []).push(m); }
-  box.innerHTML = Object.entries(groups).map(([day, list])=>{
-    const rows = list.map(m=>{
-      const locked=isLocked(m.start);
-      const res = resultsCache[m.id];
-      const resultText = res ? `<span class="result-badge">Resultado: ${res.home} - ${res.away}</span>` : "";
-      if(locked){
-        return `<div class="match"><div class="match-time">${timeJst(m.start)}</div><div class="match-teams"><strong>${m.home} vs ${m.away}</strong><small>${m.group}<br>${m.ground || ""}</small>${resultText}</div><div class="locked">${T[currentLang].closed}</div></div>`;
-      }
-      return `<div class="match" data-match="${m.id}">
-        <div class="match-time">${timeJst(m.start)}</div>
-        <div class="match-teams"><strong>${m.home} vs ${m.away}</strong><small>${m.group}<br>${m.ground || ""}</small>${resultText}</div>
-        <div class="score"><input id="${m.id}_home" type="number" min="0" placeholder="0"><span>-</span><input id="${m.id}_away" type="number" min="0" placeholder="0"></div>
-      </div>`;
-    }).join("");
-    return `<section class="day-group"><div class="day-header"><div class="day-title">📅 ${dayTitle(list[0].start)}</div><div class="day-count">${list.length} ${T[currentLang].matches}</div></div>${rows}</section>`;
+  return groups;
+}
+
+function renderMatches(){
+  const box=document.getElementById("matchesContainer");
+  const tabs=document.getElementById("dateTabs");
+  const title=document.getElementById("selectedDateTitle");
+  if(!box || !tabs) return;
+
+  const groups=buildGroups();
+  const keys=Object.keys(groups);
+  if(!selectedDayKey || !groups[selectedDayKey]) selectedDayKey = keys[0];
+
+  tabs.innerHTML = keys.map(k=>{
+    const list = groups[k];
+    const first = list[0];
+    return `<button class="${k===selectedDayKey ? "active-date" : ""}" onclick="selectDateTab('${k}')">
+      <span class="tab-day">${tabDay(first.start)}</span>
+      <span class="tab-date">${tabDate(first.start)}</span>
+      <span class="tab-count">${list.length} ${T[currentLang].matches}</span>
+    </button>`;
+  }).join("");
+
+  const list = groups[selectedDayKey] || [];
+  title.textContent = list.length ? `📅 ${dayTitle(list[0].start)} · ${list.length} ${T[currentLang].matches}` : "";
+
+  box.innerHTML = list.map(m=>{
+    const locked=isLocked(m.start);
+    const res = resultsCache[m.id];
+    const resultText = res ? `<span class="result-badge">Resultado: ${res.home} - ${res.away}</span>` : "";
+    if(locked){
+      return `<div class="match"><div class="match-time">${timeJst(m.start)}</div><div class="match-teams"><strong>${m.home} vs ${m.away}</strong><small>${m.group}<br>${m.ground || ""}</small>${resultText}</div><div class="locked">${T[currentLang].closed}</div></div>`;
+    }
+    return `<div class="match" data-match="${m.id}">
+      <div class="match-time">${timeJst(m.start)}</div>
+      <div class="match-teams"><strong>${m.home} vs ${m.away}</strong><small>${m.group}<br>${m.ground || ""}</small>${resultText}</div>
+      <div class="score"><input id="${m.id}_home" type="number" min="0" placeholder="0"><span>-</span><input id="${m.id}_away" type="number" min="0" placeholder="0"></div>
+    </div>`;
   }).join("");
 }
 
@@ -153,7 +190,9 @@ window.savePredictions = async function(){
   if(!currentPlayerName){ status.textContent=T[currentLang].noName; return; }
   try{
     const playerId=safeId(currentPlayerName);
-    for(const m of matches){
+    const groups=buildGroups();
+    const visibleMatches = groups[selectedDayKey] || matches;
+    for(const m of visibleMatches){
       if(isLocked(m.start)) continue;
       const home=document.getElementById(`${m.id}_home`)?.value;
       const away=document.getElementById(`${m.id}_away`)?.value;

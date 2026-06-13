@@ -57,8 +57,10 @@
       </div>
 
       <div class="card wide">
-        <h2 id="predTitle">📅 Mis pronósticos por día</h2>
-        <p class="small" id="predHelp">Primero ingresa tu nombre. Luego coloca tus marcadores y guarda.</p>
+        <h2 id="predTitle">📅 Mis pronósticos por fecha</h2>
+        <p class="small" id="predHelp">Elige una fecha arriba y coloca tus marcadores.</p>
+        <div id="dateTabs" class="date-tabs"></div>
+        <div id="selectedDateTitle" class="selected-date-title"></div>
         <div id="matchesContainer"></div>
         <button onclick="savePredictions()" id="saveBtn">Guardar pronósticos</button>
         <p class="status" id="predictionStatus"></p>
