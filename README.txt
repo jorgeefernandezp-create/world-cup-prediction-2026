@@ -48,3 +48,10 @@ VERSION 8.0 FIREBASE FINAL:
 - Se recuerda el partido y fecha seleccionados.
 - Ranking y ganador se calculan por partido desde Firebase.
 - Mantiene fondo de estadio verde y diseño móvil.
+
+
+VERSION 8.1 JAPAN TIME FIX:
+- Corrige conversión de horarios del Mundial a hora de Japón (JST).
+- Interpreta ET/EDT como UTC-4 y UTC correctamente.
+- Muestra fecha/hora en Asia/Tokyo.
+- El bloqueo se activa solo cuando el inicio real del partido ya pasó.
