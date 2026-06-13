@@ -58,7 +58,7 @@ window.toggleParticipants=function(){participantsOpen=!participantsOpen;renderMa
 
 function renderAll(){renderTabs();renderSelectedMatch();renderMatchRanking();renderAdminResults()}
 function renderTabs(){const groups=buildGroups();const keys=Object.keys(groups);if(!selectedDayKey||!groups[selectedDayKey])selectedDayKey=keys[0];if(!selectedMatchId)selectedMatchId=groups[selectedDayKey]?.[0]?.id;document.getElementById("dateTabs").innerHTML=keys.map(k=>{const list=groups[k],first=list[0];return `<button class="${k===selectedDayKey?"active-date":""}" onclick="selectDateTab('${k}')"><span class="tab-day">${weekday(first.start)}</span><span class="tab-date">${dateShort(first.start)}</span><span class="tab-count">${list.length} ${T[currentLang].matches}</span></button>`}).join("");const list=groups[selectedDayKey]||[];document.getElementById("matchTabs").innerHTML=list.map(m=>`<button class="${m.id===selectedMatchId?"active-match":""}" onclick="selectMatchTab('${m.id}')"><span class="match-tab-time">${timeJst(m.start)}</span><span class="match-tab-teams">${m.home.split(" ").slice(0,2).join(" ")} vs ${m.away.split(" ").slice(0,2).join(" ")}</span></button>`).join("")}
-function renderSelectedMatch(){const m=selectedMatch();if(!m)return;const res=resultsCache[m.id],locked=isLocked(m.start);const resultText=res?`<span class="result-badge">Resultado final: ${res.home} - ${res.away}</span>`:"";document.getElementById("selectedMatchBox").innerHTML=`<div class="selected-match"><div class="teams-line">${m.home} vs ${m.away}</div><div class="match-meta">📅 ${dateLong(m.start)} · 🕒 ${timeJst(m.start)} JST<br>${m.group} ${m.ground?"· "+m.ground:""}</div><div class="countdown">${countdownText(m.start)}</div><br>${resultText}${locked?`<div class="locked">${T[currentLang].closed}</div>`:`<div class="score"><input id="selected_home" type="number" min="0" placeholder="0"><span>-</span><input id="selected_away" type="number" min="0" placeholder="0"></div>`}</div>`}
+function renderSelectedMatch(){const m=selectedMatch();if(!m)return;const res=resultsCache[m.id],locked=isLocked(m.start);const resultText=res?`<span class="result-badge">Resultado final: ${res.home} - ${res.away}</span>`:"";document.getElementById("selectedMatchBox").innerHTML=`<div class="selected-match"><div class="teams-line">${m.home} vs ${m.away}</div><div class="match-meta">📅 ${dateLong(m.start)} · 🕒 ${timeJst(m.start)} JST<br>${m.group} ${m.ground?"· "+m.ground:""}</div><div class="countdown" id="countdownBox">${countdownText(m.start)}</div><br>${resultText}${locked?`<div class="locked">${T[currentLang].closed}</div>`:`<div class="score"><input id="selected_home" type="number" min="0" placeholder="0"><span>-</span><input id="selected_away" type="number" min="0" placeholder="0"></div>`}</div>`}
 window.saveSelectedPrediction=async function(){const status=document.getElementById("predictionStatus"),m=selectedMatch();if(!currentPlayerName){status.textContent=T[currentLang].noName;return}if(!m||isLocked(m.start)){status.textContent=T[currentLang].closed;return}const home=document.getElementById("selected_home")?.value,away=document.getElementById("selected_away")?.value;if(home===""||away===""){status.textContent="⚠️ Completa el marcador.";return}const playerId=safeId(currentPlayerName);await setDoc(doc(db,"predictions",`${playerId}_${m.id}`),{playerId,playerName:currentPlayerName,matchId:m.id,homeTeam:m.home,awayTeam:m.away,predictedHome:Number(home),predictedAway:Number(away),points:calcPoints({predictedHome:Number(home),predictedAway:Number(away)},resultsCache[m.id]),matchStart:m.start,updatedAt:serverTimestamp()},{merge:true});status.textContent=T[currentLang].predSaved}
 
 function selectedRows(){const m=selectedMatch();if(!m)return[];return predictionsCache.filter(p=>p.matchId===m.id).map(p=>({...p,points:calcPoints(p,resultsCache[m.id])})).sort((a,b)=>b.points-a.points)}
@@ -72,6 +72,14 @@ function launchConfetti(){const layer=document.getElementById("confettiLayer"),c
 function listenResults(){onSnapshot(collection(db,"results"),s=>{s.forEach(d=>resultsCache[d.id]=d.data());renderAll()})}
 function listenPredictions(){onSnapshot(collection(db,"predictions"),s=>{predictionsCache=[];s.forEach(d=>predictionsCache.push(d.data()));renderMatchRanking()})}
 function listenSettings(){onSnapshot(doc(db,"settings","stake"),snap=>{if(snap.exists()&&snap.data().amount!=null)stakeAmount=Number(snap.data().amount);renderMatchRanking()})}
-setInterval(()=>renderSelectedMatch(),1000);
+
+setInterval(() => {
+  const m = selectedMatch();
+  const countdownBox = document.getElementById("countdownBox");
+  if (m && countdownBox) {
+    countdownBox.textContent = countdownText(m.start);
+  }
+}, 1000);
+
 if(currentPlayerName)document.getElementById("welcomeText").textContent=`${T[currentLang].welcome}, ${currentPlayerName}!`;
 setLang("es");listenResults();listenPredictions();listenSettings();syncOpenFootball();
