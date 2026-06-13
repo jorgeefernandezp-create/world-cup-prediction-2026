@@ -9,6 +9,7 @@
 <body>
   <main class="page">
     <section class="hero">
+      <div class="stadium-lights"></div>
       <div class="badge">🏆 2026</div>
       <h1>WORLD CUP PREDICTION</h1>
       <p id="subtitle">Polla Mundialista por partido</p>
@@ -19,11 +20,10 @@
         <button onclick="setLang('pt')" id="btn-pt">🇧🇷 Português</button>
       </div>
       <p class="small" id="dataStatus">Cargando calendario automático...</p>
-      <p class="small">Admin: agrega <strong>?admin=jorge</strong> al final del enlace.</p>
     </section>
 
     <section class="grid">
-      <div class="card">
+      <div class="card compact-card">
         <h2 id="nameTitle">👤 Ingresa tu nombre</h2>
         <p id="nameText">Solo necesitas escribir tu nombre para participar.</p>
         <input id="playerName" placeholder="Ejemplo: Jorge" />
@@ -32,24 +32,30 @@
         <p class="status" id="saveStatus"></p>
       </div>
 
-      <div class="card">
+      <div class="card compact-card">
         <h2 id="playersTitle">👥 Participantes</h2>
         <ul id="playersList"><li>Cargando...</li></ul>
       </div>
 
-      <div class="card">
-        <h2 id="rulesTitle">📖 Reglas por partido</h2>
-        <table><thead><tr><th id="ruleTh">Acierto</th><th id="pointsTh">Puntos</th></tr></thead><tbody id="rulesBody"></tbody></table>
+      <div class="card rules-card">
+        <h2 id="rulesTitle">📖 Reglas</h2>
+        <table class="small-table">
+          <thead><tr><th id="ruleTh">Acierto</th><th id="pointsTh">Pts</th></tr></thead>
+          <tbody id="rulesBody"></tbody>
+        </table>
         <p class="small" id="lockInfo">Cada partido tiene su propio ganador.</p>
       </div>
 
-      <div class="card">
+      <div class="card winner-card">
         <h2 id="matchRankTitle">🏆 Ganador del partido</h2>
         <div id="winnerBox" class="winner-box">Selecciona un partido.</div>
-        <table><thead><tr><th>#</th><th id="rankNameTh">Nombre</th><th id="rankPredTh">Pronóstico</th><th id="rankPtsTh">Pts</th></tr></thead><tbody id="matchRankingBody"></tbody></table>
+        <table class="small-table">
+          <thead><tr><th>#</th><th id="rankNameTh">Nombre</th><th id="rankPredTh">Score</th><th id="rankPtsTh">Pts</th></tr></thead>
+          <tbody id="matchRankingBody"></tbody>
+        </table>
       </div>
 
-      <div class="card wide">
+      <div class="card wide prediction-card">
         <h2 id="predTitle">📅 Fechas y partidos</h2>
         <p class="small" id="predHelp">Elige la fecha, luego el partido. Solo se muestra ese partido.</p>
         <div id="dateTabs" class="date-tabs"></div>
@@ -61,7 +67,7 @@
 
       <div class="card wide admin-card" id="adminPanel">
         <h2>👨‍💼 Panel administrador</h2>
-        <p class="small">Puedes colocar el resultado final de cada partido como respaldo.</p>
+        <p class="small">Admin: agrega <strong>?admin=jorge</strong> al final del enlace.</p>
         <div id="adminResults"></div>
         <button onclick="saveResultsAndCalculate()">Guardar resultados y actualizar ganadores</button>
         <button onclick="syncOpenFootball()">Sincronizar calendario/resultados ahora</button>
@@ -69,6 +75,7 @@
       </div>
     </section>
   </main>
+
   <script type="module" src="app.js"></script>
 </body>
 </html>
