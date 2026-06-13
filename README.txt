@@ -1,15 +1,11 @@
-WORLD CUP PREDICTION 2026 - VERSION 6.2
+WORLD CUP PREDICTION 2026 - VERSION 6.3
 
 NUEVO:
-- Monto referencial por partido.
-- Fase de grupos: ¥100 por participante.
-- Pozo del partido = participantes que pronosticaron ese partido x monto.
-- Panel admin permite cambiar monto.
-- Cuenta regresiva por partido.
-- Confeti cuando aparece ganador.
-- Diseño estilo Mundial con estadio de fondo.
-- Mejor experiencia móvil.
-- Tarjeta de ganador con nombre, score y puntos.
+- Lista de participantes por partido con scroll.
+- Encima de la lista aparece el total del pozo referencial.
+- Muestra nombre y pronóstico de cada participante.
+- Pozo = participantes del partido x monto configurado.
+- Mantiene estadio, confeti, cuenta regresiva y ganador por partido.
 
 IMPORTANTE:
 La web no procesa pagos ni administra dinero. Solo muestra un cálculo referencial por partido para organizar el juego.

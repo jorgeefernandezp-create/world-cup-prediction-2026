@@ -25,10 +25,10 @@ let matches = [
 ];
 
 const T = {
-  es:{subtitle:"Polla Mundialista por partido",nameTitle:"👤 Ingresa tu nombre",nameText:"Solo necesitas escribir tu nombre para participar.",placeholder:"Ejemplo: Jorge",enterBtn:"Entrar",welcome:"Bienvenido",saved:"✅ Participante guardado.",error:"❌ Error. Revisa Firebase.",potTitle:"💰 Pozo del partido",potInfo:"Fase de grupos: ¥100 por participante.",rulesTitle:"📖 Reglas",ruleTh:"Acierto",pointsTh:"Pts",rules:[["Marcador exacto","+5"],["Ganador/empate correcto","+3"],["Fallo","0"]],lockInfo:"Cada partido tiene su propio ganador.",matchRankTitle:"🏆 Ganador del partido",rankNameTh:"Nombre",rankPredTh:"Score",rankPtsTh:"Pts",predTitle:"📅 Fechas y partidos",predHelp:"Elige la fecha, luego el partido. Solo se muestra ese partido.",saveBtn:"Guardar pronóstico de este partido",predSaved:"✅ Pronóstico guardado.",noName:"⚠️ Primero ingresa tu nombre.",closed:"🔒 Cerrado",matches:"partidos",winnerPending:"Aún no hay resultado final.",noPreds:"Aún no hay pronósticos para este partido.",winner:"Ganador",score:"Score",countdown:"Cierra en"},
-  ja:{subtitle:"試合ごとのワールドカップ予想",nameTitle:"👤 お名前を入力してください",nameText:"参加するには、お名前の入力だけで完了です。",placeholder:"例：田中",enterBtn:"参加する",welcome:"ようこそ",saved:"✅ 参加者が登録されました。",error:"❌ エラー。Firebaseを確認してください。",potTitle:"💰 この試合の合計",potInfo:"グループステージ：参加者1人につき100円。",rulesTitle:"📖 ルール",ruleTh:"内容",pointsTh:"点",rules:[["スコア完全的中","5点"],["勝敗・引き分け的中","3点"],["不的中","0"]],lockInfo:"各試合ごとに勝者が決まります。",matchRankTitle:"🏆 この試合の勝者",rankNameTh:"名前",rankPredTh:"予想",rankPtsTh:"点",predTitle:"📅 日付と試合",predHelp:"日付を選び、次に試合を選んでください。",saveBtn:"この試合の予想を保存する",predSaved:"✅ 予想が保存されました。",noName:"⚠️ 先にお名前を入力してください。",closed:"🔒 受付終了",matches:"試合",winnerPending:"まだ試合結果がありません。",noPreds:"この試合の予想はまだありません。",winner:"勝者",score:"スコア",countdown:"締切まで"},
-  en:{subtitle:"Prediction pool by match",nameTitle:"👤 Enter your name",nameText:"You only need to enter your name to join.",placeholder:"Example: Jorge",enterBtn:"Join",welcome:"Welcome",saved:"✅ Participant saved.",error:"❌ Error. Check Firebase.",potTitle:"💰 Match pot",potInfo:"Group stage: ¥100 per participant.",rulesTitle:"📖 Rules",ruleTh:"Prediction",pointsTh:"Pts",rules:[["Exact score","+5"],["Correct winner/draw","+3"],["Wrong","0"]],lockInfo:"Each match has its own winner.",matchRankTitle:"🏆 Match winner",rankNameTh:"Name",rankPredTh:"Score",rankPtsTh:"Pts",predTitle:"📅 Dates and matches",predHelp:"Choose a date, then choose a match.",saveBtn:"Save prediction for this match",predSaved:"✅ Prediction saved.",noName:"⚠️ Enter your name first.",closed:"🔒 Closed",matches:"matches",winnerPending:"No final result yet.",noPreds:"No predictions for this match yet.",winner:"Winner",score:"Score",countdown:"Closes in"},
-  pt:{subtitle:"Bolão por partida",nameTitle:"👤 Digite seu nome",nameText:"Você só precisa digitar seu nome para participar.",placeholder:"Exemplo: Jorge",enterBtn:"Entrar",welcome:"Bem-vindo",saved:"✅ Participante salvo.",error:"❌ Erro. Verifique o Firebase.",potTitle:"💰 Prêmio da partida",potInfo:"Fase de grupos: ¥100 por participante.",rulesTitle:"📖 Regras",ruleTh:"Acerto",pointsTh:"Pts",rules:[["Placar exato","+5"],["Vencedor/empate correto","+3"],["Erro","0"]],lockInfo:"Cada partida tem seu próprio vencedor.",matchRankTitle:"🏆 Vencedor da partida",rankNameTh:"Nome",rankPredTh:"Score",rankPtsTh:"Pts",predTitle:"📅 Datas e partidas",predHelp:"Escolha a data e depois a partida.",saveBtn:"Salvar palpite desta partida",predSaved:"✅ Palpite salvo.",noName:"⚠️ Primeiro digite seu nome.",closed:"🔒 Encerrado",matches:"partidas",winnerPending:"Ainda não há resultado final.",noPreds:"Ainda não há palpites para esta partida.",winner:"Vencedor",score:"Score",countdown:"Fecha em"}
+  es:{subtitle:"Polla Mundialista por partido",nameTitle:"👤 Ingresa tu nombre",nameText:"Solo necesitas escribir tu nombre para participar.",placeholder:"Ejemplo: Jorge",enterBtn:"Entrar",welcome:"Bienvenido",saved:"✅ Participante guardado.",error:"❌ Error. Revisa Firebase.",potTitle:"💰 Pozo del partido",potInfo:"Fase de grupos: ¥100 por participante.",matchParticipantsTitle:"👥 Participantes del partido",participants:"participantes",rulesTitle:"📖 Reglas",ruleTh:"Acierto",pointsTh:"Pts",rules:[["Marcador exacto","+5"],["Ganador/empate correcto","+3"],["Fallo","0"]],lockInfo:"Cada partido tiene su propio ganador.",matchRankTitle:"🏆 Ganador del partido",rankNameTh:"Nombre",rankPredTh:"Score",rankPtsTh:"Pts",predTitle:"📅 Fechas y partidos",predHelp:"Elige la fecha, luego el partido. Solo se muestra ese partido.",saveBtn:"Guardar pronóstico de este partido",predSaved:"✅ Pronóstico guardado.",noName:"⚠️ Primero ingresa tu nombre.",closed:"🔒 Cerrado",matches:"partidos",winnerPending:"Aún no hay resultado final.",noPreds:"Aún no hay pronósticos para este partido.",winner:"Ganador",score:"Score",countdown:"Cierra en"},
+  ja:{subtitle:"試合ごとのワールドカップ予想",nameTitle:"👤 お名前を入力してください",nameText:"参加するには、お名前の入力だけで完了です。",placeholder:"例：田中",enterBtn:"参加する",welcome:"ようこそ",saved:"✅ 参加者が登録されました。",error:"❌ エラー。Firebaseを確認してください。",potTitle:"💰 この試合の合計",potInfo:"グループステージ：参加者1人につき100円。",matchParticipantsTitle:"👥 この試合の参加者",participants:"参加者",rulesTitle:"📖 ルール",ruleTh:"内容",pointsTh:"点",rules:[["スコア完全的中","5点"],["勝敗・引き分け的中","3点"],["不的中","0"]],lockInfo:"各試合ごとに勝者が決まります。",matchRankTitle:"🏆 この試合の勝者",rankNameTh:"名前",rankPredTh:"予想",rankPtsTh:"点",predTitle:"📅 日付と試合",predHelp:"日付を選び、次に試合を選んでください。",saveBtn:"この試合の予想を保存する",predSaved:"✅ 予想が保存されました。",noName:"⚠️ 先にお名前を入力してください。",closed:"🔒 受付終了",matches:"試合",winnerPending:"まだ試合結果がありません。",noPreds:"この試合の予想はまだありません。",winner:"勝者",score:"スコア",countdown:"締切まで"},
+  en:{subtitle:"Prediction pool by match",nameTitle:"👤 Enter your name",nameText:"You only need to enter your name to join.",placeholder:"Example: Jorge",enterBtn:"Join",welcome:"Welcome",saved:"✅ Participant saved.",error:"❌ Error. Check Firebase.",potTitle:"💰 Match pot",potInfo:"Group stage: ¥100 per participant.",matchParticipantsTitle:"👥 Match participants",participants:"participants",rulesTitle:"📖 Rules",ruleTh:"Prediction",pointsTh:"Pts",rules:[["Exact score","+5"],["Correct winner/draw","+3"],["Wrong","0"]],lockInfo:"Each match has its own winner.",matchRankTitle:"🏆 Match winner",rankNameTh:"Name",rankPredTh:"Score",rankPtsTh:"Pts",predTitle:"📅 Dates and matches",predHelp:"Choose a date, then choose a match.",saveBtn:"Save prediction for this match",predSaved:"✅ Prediction saved.",noName:"⚠️ Enter your name first.",closed:"🔒 Closed",matches:"matches",winnerPending:"No final result yet.",noPreds:"No predictions for this match yet.",winner:"Winner",score:"Score",countdown:"Closes in"},
+  pt:{subtitle:"Bolão por partida",nameTitle:"👤 Digite seu nome",nameText:"Você só precisa digitar seu nome para participar.",placeholder:"Exemplo: Jorge",enterBtn:"Entrar",welcome:"Bem-vindo",saved:"✅ Participante salvo.",error:"❌ Erro. Verifique o Firebase.",potTitle:"💰 Prêmio da partida",potInfo:"Fase de grupos: ¥100 por participante.",matchParticipantsTitle:"👥 Participantes da partida",participants:"participantes",rulesTitle:"📖 Regras",ruleTh:"Acerto",pointsTh:"Pts",rules:[["Placar exato","+5"],["Vencedor/empate correto","+3"],["Erro","0"]],lockInfo:"Cada partida tem seu próprio vencedor.",matchRankTitle:"🏆 Vencedor da partida",rankNameTh:"Nome",rankPredTh:"Score",rankPtsTh:"Pts",predTitle:"📅 Datas e partidas",predHelp:"Escolha a data e depois a partida.",saveBtn:"Salvar palpite desta partida",predSaved:"✅ Palpite salvo.",noName:"⚠️ Primeiro digite seu nome.",closed:"🔒 Encerrado",matches:"partidas",winnerPending:"Ainda não há resultado final.",noPreds:"Ainda não há palpites para esta partida.",winner:"Vencedor",score:"Score",countdown:"Fecha em"}
 };
 
 let currentLang = "es";
@@ -61,10 +61,7 @@ function calcPoints(pred,res){
 function countdownText(start){
   const diff = new Date(start).getTime() - Date.now();
   if(diff <= 0) return T[currentLang].closed;
-  const d=Math.floor(diff/86400000);
-  const h=Math.floor((diff%86400000)/3600000);
-  const m=Math.floor((diff%3600000)/60000);
-  const s=Math.floor((diff%60000)/1000);
+  const d=Math.floor(diff/86400000), h=Math.floor((diff%86400000)/3600000), m=Math.floor((diff%3600000)/60000), s=Math.floor((diff%60000)/1000);
   return `${T[currentLang].countdown}: ${d>0?d+"d ":""}${h}h ${m}m ${s}s`;
 }
 
@@ -100,7 +97,7 @@ window.setLang=function(lang){
   document.querySelectorAll(".langs button").forEach(b=>b.classList.remove("active"));
   document.getElementById("btn-"+lang).classList.add("active");
   const t=T[lang];
-  ["subtitle","nameTitle","nameText","enterBtn","potTitle","potInfo","rulesTitle","ruleTh","pointsTh","lockInfo","matchRankTitle","rankNameTh","rankPredTh","rankPtsTh","predTitle","predHelp","saveBtn"].forEach(id=>document.getElementById(id).textContent=t[id]);
+  ["subtitle","nameTitle","nameText","enterBtn","potTitle","potInfo","matchParticipantsTitle","rulesTitle","ruleTh","pointsTh","lockInfo","matchRankTitle","rankNameTh","rankPredTh","rankPtsTh","predTitle","predHelp","saveBtn"].forEach(id=>document.getElementById(id).textContent=t[id]);
   document.getElementById("playerName").placeholder=t.placeholder;
   document.getElementById("rulesBody").innerHTML=t.rules.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join("");
   if(currentPlayerName) document.getElementById("welcomeText").textContent=`${t.welcome}, ${currentPlayerName}!`;
@@ -177,10 +174,28 @@ window.saveSelectedPrediction=async function(){
   status.textContent=T[currentLang].predSaved;
 };
 
-function renderPot(rows){
+function selectedRows(){
+  const m=selectedMatch();
+  if(!m) return [];
+  return predictionsCache.filter(p=>p.matchId===m.id).map(p=>({...p,points:calcPoints(p,resultsCache[m.id])})).sort((a,b)=>b.points-a.points);
+}
+
+function renderPotAndParticipants(rows){
   const count = rows.length;
   const total = count * stakeAmount;
-  document.getElementById("potBox").innerHTML = `¥${total.toLocaleString()}<span class="pot-detail">${count} participantes × ¥${stakeAmount}</span>`;
+  document.getElementById("potBox").innerHTML = `¥${total.toLocaleString()}<span class="pot-detail">${count} ${T[currentLang].participants} × ¥${stakeAmount}</span>`;
+  document.getElementById("matchParticipantsSummary").textContent = `${count} ${T[currentLang].participants} · Total ¥${total.toLocaleString()}`;
+  const list = document.getElementById("matchParticipantsList");
+  if(!rows.length){
+    list.innerHTML = `<div class="participant-empty">${T[currentLang].noPreds}</div>`;
+    return;
+  }
+  list.innerHTML = rows.map((r,i)=>`
+    <div class="participant-row">
+      <span class="participant-name">${i+1}. ${r.playerName}</span>
+      <span class="participant-score">${r.predictedHome} - ${r.predictedAway}</span>
+    </div>
+  `).join("");
 }
 
 function renderMatchRanking(){
@@ -188,8 +203,8 @@ function renderMatchRanking(){
   const body=document.getElementById("matchRankingBody");
   const box=document.getElementById("winnerBox");
   if(!m){body.innerHTML="";return;}
-  const rows=predictionsCache.filter(p=>p.matchId===m.id).map(p=>({...p,points:calcPoints(p,resultsCache[m.id])})).sort((a,b)=>b.points-a.points);
-  renderPot(rows);
+  const rows = selectedRows();
+  renderPotAndParticipants(rows);
   const res=resultsCache[m.id];
   if(!res){ box.innerHTML=T[currentLang].winnerPending; }
   else if(!rows.length){ box.innerHTML=T[currentLang].noPreds; }
@@ -264,14 +279,6 @@ function launchConfetti(){
   }
 }
 
-function listenPlayers(){
-  onSnapshot(query(collection(db,"players"),orderBy("updatedAt","desc")),(s)=>{
-    const ul=document.getElementById("playersList"); if(!ul) return;
-    ul.innerHTML="";
-    if(s.empty){ul.innerHTML=`<li>${T[currentLang].emptyPlayers}</li>`;return;}
-    s.forEach(d=>{const li=document.createElement("li");li.textContent=d.data().name;ul.appendChild(li);});
-  });
-}
 function listenResults(){ onSnapshot(collection(db,"results"),s=>{s.forEach(d=>resultsCache[d.id]=d.data());renderAll();}); }
 function listenPredictions(){ onSnapshot(collection(db,"predictions"),s=>{predictionsCache=[];s.forEach(d=>predictionsCache.push(d.data()));renderMatchRanking();}); }
 function listenSettings(){
@@ -284,4 +291,4 @@ function listenSettings(){
 setInterval(()=>renderSelectedMatch(),1000);
 
 if(currentPlayerName){document.getElementById("welcomeText").textContent=`${T[currentLang].welcome}, ${currentPlayerName}!`;}
-setLang("es"); listenPlayers(); listenResults(); listenPredictions(); listenSettings(); syncOpenFootball();
+setLang("es"); listenResults(); listenPredictions(); listenSettings(); syncOpenFootball();
