@@ -1335,31 +1335,60 @@ window.saveStakeAmount = async function() {
   renderMatchRanking();
 };
 window.saveResultsAndCalculate = async function() {
-  for (const m of matches) {
-    const h = document.getElementById(`res_${m.id}_home`)?.value;
-    const a = document.getElementById(`res_${m.id}_away`)?.value;
-    if (h === "" || a === "" || h == null || a == null) continue;
-    await setDoc(doc(db, "results", m.id), {
-      matchId: m.id,
-      homeKey: m.homeKey,
-      awayKey: m.awayKey,
-      home: Number(h),
-      away: Number(a),
-      updatedAt: serverTimestamp()
-    }, { merge: true });
+  const adminStatus = document.getElementById("adminStatus");
+  try {
+    if (adminStatus) adminStatus.textContent = "⏳ Guardando resultados manuales...";
+    let saved = 0;
+    for (const m of matches) {
+      const h = document.getElementById(`res_${m.id}_home`)?.value;
+      const a = document.getElementById(`res_${m.id}_away`)?.value;
+      if (h === "" || a === "" || h == null || a == null) continue;
+
+      const resultObj = {
+        matchId: m.id,
+        homeKey: m.homeKey,
+        awayKey: m.awayKey,
+        home: Number(h),
+        away: Number(a),
+        status: "MANUAL",
+        provider: "manual",
+        updatedAt: serverTimestamp()
+      };
+
+      // IMPORTANTE: actualiza memoria local antes de recalcular puntos.
+      resultsCache[m.id] = { ...resultObj, updatedAt: new Date().toISOString() };
+
+      await setDoc(doc(db, "results", m.id), resultObj, { merge: true });
+      saved++;
+    }
+
+    await updatePredictionPoints();
+    renderAll();
+    if (adminStatus) adminStatus.textContent = `✅ Resultados manuales guardados: ${saved}. Ranking actualizado.`;
+  } catch (err) {
+    console.error(err);
+    if (adminStatus) adminStatus.textContent = "❌ Error guardando resultados manuales.";
   }
-  await updatePredictionPoints();
-  document.getElementById("adminStatus").textContent = "✅ Resultados guardados.";
 };
 async function updatePredictionPoints() {
   const snap = await getDocs(collection(db, "predictions"));
   const updates = [];
+  const newPredictions = [];
+
   snap.forEach(d => {
     const p = d.data();
     const match = matches.find(m => m.id === p.matchId);
-    updates.push(setDoc(doc(db, "predictions", d.id), { points: calcPoints(p, match ? officialResultFor(match) : resultsCache[p.matchId]) }, { merge: true }));
+    const res = match ? officialResultFor(match) : resultsCache[p.matchId];
+    const points = calcPoints(p, res);
+    const updatedPrediction = { ...p, points };
+    newPredictions.push(updatedPrediction);
+    updates.push(setDoc(doc(db, "predictions", d.id), { points }, { merge: true }));
   });
+
   await Promise.all(updates);
+
+  // IMPORTANTE: actualiza la memoria local inmediatamente, sin esperar al listener.
+  predictionsCache = newPredictions;
 }
 function launchConfetti() {
   const layer = document.getElementById("confettiLayer");
@@ -1374,7 +1403,13 @@ function launchConfetti() {
     setTimeout(() => el.remove(), 3600);
   }
 }
-function listenResults() { onSnapshot(collection(db, "results"), s => { s.forEach(d => resultsCache[d.id] = d.data()); renderAll(); }); }
+function listenResults() {
+  onSnapshot(collection(db, "results"), s => {
+    resultsCache = {};
+    s.forEach(d => resultsCache[d.id] = d.data());
+    renderAll();
+  });
+}
 function listenPredictions() { onSnapshot(collection(db, "predictions"), s => { predictionsCache = []; s.forEach(d => predictionsCache.push(d.data())); renderMatchRanking(); renderSelectedMatch(); }); }
 function listenSettings() { onSnapshot(doc(db, "settings", "stake"), snap => { if (snap.exists() && snap.data().amount != null) stakeAmount = Number(snap.data().amount); renderMatchRanking(); }); }
 
@@ -1397,25 +1432,33 @@ window.syncResultsFromApi = async function() {
 
     let saved = 0;
     for (const item of data.results || []) {
-      await setDoc(doc(db, "results", item.matchId), {
+      const resultObj = {
         matchId: item.matchId,
         home: Number(item.home),
         away: Number(item.away),
         status: item.status || "FT",
-        provider: data.provider || "api",
+        provider: item.provider || data.provider || "api-football",
         providerFixtureId: item.providerFixtureId || null,
         providerHome: item.providerHome || "",
         providerAway: item.providerAway || "",
+        fixtureDate: item.fixtureDate || "",
         apiUpdatedAt: item.updatedAt || new Date().toISOString(),
         updatedAt: serverTimestamp()
-      }, { merge: true });
+      };
+
+      // IMPORTANTE: actualiza memoria local antes de recalcular puntos.
+      resultsCache[item.matchId] = { ...resultObj, updatedAt: new Date().toISOString() };
+
+      await setDoc(doc(db, "results", item.matchId), resultObj, { merge: true });
       saved++;
     }
 
     await updatePredictionPoints();
-    if (adminStatus) adminStatus.textContent = `✅ API sincronizada. ${saved} resultados guardados.`;
-    if (dataStatus) dataStatus.textContent = `✅ API sincronizada: ${saved}`;
     renderAll();
+
+    const checked = Array.isArray(data.checkedDates) ? data.checkedDates.join(", ") : "";
+    if (adminStatus) adminStatus.textContent = `✅ API sincronizada. ${saved} resultados guardados. Fechas revisadas: ${checked}`;
+    if (dataStatus) dataStatus.textContent = `✅ API sincronizada: ${saved}`;
   } catch (err) {
     console.error(err);
     if (adminStatus) adminStatus.textContent = "❌ Error sincronizando API.";

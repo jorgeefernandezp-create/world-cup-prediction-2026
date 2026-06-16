@@ -146,7 +146,13 @@ export default async function handler(req, res) {
     const now = new Date();
     const dates = requestedDate
       ? [requestedDate]
-      : [ymd(new Date(now.getTime() - 86400000)), ymd(now), ymd(new Date(now.getTime() + 86400000))];
+      : [
+          ymd(new Date(now.getTime() - 2 * 86400000)),
+          ymd(new Date(now.getTime() - 86400000)),
+          ymd(now),
+          ymd(new Date(now.getTime() + 86400000)),
+          ymd(new Date(now.getTime() + 2 * 86400000))
+        ];
 
     const allFixtures = [];
     for (const d of dates) {

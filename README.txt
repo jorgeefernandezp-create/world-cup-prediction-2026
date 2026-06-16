@@ -1,21 +1,14 @@
-WORLD CUP PREDICTION 2026 - VERSION 8.5 DAILY API FINAL
+WORLD CUP PREDICTION 2026 - VERSION 8.6 RESULTS REFRESH FIX
 
-NUEVO:
-- API automática usando fixtures por fecha.
-- Ya NO necesita API_FOOTBALL_LEAGUE_ID.
-- Usa solo API_FOOTBALL_KEY en Vercel.
-- Consulta ayer, hoy y mañana para detectar partidos finalizados.
-- Cruza equipos por nombres/alias contra el calendario interno.
-- Guarda resultados oficiales en Firebase.
-- Calcula ranking y ganador por partido automáticamente.
-- Sincroniza cada 15 minutos y también con botón admin.
+CORRIGE:
+- Resultado manual ahora actualiza la memoria local inmediatamente.
+- API ahora actualiza la memoria local inmediatamente.
+- Ranking y puntos se recalculan sin esperar al listener de Firebase.
+- Se limpia resultsCache al leer Firestore para evitar datos viejos.
+- API revisa más fechas: 2 días antes, ayer, hoy, mañana y 2 días después.
+- Mensajes del panel admin muestran cuántos resultados guardó la API/manual.
 
-Variables Vercel necesarias:
-API_FOOTBALL_KEY = tu API key
-API_FOOTBALL_MODE = daily-fixtures
-API_FOOTBALL_TIMEZONE = UTC
-
-Subir:
+SUBIR A GITHUB:
 - assets
 - api
 - app.js
@@ -23,11 +16,12 @@ Subir:
 - README.txt
 - style.css
 
-Luego:
+DESPUÉS:
 1. Commit changes.
-2. Esperar Vercel Ready.
-3. Abrir:
-   https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge
-4. Presionar "Actualizar resultados API".
-5. Probar también:
-   https://world-cup-prediction-2026-26ej.vercel.app/api/sync-results
+2. Espera Vercel Ready.
+3. Abre:
+   https://world-cup-prediction-2026-26ej.vercel.app/?v=86fix
+4. Admin:
+   https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=86fix
+5. Pulsa "Actualizar resultados API".
+6. Si quieres guardar manual, cambia el score y pulsa "Guardar resultados".
