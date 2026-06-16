@@ -1,3 +1,4 @@
+const APP_VERSION = "8.7-clean-final-fix";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
   getFirestore, collection, serverTimestamp, query, orderBy, onSnapshot,
@@ -1101,12 +1102,18 @@ function selectedMatch() { return matches.find(m => m.id === selectedMatchId) ||
 
 function officialResultFor(match) {
   if (!match) return null;
-  const manual = resultsCache[match.id];
-  if (manual && manual.home != null && manual.away != null && manual.home !== "" && manual.away !== "") return manual;
-  if (match.finalHome != null && match.finalAway != null) {
-    return { matchId: match.id, home: Number(match.finalHome), away: Number(match.finalAway), source: "static" };
-  }
-  return null;
+  const saved = resultsCache[match.id] || resultsCache[String(match.id)];
+  const normalize = (r) => {
+    if (!r) return null;
+    const h = r.home ?? r.homeScore ?? r.finalHome;
+    const a = r.away ?? r.awayScore ?? r.finalAway;
+    if (h === "" || a === "" || h == null || a == null) return null;
+    const home = Number(h);
+    const away = Number(a);
+    if (Number.isNaN(home) || Number.isNaN(away)) return null;
+    return { ...r, matchId: match.id, home, away };
+  };
+  return normalize(saved) || normalize({ home: match.finalHome, away: match.finalAway, source: "static" });
 }
 function hasOfficialResult(match) {
   return !!officialResultFor(match);
@@ -1363,6 +1370,7 @@ window.saveResultsAndCalculate = async function() {
     }
 
     await updatePredictionPoints();
+    await forceRefreshDataFromFirestore();
     renderAll();
     if (adminStatus) adminStatus.textContent = `✅ Resultados manuales guardados: ${saved}. Ranking actualizado.`;
   } catch (err) {
@@ -1414,6 +1422,32 @@ function listenPredictions() { onSnapshot(collection(db, "predictions"), s => { 
 function listenSettings() { onSnapshot(doc(db, "settings", "stake"), snap => { if (snap.exists() && snap.data().amount != null) stakeAmount = Number(snap.data().amount); renderMatchRanking(); }); }
 
 
+
+async function forceRefreshDataFromFirestore() {
+  try {
+    const [playersSnap, predictionsSnap, resultsSnap, settingsSnap] = await Promise.all([
+      getDocs(collection(db, "players")),
+      getDocs(collection(db, "predictions")),
+      getDocs(collection(db, "results")),
+      getDocs(collection(db, "settings"))
+    ]);
+    playersCache = [];
+    playersSnap.forEach(d => playersCache.push({ id: d.id, ...d.data() }));
+    predictionsCache = [];
+    predictionsSnap.forEach(d => predictionsCache.push({ id: d.id, ...d.data() }));
+    resultsCache = {};
+    resultsSnap.forEach(d => resultsCache[d.id] = { id: d.id, ...d.data() });
+    settingsCache = {};
+    settingsSnap.forEach(d => settingsCache[d.id] = d.data());
+    renderAll();
+    return true;
+  } catch (err) {
+    console.error("forceRefreshDataFromFirestore error", err);
+    return false;
+  }
+}
+window.forceRefreshDataFromFirestore = forceRefreshDataFromFirestore;
+
 window.syncResultsFromApi = async function() {
   const adminStatus = document.getElementById("adminStatus");
   const dataStatus = document.getElementById("dataStatus");
@@ -1454,6 +1488,7 @@ window.syncResultsFromApi = async function() {
     }
 
     await updatePredictionPoints();
+    await forceRefreshDataFromFirestore();
     renderAll();
 
     const checked = Array.isArray(data.checkedDates) ? data.checkedDates.join(", ") : "";
@@ -1480,3 +1515,8 @@ listenSettings();
 syncOpenFootball();
 setTimeout(() => syncResultsFromApi(), 1500);
 setInterval(() => syncResultsFromApi(), 15 * 60 * 1000);
+
+setTimeout(() => {
+  const ds = document.getElementById("dataStatus");
+  if (ds) ds.textContent = (ds.textContent || "Sistema listo") + " · v8.7";
+}, 2000);

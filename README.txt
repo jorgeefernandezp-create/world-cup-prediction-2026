@@ -1,27 +1,29 @@
-WORLD CUP PREDICTION 2026 - VERSION 8.6 RESULTS REFRESH FIX
+WORLD CUP PREDICTION 2026 - VERSION 8.7 CLEAN FINAL FIX
+
+NO BORRA FIREBASE:
+- Mantiene players.
+- Mantiene predictions.
+- Mantiene results.
+- Solo reemplaza archivos de la web.
 
 CORRIGE:
-- Resultado manual ahora actualiza la memoria local inmediatamente.
-- API ahora actualiza la memoria local inmediatamente.
-- Ranking y puntos se recalculan sin esperar al listener de Firebase.
-- Se limpia resultsCache al leer Firestore para evitar datos viejos.
-- API revisa más fechas: 2 días antes, ayer, hoy, mañana y 2 días después.
-- Mensajes del panel admin muestran cuántos resultados guardó la API/manual.
+- 404 en Vercel con vercel.json.
+- Caché viejo con ?v=87clean.
+- Lectura limpia de Firestore.
+- Botón extra: Refrescar Firebase.
+- Manual/API actualizan pantalla, ranking y ganador.
 
-SUBIR A GITHUB:
-- assets
-- api
-- app.js
-- index.html
-- README.txt
-- style.css
+SUBIR TODO A GITHUB:
+api
+assets
+app.js
+index.html
+style.css
+README.txt
+vercel.json
+package.json
 
-DESPUÉS:
-1. Commit changes.
-2. Espera Vercel Ready.
-3. Abre:
-   https://world-cup-prediction-2026-26ej.vercel.app/?v=86fix
-4. Admin:
-   https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=86fix
-5. Pulsa "Actualizar resultados API".
-6. Si quieres guardar manual, cambia el score y pulsa "Guardar resultados".
+PROBAR:
+https://world-cup-prediction-2026-26ej.vercel.app/?v=87clean
+https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=87clean
+https://world-cup-prediction-2026-26ej.vercel.app/api/sync-results
