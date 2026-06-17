@@ -1,8 +1,10 @@
 // Vercel Serverless Function
 // Endpoint: /api/sync-results
-// Uses API-Football by DATE, no World Cup league id needed.
-// Reads API_FOOTBALL_KEY from Vercel Environment Variables.
-// Returns final scores matched to the local World Cup schedule.
+// Version 9.0 - football-data.org final
+// Uses FOOTBALL_DATA_API_KEY from Vercel Environment Variables.
+// Header required by football-data.org: X-Auth-Token.
+// This endpoint returns final scores matched to your internal match IDs.
+// It does NOT delete players, predictions or results.
 
 const TEAM_ALIASES = {
   MEX: ["Mexico", "México"],
@@ -33,9 +35,9 @@ const TEAM_ALIASES = {
   CPV: ["Cape Verde", "Cabo Verde"],
   BEL: ["Belgium", "Bélgica"],
   EGY: ["Egypt", "Egipto"],
-  KSA: ["Saudi Arabia", "Arabia Saudita"],
+  KSA: ["Saudi Arabia", "Saudi Arabia", "Arabia Saudita"],
   URU: ["Uruguay"],
-  IRI: ["Iran", "Irán"],
+  IRI: ["Iran", "IR Iran", "Irán"],
   NZL: ["New Zealand", "Nueva Zelanda"],
   FRA: ["France", "Francia"],
   SEN: ["Senegal"],
@@ -55,7 +57,6 @@ const TEAM_ALIASES = {
   COL: ["Colombia"]
 };
 
-// Local schedule ids and UTC kickoff dates. These are the ids used by the web/Firebase.
 const LOCAL_MATCHES = [
   ["66456904","MEX","RSA","2026-06-11T19:00:00Z"],["66456906","KOR","CZE","2026-06-12T02:00:00Z"],
   ["66456916","CAN","BIH","2026-06-12T19:00:00Z"],["66456940","USA","PAR","2026-06-13T01:00:00Z"],
@@ -95,6 +96,14 @@ const LOCAL_MATCHES = [
   ["66457026","JOR","ARG","2026-06-28T02:00:00Z"],["66457028","DZA","AUT","2026-06-28T02:00:00Z"]
 ].map(([id, homeCode, awayCode, startUtc]) => ({ id, homeCode, awayCode, startUtc }));
 
+// Temporary fallback for already finished test matches. The API remains the first source.
+const FALLBACK_RESULTS = [
+  ["66456904",2,0],["66456906",2,1],["66456916",1,1],["66456940",4,1],
+  ["66456918",1,1],["66456928",1,1],["66456930",0,1],["66456942",2,0],
+  ["66457070",7,1],["66456968",2,2],["66457072",1,0],["66456970",5,1],
+  ["66456994",0,0],["66456982",1,1],["66456996",1,1],["66456984",2,2]
+];
+
 function norm(s) {
   return String(s || "").toLowerCase().normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
@@ -110,97 +119,146 @@ function ymd(date) {
 function daysBetween(a, b) {
   return Math.abs(new Date(a).getTime() - new Date(b).getTime()) / 86400000;
 }
-function findLocalMatch(homeName, awayName, fixtureDate) {
+function findLocalMatch(homeName, awayName, utcDate) {
   const candidates = [];
   for (const m of LOCAL_MATCHES) {
     const normal = teamMatches(homeName, m.homeCode) && teamMatches(awayName, m.awayCode);
     const reversed = teamMatches(homeName, m.awayCode) && teamMatches(awayName, m.homeCode);
     if (normal || reversed) {
-      const dist = daysBetween(m.startUtc, fixtureDate);
-      if (dist <= 2) candidates.push({ ...m, reversed, dist });
+      const dist = daysBetween(m.startUtc, utcDate);
+      if (dist <= 3) candidates.push({ ...m, reversed, dist });
     }
   }
   candidates.sort((a, b) => a.dist - b.dist);
   return candidates[0] || null;
 }
-async function fetchFixturesForDate(key, date) {
-  const url = `https://v3.football.api-sports.io/fixtures?date=${date}`;
-  const r = await fetch(url, { headers: { "x-apisports-key": key } });
-  if (!r.ok) throw new Error(`API-Football error ${r.status}`);
-  const data = await r.json();
-  return Array.isArray(data.response) ? data.response : [];
+
+async function fetchFootballDataMatches(key, dateFrom, dateTo) {
+  const headers = { "X-Auth-Token": key };
+  const urls = [
+    `https://api.football-data.org/v4/matches?dateFrom=${dateFrom}&dateTo=${dateTo}`,
+    `https://api.football-data.org/v4/competitions/WC/matches?season=2026`
+  ];
+
+  const all = [];
+  const errors = [];
+  for (const url of urls) {
+    try {
+      const r = await fetch(url, { headers });
+      const text = await r.text();
+      let data = {};
+      try { data = JSON.parse(text); } catch { data = { raw: text }; }
+      if (!r.ok) {
+        errors.push({ url, status: r.status, message: data.message || text.slice(0, 150) });
+        continue;
+      }
+      if (Array.isArray(data.matches)) all.push(...data.matches);
+    } catch (err) {
+      errors.push({ url, message: err.message });
+    }
+  }
+
+  return { matches: all, errors };
+}
+
+function convertFootballDataMatch(match) {
+  if (!match || match.status !== "FINISHED") return null;
+
+  const homeName = match.homeTeam?.name || match.homeTeam?.shortName || match.homeTeam?.tla;
+  const awayName = match.awayTeam?.name || match.awayTeam?.shortName || match.awayTeam?.tla;
+  const homeScore = match.score?.fullTime?.home ?? match.score?.regularTime?.home;
+  const awayScore = match.score?.fullTime?.away ?? match.score?.regularTime?.away;
+  const utcDate = match.utcDate;
+
+  if (homeName == null || awayName == null || homeScore == null || awayScore == null || !utcDate) return null;
+
+  const local = findLocalMatch(homeName, awayName, utcDate);
+  if (!local) return null;
+
+  return {
+    matchId: local.id,
+    home: local.reversed ? Number(awayScore) : Number(homeScore),
+    away: local.reversed ? Number(homeScore) : Number(awayScore),
+    status: "FT",
+    provider: "football-data.org",
+    providerFixtureId: match.id || null,
+    providerHome: homeName,
+    providerAway: awayName,
+    fixtureDate: utcDate,
+    updatedAt: new Date().toISOString()
+  };
+}
+
+function fallbackResultsObject() {
+  return FALLBACK_RESULTS.map(([matchId, home, away]) => {
+    const m = LOCAL_MATCHES.find(x => x.id === matchId);
+    return {
+      matchId,
+      home,
+      away,
+      status: "FT",
+      provider: "fallback-static",
+      providerFixtureId: null,
+      providerHome: m?.homeCode || "",
+      providerAway: m?.awayCode || "",
+      fixtureDate: m?.startUtc || "",
+      updatedAt: new Date().toISOString()
+    };
+  });
 }
 
 export default async function handler(req, res) {
   try {
-    const key = process.env.API_FOOTBALL_KEY;
+    const key = process.env.FOOTBALL_DATA_API_KEY || process.env.FOOTBALL_DATA_KEY || process.env.API_FOOTBALL_KEY;
+    const useFallback = String(req.query.fallback || "").toLowerCase() === "1";
+    const now = new Date();
+    const dateFrom = req.query.dateFrom || ymd(new Date(now.getTime() - 7 * 86400000));
+    const dateTo = req.query.dateTo || ymd(new Date(now.getTime() + 2 * 86400000));
+
     if (!key) {
       return res.status(200).json({
         ok: false,
-        message: "Missing API_FOOTBALL_KEY in Vercel Environment Variables.",
-        results: []
+        provider: "football-data.org",
+        message: "Missing FOOTBALL_DATA_API_KEY in Vercel Environment Variables.",
+        results: useFallback ? fallbackResultsObject() : []
       });
     }
 
-    const requestedDate = req.query.date;
-    const now = new Date();
-    const dates = requestedDate
-      ? [requestedDate]
-      : [
-          ymd(new Date(now.getTime() - 2 * 86400000)),
-          ymd(new Date(now.getTime() - 86400000)),
-          ymd(now),
-          ymd(new Date(now.getTime() + 86400000)),
-          ymd(new Date(now.getTime() + 2 * 86400000))
-        ];
-
-    const allFixtures = [];
-    for (const d of dates) {
-      const fixtures = await fetchFixturesForDate(key, d);
-      allFixtures.push(...fixtures);
-    }
-
+    const { matches, errors } = await fetchFootballDataMatches(key, dateFrom, dateTo);
     const finals = [];
     const seen = new Set();
-    for (const f of allFixtures) {
-      const status = f.fixture?.status?.short || "";
-      const isFinal = ["FT", "AET", "PEN"].includes(status);
-      if (!isFinal) continue;
 
-      const homeName = f.teams?.home?.name;
-      const awayName = f.teams?.away?.name;
-      const gh = f.goals?.home;
-      const ga = f.goals?.away;
-      const fixtureDate = f.fixture?.date;
-      if (homeName == null || awayName == null || gh == null || ga == null || !fixtureDate) continue;
+    for (const match of matches) {
+      const item = convertFootballDataMatch(match);
+      if (!item || seen.has(item.matchId)) continue;
+      seen.add(item.matchId);
+      finals.push(item);
+    }
 
-      const local = findLocalMatch(homeName, awayName, fixtureDate);
-      if (!local || seen.has(local.id)) continue;
-      seen.add(local.id);
-
-      finals.push({
-        matchId: local.id,
-        home: local.reversed ? Number(ga) : Number(gh),
-        away: local.reversed ? Number(gh) : Number(ga),
-        status,
-        provider: "api-football",
-        providerFixtureId: f.fixture?.id || null,
-        providerHome: homeName,
-        providerAway: awayName,
-        fixtureDate,
-        updatedAt: new Date().toISOString()
-      });
+    // If football-data does not expose the World Cup yet on the free token, keep old completed matches working.
+    const combined = [...finals];
+    for (const fb of fallbackResultsObject()) {
+      if (!seen.has(fb.matchId)) combined.push(fb);
     }
 
     return res.status(200).json({
       ok: true,
-      mode: "daily-fixtures",
-      checkedDates: dates,
-      fixtureCount: allFixtures.length,
-      count: finals.length,
-      results: finals
+      provider: "football-data.org",
+      source: "football-data.org + fallback",
+      checkedRange: { dateFrom, dateTo },
+      apiMatchesFound: matches.length,
+      apiResultsMatched: finals.length,
+      fallbackAdded: combined.length - finals.length,
+      count: combined.length,
+      errors,
+      results: combined
     });
   } catch (err) {
-    return res.status(500).json({ ok: false, message: err.message, results: [] });
+    return res.status(500).json({
+      ok: false,
+      provider: "football-data.org",
+      message: err.message,
+      results: fallbackResultsObject()
+    });
   }
 }

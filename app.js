@@ -1,4 +1,4 @@
-const APP_VERSION = "8.7-clean-final-fix";
+const APP_VERSION = "9.0-football-data-final";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
   getFirestore, collection, serverTimestamp, query, orderBy, onSnapshot,
@@ -1102,22 +1102,61 @@ function selectedMatch() { return matches.find(m => m.id === selectedMatchId) ||
 
 function officialResultFor(match) {
   if (!match) return null;
-  const saved = resultsCache[match.id] || resultsCache[String(match.id)];
-  const normalize = (r) => {
-    if (!r) return null;
-    const h = r.home ?? r.homeScore ?? r.finalHome;
-    const a = r.away ?? r.awayScore ?? r.finalAway;
-    if (h === "" || a === "" || h == null || a == null) return null;
-    const home = Number(h);
-    const away = Number(a);
-    if (Number.isNaN(home) || Number.isNaN(away)) return null;
-    return { ...r, matchId: match.id, home, away };
+
+  const normalizeResult = (r) => {
+    if (!resultValuesOk(r)) return null;
+    return {
+      ...r,
+      matchId: String(r.matchId || match.id),
+      home: Number(r.home ?? r.homeScore ?? r.finalHome),
+      away: Number(r.away ?? r.awayScore ?? r.finalAway)
+    };
   };
-  return normalize(saved) || normalize({ home: match.finalHome, away: match.finalAway, source: "static" });
+
+  const byId = resultsCache[String(match.id)] || resultsCache[match.id];
+  const exact = normalizeResult(byId);
+  if (exact) return exact;
+
+  const byMatchId = Object.values(resultsCache).find(r => String(r.matchId) === String(match.id));
+  const matchedId = normalizeResult(byMatchId);
+  if (matchedId) return matchedId;
+
+  const byTeams = Object.values(resultsCache).find(r =>
+    (sameTeamName(r.homeKey || r.providerHome, match.homeKey) && sameTeamName(r.awayKey || r.providerAway, match.awayKey)) ||
+    (sameTeamName(r.homeKey || r.providerHome, match.awayKey) && sameTeamName(r.awayKey || r.providerAway, match.homeKey))
+  );
+  const teamResult = normalizeResult(byTeams);
+  if (teamResult) {
+    const reversed =
+      sameTeamName(byTeams.homeKey || byTeams.providerHome, match.awayKey) &&
+      sameTeamName(byTeams.awayKey || byTeams.providerAway, match.homeKey);
+    if (reversed) return { ...teamResult, home: teamResult.away, away: teamResult.home };
+    return teamResult;
+  }
+
+  return normalizeResult({ matchId: match.id, home: match.finalHome, away: match.finalAway, source: "static" });
 }
 function hasOfficialResult(match) {
   return !!officialResultFor(match);
 }
+
+function cleanTeamNameForMatch(v) {
+  return String(v || "").toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]/g, "");
+}
+function sameTeamName(a, b) {
+  const aa = cleanTeamNameForMatch(a);
+  const bb = cleanTeamNameForMatch(b);
+  return aa && bb && (aa === bb || aa.includes(bb) || bb.includes(aa));
+}
+function resultValuesOk(r) {
+  if (!r) return false;
+  const h = r.home ?? r.homeScore ?? r.finalHome;
+  const a = r.away ?? r.awayScore ?? r.finalAway;
+  return h !== "" && a !== "" && h != null && a != null && !Number.isNaN(Number(h)) && !Number.isNaN(Number(a));
+}
+
 function flagOnly(key) {
   const data = TEAM_NAMES[key] || [key,key,key,key,"⚽"];
   return data[4];
@@ -1135,7 +1174,7 @@ function saveSelectedPosition() {
 function currentPredictionFor(matchId) {
   if (!currentPlayerName) return null;
   const playerId = safeId(currentPlayerName);
-  return predictionsCache.find(p => p.matchId === matchId && p.playerId === playerId) || null;
+  return predictionsCache.find(p => String(p.matchId) === String(matchId) && p.playerId === playerId) || null;
 }
 function calcPoints(pred, res) {
   if (!res || res.home == null || res.away == null || res.home === "" || res.away === "") return 0;
@@ -1279,7 +1318,7 @@ function selectedRows() {
   const m = selectedMatch();
   if (!m) return [];
   return predictionsCache
-    .filter(p => p.matchId === m.id)
+    .filter(p => String(p.matchId) === String(m.id))
     .map(p => ({ ...p, points: calcPoints(p, officialResultFor(m)) }))
     .sort((a,b) => b.points - a.points);
 }
@@ -1385,8 +1424,8 @@ async function updatePredictionPoints() {
 
   snap.forEach(d => {
     const p = d.data();
-    const match = matches.find(m => m.id === p.matchId);
-    const res = match ? officialResultFor(match) : resultsCache[p.matchId];
+    const match = matches.find(m => String(m.id) === String(p.matchId));
+    const res = match ? officialResultFor(match) : resultsCache[String(p.matchId)] || resultsCache[p.matchId];
     const points = calcPoints(p, res);
     const updatedPrediction = { ...p, points };
     newPredictions.push(updatedPrediction);
@@ -1414,7 +1453,11 @@ function launchConfetti() {
 function listenResults() {
   onSnapshot(collection(db, "results"), s => {
     resultsCache = {};
-    s.forEach(d => resultsCache[d.id] = d.data());
+    s.forEach(d => {
+      const data = { id: d.id, ...d.data() };
+      resultsCache[String(d.id)] = data;
+      if (data.matchId != null) resultsCache[String(data.matchId)] = data;
+    });
     renderAll();
   });
 }
@@ -1436,7 +1479,11 @@ async function forceRefreshDataFromFirestore() {
     predictionsCache = [];
     predictionsSnap.forEach(d => predictionsCache.push({ id: d.id, ...d.data() }));
     resultsCache = {};
-    resultsSnap.forEach(d => resultsCache[d.id] = { id: d.id, ...d.data() });
+    resultsSnap.forEach(d => {
+      const data = { id: d.id, ...d.data() };
+      resultsCache[String(d.id)] = data;
+      if (data.matchId != null) resultsCache[String(data.matchId)] = data;
+    });
     settingsCache = {};
     settingsSnap.forEach(d => settingsCache[d.id] = d.data());
     renderAll();
@@ -1492,13 +1539,24 @@ window.syncResultsFromApi = async function() {
     renderAll();
 
     const checked = Array.isArray(data.checkedDates) ? data.checkedDates.join(", ") : "";
-    if (adminStatus) adminStatus.textContent = `✅ API sincronizada. ${saved} resultados guardados. Fechas revisadas: ${checked}`;
-    if (dataStatus) dataStatus.textContent = `✅ API sincronizada: ${saved}`;
+    if (adminStatus) adminStatus.textContent = `✅ Football-data sincronizada. ${saved} resultados guardados. Fechas revisadas: ${checked}`;
+    if (dataStatus) dataStatus.textContent = `✅ Football-data: ${saved}`;
   } catch (err) {
     console.error(err);
     if (adminStatus) adminStatus.textContent = "❌ Error sincronizando API.";
     if (dataStatus) dataStatus.textContent = "⚠️ No se pudo sincronizar API.";
   }
+};
+
+
+window.recalculateAllWinners = async function() {
+  const adminStatus = document.getElementById("adminStatus");
+  if (adminStatus) adminStatus.textContent = "⏳ Recalculando puntos y ganadores...";
+  await forceRefreshDataFromFirestore();
+  await updatePredictionPoints();
+  await forceRefreshDataFromFirestore();
+  renderAll();
+  if (adminStatus) adminStatus.textContent = "✅ Puntos y ganadores recalculados desde Firebase.";
 };
 
 setInterval(() => {

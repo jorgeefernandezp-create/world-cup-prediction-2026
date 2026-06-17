@@ -1,13 +1,18 @@
-WORLD CUP PREDICTION 2026 - VERSION 8.8 VERCEL PUBLIC FIX
+WORLD CUP PREDICTION 2026 - VERSION 9.0 FOOTBALL-DATA FINAL
 
-CORRIGE:
-- Error Vercel: No Output Directory named "public" found.
-- Se elimina package.json para que Vercel NO ejecute npm build.
-- El proyecto vuelve a publicarse como HTML/CSS/JS estático desde la raíz.
-- Mantiene Firebase, API Football, apuestas, participantes y resultados.
+CAMBIO PRINCIPAL:
+- Se reemplaza API-Football por football-data.org.
+- Usa variable Vercel: FOOTBALL_DATA_API_KEY.
+- Header usado: X-Auth-Token.
+- Mantiene Firebase y todas las apuestas ya hechas.
+
+IMPORTANTE:
+- NO borra players.
+- NO borra predictions.
+- NO borra results.
+- package.json NO debe existir en GitHub.
 
 SUBIR A GITHUB:
-Sube/reemplaza:
 api
 assets
 app.js
@@ -16,19 +21,25 @@ style.css
 README.txt
 vercel.json
 
-IMPORTANTE:
-Si en GitHub existe package.json, ELIMÍNALO.
-No debe quedar package.json en el repositorio.
+NO SUBIR:
+package.json
 
-VERCEL:
-Project Settings > Build and Deployment:
-- Framework Preset: Other
-- Build Command: vacío / sin override
-- Output Directory: vacío / sin override
-- Install Command: vacío / sin override
-- Root Directory: vacío
+EN VERCEL:
+Settings > Environment Variables:
+FOOTBALL_DATA_API_KEY = tu token de football-data.org
+
+Luego Redeploy.
 
 PROBAR:
-https://world-cup-prediction-2026-26ej.vercel.app/?v=88fix
-https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=88fix
 https://world-cup-prediction-2026-26ej.vercel.app/api/sync-results
+https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=90fd
+
+EN ADMIN:
+1. Pulsa Actualizar resultados API.
+2. Pulsa Recalcular ganador.
+3. Pulsa Refrescar Firebase si hace falta.
+
+NOTA:
+Si football-data todavía no entrega Mundial 2026 para el plan gratuito,
+la función incluye fallback temporal para partidos ya finalizados de prueba,
+para que la web muestre scores y calcule ganadores.
