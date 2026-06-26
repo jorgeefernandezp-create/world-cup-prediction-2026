@@ -1,12 +1,11 @@
-WORLD CUP PREDICTION 2026 - VERSION 11.2 STABLE CALENDAR FIX
+WORLD CUP PREDICTION 2026 - VERSION 11.3 COUNTDOWN LOCK FIX
 
-CORRECCIÓN FUERTE:
-- Reemplaza el JavaScript anterior por una versión estable.
-- La web ya no debe quedarse en "Cargando calendario automático".
-- Muestra todas las fechas:
-  grupos finales, Ronda de 32, Octavos, Cuartos, Semifinales, Tercer puesto y Final.
-- Mantiene Firebase, jugadores y apuestas.
-- El API ya no rompe la página si no trae resultados.
+CORRIGE:
+- Regresa la cuenta regresiva para cada partido.
+- Muestra "Cierra en 0d 00h 00m 00s".
+- Bloquea automáticamente cuando llega la hora de inicio del partido.
+- No permite guardar score después del inicio.
+- Mantiene fechas, Firebase, participantes y apuestas.
 
 SUBIR A GITHUB:
 api
@@ -21,5 +20,4 @@ NO SUBIR:
 package.json
 
 PROBAR:
-https://world-cup-prediction-2026-26ej.vercel.app/?v=112stable
-https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=112stable
+https://world-cup-prediction-2026-26ej.vercel.app/?v=113count

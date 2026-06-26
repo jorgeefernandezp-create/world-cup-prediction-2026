@@ -282,3 +282,7 @@ th{color:#946b00}
 @media(max-width:560px){.full-game{align-items:flex-start;flex-direction:column}.time-badge,.ft-badge{display:inline-block}}
 
 /* v11 calendar loaded */
+
+.countdown{display:inline-block;margin-top:10px;background:#061326;color:#ffd24a;font-weight:900;border-radius:999px;padding:8px 14px}
+.locked{margin-top:10px;font-weight:900;color:#7a1b1b;background:#ffe2e2;border-radius:12px;padding:8px 10px}
+.match-tabs button small{display:block;margin-top:4px;font-size:11px;opacity:.85;font-weight:800}
