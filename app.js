@@ -1,4 +1,4 @@
-const APP_VERSION = "10.2-api-crash-fix";
+const APP_VERSION = "11.0-all-knockout-dates-visible";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
   getFirestore, collection, serverTimestamp, query, orderBy, onSnapshot,
@@ -38,664 +38,460 @@ function isVisibleMatchByJst(iso) {
 
 const STATIC_MATCHES = [
   {
-    "id": "66456904",
-    "group": "Group A",
-    "homeCode": "MEX",
-    "awayCode": "RSA",
-    "homeKey": "Mexico",
-    "awayKey": "South Africa",
-    "startUtc": "2026-06-11T19:00:00Z",
-    "finalHome": 2,
-    "finalAway": 0,
-    "status": "complete"
-  },
-  {
-    "id": "66456906",
-    "group": "Group A",
-    "homeCode": "KOR",
-    "awayCode": "CZE",
-    "homeKey": "South Korea",
-    "awayKey": "Czechia",
-    "startUtc": "2026-06-12T02:00:00Z",
-    "finalHome": 2,
-    "finalAway": 1,
-    "status": "complete"
-  },
-  {
-    "id": "66456916",
-    "group": "Group B",
-    "homeCode": "CAN",
-    "awayCode": "BIH",
-    "homeKey": "Canada",
-    "awayKey": "Bosnia and Herzegovina",
-    "startUtc": "2026-06-12T19:00:00Z",
-    "finalHome": 1,
-    "finalAway": 1,
-    "status": "complete"
-  },
-  {
-    "id": "66456940",
-    "group": "Group D",
-    "homeCode": "USA",
-    "awayCode": "PAR",
-    "homeKey": "United States",
-    "awayKey": "Paraguay",
-    "startUtc": "2026-06-13T01:00:00Z",
-    "finalHome": 4,
-    "finalAway": 1,
-    "status": "complete"
-  },
-  {
-    "id": "66456918",
-    "group": "Group B",
-    "homeCode": "QAT",
-    "awayCode": "SUI",
-    "homeKey": "Qatar",
-    "awayKey": "Switzerland",
-    "startUtc": "2026-06-13T19:00:00Z"
-  },
-  {
-    "id": "66456928",
-    "group": "Group C",
-    "homeCode": "BRA",
-    "awayCode": "MAR",
-    "homeKey": "Brazil",
-    "awayKey": "Morocco",
-    "startUtc": "2026-06-13T22:00:00Z"
-  },
-  {
-    "id": "66456930",
-    "group": "Group C",
-    "homeCode": "HTI",
-    "awayCode": "SCO",
-    "homeKey": "Haiti",
-    "awayKey": "Scotland",
-    "startUtc": "2026-06-14T01:00:00Z"
-  },
-  {
-    "id": "66456942",
-    "group": "Group D",
-    "homeCode": "AUS",
-    "awayCode": "TUR",
-    "homeKey": "Australia",
-    "awayKey": "Turkey",
-    "startUtc": "2026-06-14T04:00:00Z"
-  },
-  {
-    "id": "66457070",
-    "group": "Group E",
-    "homeCode": "GER",
-    "awayCode": "CUW",
-    "homeKey": "Germany",
-    "awayKey": "Curacao",
-    "startUtc": "2026-06-14T17:00:00Z"
-  },
-  {
-    "id": "66456968",
-    "group": "Group F",
-    "homeCode": "NED",
-    "awayCode": "JPN",
-    "homeKey": "Netherlands",
-    "awayKey": "Japan",
-    "startUtc": "2026-06-14T20:00:00Z"
-  },
-  {
-    "id": "66457072",
-    "group": "Group E",
-    "homeCode": "CIV",
-    "awayCode": "ECU",
-    "homeKey": "Ivory Coast",
-    "awayKey": "Ecuador",
-    "startUtc": "2026-06-14T23:00:00Z"
-  },
-  {
-    "id": "66456970",
-    "group": "Group F",
-    "homeCode": "SWE",
-    "awayCode": "TUN",
-    "homeKey": "Sweden",
-    "awayKey": "Tunisia",
-    "startUtc": "2026-06-15T02:00:00Z"
-  },
-  {
-    "id": "66456994",
-    "group": "Group H",
-    "homeCode": "ESP",
-    "awayCode": "CPV",
-    "homeKey": "Spain",
-    "awayKey": "Cape Verde",
-    "startUtc": "2026-06-15T16:00:00Z"
-  },
-  {
-    "id": "66456982",
-    "group": "Group G",
-    "homeCode": "BEL",
-    "awayCode": "EGY",
-    "homeKey": "Belgium",
-    "awayKey": "Egypt",
-    "startUtc": "2026-06-15T19:00:00Z"
-  },
-  {
-    "id": "66456996",
-    "group": "Group H",
-    "homeCode": "KSA",
-    "awayCode": "URU",
-    "homeKey": "Saudi Arabia",
-    "awayKey": "Uruguay",
-    "startUtc": "2026-06-15T22:00:00Z"
-  },
-  {
-    "id": "66456984",
-    "group": "Group G",
-    "homeCode": "IRI",
-    "awayCode": "NZL",
-    "homeKey": "Iran",
-    "awayKey": "New Zealand",
-    "startUtc": "2026-06-16T01:00:00Z"
-  },
-  {
-    "id": "66457006",
-    "group": "Group I",
-    "homeCode": "FRA",
-    "awayCode": "SEN",
-    "homeKey": "France",
-    "awayKey": "Senegal",
-    "startUtc": "2026-06-16T19:00:00Z"
-  },
-  {
-    "id": "66457008",
-    "group": "Group I",
-    "homeCode": "IRQ",
-    "awayCode": "NOR",
-    "homeKey": "Iraq",
-    "awayKey": "Norway",
-    "startUtc": "2026-06-16T22:00:00Z"
-  },
-  {
-    "id": "66457018",
-    "group": "Group J",
-    "homeCode": "ARG",
-    "awayCode": "DZA",
-    "homeKey": "Argentina",
-    "awayKey": "Algeria",
-    "startUtc": "2026-06-17T01:00:00Z"
-  },
-  {
-    "id": "66457020",
-    "group": "Group J",
-    "homeCode": "AUT",
-    "awayCode": "JOR",
-    "homeKey": "Austria",
-    "awayKey": "Jordan",
-    "startUtc": "2026-06-17T04:00:00Z"
-  },
-  {
-    "id": "66457030",
-    "group": "Group K",
-    "homeCode": "POR",
-    "awayCode": "COD",
-    "homeKey": "Portugal",
-    "awayKey": "DR Congo",
-    "startUtc": "2026-06-17T17:00:00Z"
-  },
-  {
-    "id": "66457042",
-    "group": "Group L",
-    "homeCode": "ENG",
-    "awayCode": "CRO",
-    "homeKey": "England",
-    "awayKey": "Croatia",
-    "startUtc": "2026-06-17T20:00:00Z"
-  },
-  {
-    "id": "66457044",
-    "group": "Group L",
-    "homeCode": "GHA",
-    "awayCode": "PAN",
-    "homeKey": "Ghana",
-    "awayKey": "Panama",
-    "startUtc": "2026-06-17T23:00:00Z"
-  },
-  {
-    "id": "66457032",
-    "group": "Group K",
-    "homeCode": "UZB",
-    "awayCode": "COL",
-    "homeKey": "Uzbekistan",
-    "awayKey": "Colombia",
-    "startUtc": "2026-06-18T02:00:00Z"
-  },
-  {
-    "id": "66456910",
-    "group": "Group A",
-    "homeCode": "CZE",
-    "awayCode": "RSA",
-    "homeKey": "Czechia",
-    "awayKey": "South Africa",
-    "startUtc": "2026-06-18T16:00:00Z"
-  },
-  {
-    "id": "66456922",
-    "group": "Group B",
-    "homeCode": "SUI",
-    "awayCode": "BIH",
-    "homeKey": "Switzerland",
-    "awayKey": "Bosnia and Herzegovina",
-    "startUtc": "2026-06-18T19:00:00Z"
-  },
-  {
-    "id": "66456920",
-    "group": "Group B",
-    "homeCode": "CAN",
-    "awayCode": "QAT",
-    "homeKey": "Canada",
-    "awayKey": "Qatar",
-    "startUtc": "2026-06-18T22:00:00Z"
-  },
-  {
-    "id": "66456908",
-    "group": "Group A",
-    "homeCode": "MEX",
-    "awayCode": "KOR",
-    "homeKey": "Mexico",
-    "awayKey": "South Korea",
-    "startUtc": "2026-06-19T01:00:00Z"
-  },
-  {
-    "id": "66456944",
-    "group": "Group D",
-    "homeCode": "USA",
-    "awayCode": "AUS",
-    "homeKey": "United States",
-    "awayKey": "Australia",
-    "startUtc": "2026-06-19T19:00:00Z"
-  },
-  {
-    "id": "66456934",
-    "group": "Group C",
-    "homeCode": "SCO",
-    "awayCode": "MAR",
-    "homeKey": "Scotland",
-    "awayKey": "Morocco",
-    "startUtc": "2026-06-19T22:00:00Z"
-  },
-  {
-    "id": "66456932",
-    "group": "Group C",
-    "homeCode": "BRA",
-    "awayCode": "HTI",
-    "homeKey": "Brazil",
-    "awayKey": "Haiti",
-    "startUtc": "2026-06-20T00:30:00Z"
-  },
-  {
-    "id": "66456946",
-    "group": "Group D",
-    "homeCode": "TUR",
-    "awayCode": "PAR",
-    "homeKey": "Turkey",
-    "awayKey": "Paraguay",
-    "startUtc": "2026-06-20T03:00:00Z"
-  },
-  {
-    "id": "66456972",
-    "group": "Group F",
-    "homeCode": "NED",
-    "awayCode": "SWE",
-    "homeKey": "Netherlands",
-    "awayKey": "Sweden",
-    "startUtc": "2026-06-20T17:00:00Z"
-  },
-  {
-    "id": "66457074",
-    "group": "Group E",
-    "homeCode": "GER",
-    "awayCode": "CIV",
-    "homeKey": "Germany",
-    "awayKey": "Ivory Coast",
-    "startUtc": "2026-06-20T20:00:00Z"
-  },
-  {
-    "id": "66457076",
-    "group": "Group E",
-    "homeCode": "ECU",
-    "awayCode": "CUW",
-    "homeKey": "Ecuador",
-    "awayKey": "Curacao",
-    "startUtc": "2026-06-21T00:00:00Z"
-  },
-  {
-    "id": "66456974",
-    "group": "Group F",
-    "homeCode": "TUN",
-    "awayCode": "JPN",
-    "homeKey": "Tunisia",
-    "awayKey": "Japan",
-    "startUtc": "2026-06-21T04:00:00Z"
-  },
-  {
-    "id": "66456998",
-    "group": "Group H",
-    "homeCode": "ESP",
-    "awayCode": "KSA",
-    "homeKey": "Spain",
-    "awayKey": "Saudi Arabia",
-    "startUtc": "2026-06-21T16:00:00Z"
-  },
-  {
-    "id": "66456986",
-    "group": "Group G",
-    "homeCode": "BEL",
-    "awayCode": "IRI",
-    "homeKey": "Belgium",
-    "awayKey": "Iran",
-    "startUtc": "2026-06-21T19:00:00Z"
-  },
-  {
-    "id": "66457000",
-    "group": "Group H",
-    "homeCode": "URU",
-    "awayCode": "CPV",
-    "homeKey": "Uruguay",
-    "awayKey": "Cape Verde",
-    "startUtc": "2026-06-21T22:00:00Z"
-  },
-  {
-    "id": "66456988",
-    "group": "Group G",
-    "homeCode": "NZL",
-    "awayCode": "EGY",
-    "homeKey": "New Zealand",
-    "awayKey": "Egypt",
-    "startUtc": "2026-06-22T01:00:00Z"
-  },
-  {
-    "id": "66457022",
-    "group": "Group J",
-    "homeCode": "ARG",
-    "awayCode": "AUT",
-    "homeKey": "Argentina",
-    "awayKey": "Austria",
-    "startUtc": "2026-06-22T17:00:00Z"
-  },
-  {
-    "id": "66457010",
-    "group": "Group I",
-    "homeCode": "FRA",
-    "awayCode": "IRQ",
-    "homeKey": "France",
-    "awayKey": "Iraq",
-    "startUtc": "2026-06-22T21:00:00Z"
-  },
-  {
-    "id": "66457012",
-    "group": "Group I",
-    "homeCode": "NOR",
-    "awayCode": "SEN",
-    "homeKey": "Norway",
-    "awayKey": "Senegal",
-    "startUtc": "2026-06-23T00:00:00Z"
-  },
-  {
-    "id": "66457024",
-    "group": "Group J",
-    "homeCode": "JOR",
-    "awayCode": "DZA",
-    "homeKey": "Jordan",
-    "awayKey": "Algeria",
-    "startUtc": "2026-06-23T03:00:00Z"
-  },
-  {
-    "id": "66457034",
-    "group": "Group K",
-    "homeCode": "POR",
-    "awayCode": "UZB",
-    "homeKey": "Portugal",
-    "awayKey": "Uzbekistan",
-    "startUtc": "2026-06-23T17:00:00Z"
-  },
-  {
-    "id": "66457046",
-    "group": "Group L",
-    "homeCode": "ENG",
-    "awayCode": "GHA",
-    "homeKey": "England",
-    "awayKey": "Ghana",
-    "startUtc": "2026-06-23T20:00:00Z"
-  },
-  {
-    "id": "66457048",
-    "group": "Group L",
-    "homeCode": "PAN",
-    "awayCode": "CRO",
-    "homeKey": "Panama",
-    "awayKey": "Croatia",
-    "startUtc": "2026-06-23T23:00:00Z"
-  },
-  {
-    "id": "66457036",
-    "group": "Group K",
-    "homeCode": "COL",
-    "awayCode": "COD",
-    "homeKey": "Colombia",
-    "awayKey": "DR Congo",
-    "startUtc": "2026-06-24T02:00:00Z"
-  },
-  {
-    "id": "66456924",
-    "group": "Group B",
-    "homeCode": "SUI",
-    "awayCode": "CAN",
-    "homeKey": "Switzerland",
-    "awayKey": "Canada",
-    "startUtc": "2026-06-24T19:00:00Z"
-  },
-  {
-    "id": "66456926",
-    "group": "Group B",
-    "homeCode": "BIH",
-    "awayCode": "QAT",
-    "homeKey": "Bosnia and Herzegovina",
-    "awayKey": "Qatar",
-    "startUtc": "2026-06-24T19:00:00Z"
-  },
-  {
-    "id": "66456936",
-    "group": "Group C",
-    "homeCode": "SCO",
-    "awayCode": "BRA",
-    "homeKey": "Scotland",
-    "awayKey": "Brazil",
-    "startUtc": "2026-06-24T22:00:00Z"
-  },
-  {
-    "id": "66456938",
-    "group": "Group C",
-    "homeCode": "MAR",
-    "awayCode": "HTI",
-    "homeKey": "Morocco",
-    "awayKey": "Haiti",
-    "startUtc": "2026-06-24T22:00:00Z"
-  },
-  {
-    "id": "66456912",
-    "group": "Group A",
-    "homeCode": "CZE",
-    "awayCode": "MEX",
-    "homeKey": "Czechia",
-    "awayKey": "Mexico",
-    "startUtc": "2026-06-25T01:00:00Z"
-  },
-  {
-    "id": "66456914",
-    "group": "Group A",
-    "homeCode": "RSA",
-    "awayCode": "KOR",
-    "homeKey": "South Africa",
-    "awayKey": "South Korea",
-    "startUtc": "2026-06-25T01:00:00Z"
-  },
-  {
-    "id": "66457078",
-    "group": "Group E",
-    "homeCode": "ECU",
-    "awayCode": "GER",
-    "homeKey": "Ecuador",
-    "awayKey": "Germany",
-    "startUtc": "2026-06-25T20:00:00Z"
-  },
-  {
-    "id": "66457080",
-    "group": "Group E",
-    "homeCode": "CUW",
-    "awayCode": "CIV",
-    "homeKey": "Curacao",
-    "awayKey": "Ivory Coast",
-    "startUtc": "2026-06-25T20:00:00Z"
-  },
-  {
-    "id": "66456976",
-    "group": "Group F",
-    "homeCode": "TUN",
-    "awayCode": "NED",
-    "homeKey": "Tunisia",
-    "awayKey": "Netherlands",
-    "startUtc": "2026-06-25T23:00:00Z"
-  },
-  {
-    "id": "66456978",
-    "group": "Group F",
-    "homeCode": "JPN",
-    "awayCode": "SWE",
-    "homeKey": "Japan",
-    "awayKey": "Sweden",
-    "startUtc": "2026-06-25T23:00:00Z"
-  },
-  {
-    "id": "66456948",
-    "group": "Group D",
-    "homeCode": "TUR",
-    "awayCode": "USA",
-    "homeKey": "Turkey",
-    "awayKey": "United States",
-    "startUtc": "2026-06-26T02:00:00Z"
-  },
-  {
-    "id": "66456950",
-    "group": "Group D",
-    "homeCode": "PAR",
-    "awayCode": "AUS",
-    "homeKey": "Paraguay",
-    "awayKey": "Australia",
-    "startUtc": "2026-06-26T02:00:00Z"
-  },
-  {
     "id": "66457014",
-    "group": "Group I",
-    "homeCode": "NOR",
-    "awayCode": "FRA",
+    "group": "Grupo I",
     "homeKey": "Norway",
     "awayKey": "France",
+    "homeCode": "NO",
+    "awayCode": "FR",
     "startUtc": "2026-06-26T19:00:00Z"
   },
   {
     "id": "66457016",
-    "group": "Group I",
-    "homeCode": "SEN",
-    "awayCode": "IRQ",
+    "group": "Grupo I",
     "homeKey": "Senegal",
     "awayKey": "Iraq",
+    "homeCode": "SN",
+    "awayCode": "IQ",
     "startUtc": "2026-06-26T19:00:00Z"
   },
   {
     "id": "66457002",
-    "group": "Group H",
-    "homeCode": "URU",
-    "awayCode": "ESP",
+    "group": "Grupo H",
     "homeKey": "Uruguay",
     "awayKey": "Spain",
+    "homeCode": "UY",
+    "awayCode": "ES",
     "startUtc": "2026-06-27T00:00:00Z"
   },
   {
     "id": "66457004",
-    "group": "Group H",
-    "homeCode": "CPV",
-    "awayCode": "KSA",
+    "group": "Grupo H",
     "homeKey": "Cape Verde",
     "awayKey": "Saudi Arabia",
+    "homeCode": "CV",
+    "awayCode": "SA",
     "startUtc": "2026-06-27T00:00:00Z"
   },
   {
     "id": "66456990",
-    "group": "Group G",
-    "homeCode": "NZL",
-    "awayCode": "BEL",
+    "group": "Grupo G",
     "homeKey": "New Zealand",
     "awayKey": "Belgium",
+    "homeCode": "NZ",
+    "awayCode": "BE",
     "startUtc": "2026-06-27T03:00:00Z"
   },
   {
     "id": "66456992",
-    "group": "Group G",
-    "homeCode": "EGY",
-    "awayCode": "IRI",
+    "group": "Grupo G",
     "homeKey": "Egypt",
     "awayKey": "Iran",
+    "homeCode": "EG",
+    "awayCode": "IR",
     "startUtc": "2026-06-27T03:00:00Z"
   },
   {
     "id": "66457050",
-    "group": "Group L",
-    "homeCode": "PAN",
-    "awayCode": "ENG",
+    "group": "Grupo L",
     "homeKey": "Panama",
     "awayKey": "England",
+    "homeCode": "PA",
+    "awayCode": "GB",
     "startUtc": "2026-06-27T21:00:00Z"
   },
   {
     "id": "66457052",
-    "group": "Group L",
-    "homeCode": "CRO",
-    "awayCode": "GHA",
+    "group": "Grupo L",
     "homeKey": "Croatia",
     "awayKey": "Ghana",
+    "homeCode": "HR",
+    "awayCode": "GH",
     "startUtc": "2026-06-27T21:00:00Z"
   },
   {
     "id": "66457038",
-    "group": "Group K",
-    "homeCode": "COL",
-    "awayCode": "POR",
+    "group": "Grupo K",
     "homeKey": "Colombia",
     "awayKey": "Portugal",
+    "homeCode": "CO",
+    "awayCode": "PT",
     "startUtc": "2026-06-27T23:30:00Z"
   },
   {
     "id": "66457040",
-    "group": "Group K",
-    "homeCode": "COD",
-    "awayCode": "UZB",
+    "group": "Grupo K",
     "homeKey": "DR Congo",
     "awayKey": "Uzbekistan",
+    "homeCode": "CD",
+    "awayCode": "UZ",
     "startUtc": "2026-06-27T23:30:00Z"
   },
   {
     "id": "66457026",
-    "group": "Group J",
-    "homeCode": "JOR",
-    "awayCode": "ARG",
+    "group": "Grupo J",
     "homeKey": "Jordan",
     "awayKey": "Argentina",
+    "homeCode": "JO",
+    "awayCode": "AR",
     "startUtc": "2026-06-28T02:00:00Z"
   },
   {
     "id": "66457028",
-    "group": "Group J",
-    "homeCode": "DZA",
-    "awayCode": "AUT",
+    "group": "Grupo J",
     "homeKey": "Algeria",
     "awayKey": "Austria",
+    "homeCode": "DZ",
+    "awayCode": "AT",
     "startUtc": "2026-06-28T02:00:00Z"
+  },
+  {
+    "id": "53452545",
+    "group": "Ronda de 32",
+    "homeKey": "South Africa",
+    "awayKey": "Canada",
+    "homeCode": "ZA",
+    "awayCode": "CA",
+    "startUtc": "2026-06-28T19:00:00Z",
+    "nextMatchId": "53452511",
+    "nextSlot": "home"
+  },
+  {
+    "id": "53452557",
+    "group": "Ronda de 32",
+    "homeKey": "Brazil",
+    "awayKey": "Japan",
+    "homeCode": "BR",
+    "awayCode": "JP",
+    "startUtc": "2026-06-29T17:00:00Z",
+    "nextMatchId": "53452517",
+    "nextSlot": "home"
+  },
+  {
+    "id": "53452541",
+    "group": "Ronda de 32",
+    "homeKey": "Germany",
+    "awayKey": "3.º mejor A/B/C/D/F",
+    "homeCode": "DE",
+    "awayCode": "TBD",
+    "startUtc": "2026-06-29T20:30:00Z",
+    "nextMatchId": "53452509",
+    "nextSlot": "home"
+  },
+  {
+    "id": "53452547",
+    "group": "Ronda de 32",
+    "homeKey": "Netherlands",
+    "awayKey": "Morocco",
+    "homeCode": "NL",
+    "awayCode": "MA",
+    "startUtc": "2026-06-30T01:00:00Z",
+    "nextMatchId": "53452511",
+    "nextSlot": "away"
+  },
+  {
+    "id": "53452561",
+    "group": "Ronda de 32",
+    "homeKey": "Ivory Coast",
+    "awayKey": "2.º Grupo I",
+    "homeCode": "CI",
+    "awayCode": "TBD",
+    "startUtc": "2026-06-30T17:00:00Z",
+    "nextMatchId": "53452517",
+    "nextSlot": "away"
+  },
+  {
+    "id": "53452543",
+    "group": "Ronda de 32",
+    "homeKey": "1.º Grupo I",
+    "awayKey": "3.º mejor C/D/F/G/H",
+    "homeCode": "TBD",
+    "awayCode": "TBD",
+    "startUtc": "2026-06-30T21:00:00Z",
+    "nextMatchId": "53452509",
+    "nextSlot": "away"
+  },
+  {
+    "id": "53452563",
+    "group": "Ronda de 32",
+    "homeKey": "Mexico",
+    "awayKey": "3.º mejor C/E/F/H/I",
+    "homeCode": "MX",
+    "awayCode": "TBD",
+    "startUtc": "2026-07-01T01:00:00Z",
+    "nextMatchId": "53452519",
+    "nextSlot": "home"
+  },
+  {
+    "id": "53452565",
+    "group": "Ronda de 32",
+    "homeKey": "1.º Grupo L",
+    "awayKey": "3.º mejor E/H/I/J/K",
+    "homeCode": "TBD",
+    "awayCode": "TBD",
+    "startUtc": "2026-07-01T16:00:00Z",
+    "nextMatchId": "53452519",
+    "nextSlot": "away"
+  },
+  {
+    "id": "53452555",
+    "group": "Ronda de 32",
+    "homeKey": "1.º Grupo G",
+    "awayKey": "3.º mejor A/E/H/I/J",
+    "homeCode": "TBD",
+    "awayCode": "TBD",
+    "startUtc": "2026-07-01T20:00:00Z",
+    "nextMatchId": "53452515",
+    "nextSlot": "home"
+  },
+  {
+    "id": "53452553",
+    "group": "Ronda de 32",
+    "homeKey": "United States",
+    "awayKey": "Bosnia and Herzegovina",
+    "homeCode": "US",
+    "awayCode": "BA",
+    "startUtc": "2026-07-02T00:00:00Z",
+    "nextMatchId": "53452515",
+    "nextSlot": "away"
+  },
+  {
+    "id": "53452551",
+    "group": "Ronda de 32",
+    "homeKey": "1.º Grupo H",
+    "awayKey": "2.º Grupo J",
+    "homeCode": "TBD",
+    "awayCode": "TBD",
+    "startUtc": "2026-07-02T19:00:00Z",
+    "nextMatchId": "53452513",
+    "nextSlot": "home"
+  },
+  {
+    "id": "53452549",
+    "group": "Ronda de 32",
+    "homeKey": "2.º Grupo K",
+    "awayKey": "2.º Grupo L",
+    "homeCode": "TBD",
+    "awayCode": "TBD",
+    "startUtc": "2026-07-02T23:00:00Z",
+    "nextMatchId": "53452513",
+    "nextSlot": "away"
+  },
+  {
+    "id": "53452505",
+    "group": "Ronda de 32",
+    "homeKey": "Switzerland",
+    "awayKey": "3.º mejor E/F/G/I/J",
+    "homeCode": "CH",
+    "awayCode": "TBD",
+    "startUtc": "2026-07-03T03:00:00Z",
+    "nextMatchId": "53452523",
+    "nextSlot": "home"
+  },
+  {
+    "id": "53452503",
+    "group": "Ronda de 32",
+    "homeKey": "Australia",
+    "awayKey": "2.º Grupo G",
+    "homeCode": "AU",
+    "awayCode": "TBD",
+    "startUtc": "2026-07-03T18:00:00Z",
+    "nextMatchId": "53452521",
+    "nextSlot": "home"
+  },
+  {
+    "id": "53452569",
+    "group": "Ronda de 32",
+    "homeKey": "Argentina",
+    "awayKey": "2.º Grupo H",
+    "homeCode": "AR",
+    "awayCode": "TBD",
+    "startUtc": "2026-07-03T22:00:00Z",
+    "nextMatchId": "53452521",
+    "nextSlot": "away"
+  },
+  {
+    "id": "53452507",
+    "group": "Ronda de 32",
+    "homeKey": "1.º Grupo K",
+    "awayKey": "3.º mejor D/E/I/J/L",
+    "homeCode": "TBD",
+    "awayCode": "TBD",
+    "startUtc": "2026-07-04T01:30:00Z",
+    "nextMatchId": "53452523",
+    "nextSlot": "away"
+  },
+  {
+    "id": "53452511",
+    "group": "Octavos",
+    "homeKey": "Ganador RSA-CAN",
+    "awayKey": "Ganador NED-MAR",
+    "homeCode": "TBD",
+    "awayCode": "TBD",
+    "startUtc": "2026-07-04T17:00:00Z",
+    "nextMatchId": "53452525",
+    "nextSlot": "home"
+  },
+  {
+    "id": "53452509",
+    "group": "Octavos",
+    "homeKey": "Ganador GER-3.º",
+    "awayKey": "Ganador Grupo I-3.º",
+    "homeCode": "TBD",
+    "awayCode": "TBD",
+    "startUtc": "2026-07-04T21:00:00Z",
+    "nextMatchId": "53452525",
+    "nextSlot": "away"
+  },
+  {
+    "id": "53452517",
+    "group": "Octavos",
+    "homeKey": "Ganador BRA-JPN",
+    "awayKey": "Ganador CIV-2.º I",
+    "homeCode": "TBD",
+    "awayCode": "TBD",
+    "startUtc": "2026-07-05T17:00:00Z",
+    "nextMatchId": "53452527",
+    "nextSlot": "home"
+  },
+  {
+    "id": "53452519",
+    "group": "Octavos",
+    "homeKey": "Ganador MEX-3.º",
+    "awayKey": "Ganador 1.º L-3.º",
+    "homeCode": "TBD",
+    "awayCode": "TBD",
+    "startUtc": "2026-07-05T21:00:00Z",
+    "nextMatchId": "53452527",
+    "nextSlot": "away"
+  },
+  {
+    "id": "53452515",
+    "group": "Octavos",
+    "homeKey": "Ganador 1.º G-3.º",
+    "awayKey": "Ganador USA-BIH",
+    "homeCode": "TBD",
+    "awayCode": "TBD",
+    "startUtc": "2026-07-06T17:00:00Z",
+    "nextMatchId": "53452529",
+    "nextSlot": "home"
+  },
+  {
+    "id": "53452513",
+    "group": "Octavos",
+    "homeKey": "Ganador 1.º H-2.º J",
+    "awayKey": "Ganador 2.º K-2.º L",
+    "homeCode": "TBD",
+    "awayCode": "TBD",
+    "startUtc": "2026-07-06T21:00:00Z",
+    "nextMatchId": "53452529",
+    "nextSlot": "away"
+  },
+  {
+    "id": "53452521",
+    "group": "Octavos",
+    "homeKey": "Ganador AUS-2.º G",
+    "awayKey": "Ganador ARG-2.º H",
+    "homeCode": "TBD",
+    "awayCode": "TBD",
+    "startUtc": "2026-07-07T17:00:00Z",
+    "nextMatchId": "53452531",
+    "nextSlot": "home"
+  },
+  {
+    "id": "53452523",
+    "group": "Octavos",
+    "homeKey": "Ganador SUI-3.º",
+    "awayKey": "Ganador 1.º K-3.º",
+    "homeCode": "TBD",
+    "awayCode": "TBD",
+    "startUtc": "2026-07-07T21:00:00Z",
+    "nextMatchId": "53452531",
+    "nextSlot": "away"
+  },
+  {
+    "id": "53452525",
+    "group": "Cuartos",
+    "homeKey": "Ganador Octavos 1",
+    "awayKey": "Ganador Octavos 2",
+    "homeCode": "TBD",
+    "awayCode": "TBD",
+    "startUtc": "2026-07-09T19:00:00Z",
+    "nextMatchId": "53452533",
+    "nextSlot": "home"
+  },
+  {
+    "id": "53452527",
+    "group": "Cuartos",
+    "homeKey": "Ganador Octavos 3",
+    "awayKey": "Ganador Octavos 4",
+    "homeCode": "TBD",
+    "awayCode": "TBD",
+    "startUtc": "2026-07-10T19:00:00Z",
+    "nextMatchId": "53452533",
+    "nextSlot": "away"
+  },
+  {
+    "id": "53452529",
+    "group": "Cuartos",
+    "homeKey": "Ganador Octavos 5",
+    "awayKey": "Ganador Octavos 6",
+    "homeCode": "TBD",
+    "awayCode": "TBD",
+    "startUtc": "2026-07-11T19:00:00Z",
+    "nextMatchId": "53452535",
+    "nextSlot": "home"
+  },
+  {
+    "id": "53452531",
+    "group": "Cuartos",
+    "homeKey": "Ganador Octavos 7",
+    "awayKey": "Ganador Octavos 8",
+    "homeCode": "TBD",
+    "awayCode": "TBD",
+    "startUtc": "2026-07-12T19:00:00Z",
+    "nextMatchId": "53452535",
+    "nextSlot": "away"
+  },
+  {
+    "id": "53452533",
+    "group": "Semifinal",
+    "homeKey": "Ganador Cuartos 1",
+    "awayKey": "Ganador Cuartos 2",
+    "homeCode": "TBD",
+    "awayCode": "TBD",
+    "startUtc": "2026-07-14T19:00:00Z",
+    "nextMatchId": "53452539",
+    "nextSlot": "home"
+  },
+  {
+    "id": "53452535",
+    "group": "Semifinal",
+    "homeKey": "Ganador Cuartos 3",
+    "awayKey": "Ganador Cuartos 4",
+    "homeCode": "TBD",
+    "awayCode": "TBD",
+    "startUtc": "2026-07-15T19:00:00Z",
+    "nextMatchId": "53452539",
+    "nextSlot": "away"
+  },
+  {
+    "id": "53452537",
+    "group": "Tercer puesto",
+    "homeKey": "Perdedor Semifinal 1",
+    "awayKey": "Perdedor Semifinal 2",
+    "homeCode": "TBD",
+    "awayCode": "TBD",
+    "startUtc": "2026-07-18T19:00:00Z"
+  },
+  {
+    "id": "53452539",
+    "group": "Final",
+    "homeKey": "Ganador Semifinal 1",
+    "awayKey": "Ganador Semifinal 2",
+    "homeCode": "TBD",
+    "awayCode": "TBD",
+    "startUtc": "2026-07-19T19:00:00Z"
   }
 ];
 
@@ -1057,7 +853,8 @@ let participantsOpen = false;
 
 let allMatches = STATIC_MATCHES.map(m => ({
   id: m.id,
-  groupLetter: (m.group || "").replace("Group ",""),
+  groupLetter: m.group || "",
+  roundName: m.group || "",
   homeKey: m.homeKey,
   awayKey: m.awayKey,
   homeCode: m.homeCode,
@@ -1065,7 +862,9 @@ let allMatches = STATIC_MATCHES.map(m => ({
   start: m.startUtc,
   finalHome: m.finalHome,
   finalAway: m.finalAway,
-  status: m.status || "scheduled"
+  status: m.status || "scheduled",
+  nextMatchId: m.nextMatchId || "",
+  nextSlot: m.nextSlot || ""
 }));
 
 let matches = allMatches.filter(m => isVisibleMatchByJst(m.start));
@@ -1082,14 +881,19 @@ function teamShort(key) {
   const data = TEAM_NAMES[key] || [key,key,key,key,"⚽"];
   return `${data[4]} ${data[langIndex()].split(" ")[0]}`;
 }
-function groupLabel(m) { return `${T[currentLang].group} ${m.groupLetter}`; }
-function isLocked(start) { return Date.now() >= new Date(start).getTime(); }
-function localDayKey(start) { return new Date(start).toLocaleDateString("sv-SE", { timeZone: JAPAN_TIMEZONE }); }
-function timeJst(start) {
-  return new Date(start).toLocaleTimeString(currentLang === "ja" ? "ja-JP" : "es-ES", {
-    hour: "2-digit", minute: "2-digit", timeZone: JAPAN_TIMEZONE
-  });
+
+// ===== V11 OVERRIDES: mostrar todas las fechas de eliminatorias en la sección Partido =====
+function v11IsPlaceholder(name) {
+  return /Ganador|Perdedor|Por definir|Grupo|3.º|2.º|1.º/i.test(String(name || ""));
 }
+function v11TeamText(name) {
+  return v11IsPlaceholder(name) ? String(name || "Por definir") : teamShort(name);
+}
+function v11GroupLabel(m) {
+  return m.roundName || m.groupLetter || "";
+}
+
+function groupLabel(m) { return v11GroupLabel(m); }
 function dateShort(start) {
   return new Date(start).toLocaleDateString("es-ES", { day: "2-digit", month: "short", timeZone: JAPAN_TIMEZONE }).replace(".", "");
 }
@@ -1103,6 +907,24 @@ function dateLong(start) {
     weekday: "long", year: "numeric", month: "long", day: "numeric", timeZone: JAPAN_TIMEZONE
   });
 }
+
+function renderFullKnockoutCalendar() {
+  const target = document.getElementById("fullKnockoutCalendar");
+  if (!target) return;
+  const rounds = ["Grupo I","Grupo H","Grupo G","Grupo L","Grupo K","Grupo J","Ronda de 32","Octavos","Cuartos","Semifinal","Tercer puesto","Final"];
+  const visible = allMatches.filter(m => isVisibleMatchByJst(m.start)).sort((a,b)=>new Date(a.start)-new Date(b.start));
+  target.innerHTML = rounds.map(round => {
+    const list = visible.filter(m => m.roundName === round);
+    if (!list.length) return "";
+    return `<div class="full-round"><h3>🏆 ${round}</h3>` + list.map(m => {
+      const r = officialResultFor(m);
+      const date = new Date(m.start).toLocaleDateString("es-ES", {weekday:"short", day:"2-digit", month:"short", timeZone:JAPAN_TIMEZONE}).replace(".", "");
+      const status = r ? `<strong class="ft-badge">FT ${r.home} - ${r.away}</strong>` : `<span class="time-badge">${date} · ${timeJst(m.start)} JST</span>`;
+      return `<div class="full-game"><div class="full-teams">${v11TeamText(m.homeKey)} <span>vs</span> ${v11TeamText(m.awayKey)}</div><div>${status}</div></div>`;
+    }).join("") + `</div>`;
+  }).join("");
+}
+
 function buildGroups() {
   const sorted = [...matches].sort((a,b) => new Date(a.start) - new Date(b.start));
   const g = {};
@@ -1261,6 +1083,7 @@ window.selectMatchTab = function(matchId) {
 window.toggleParticipants = function() {
   participantsOpen = !participantsOpen;
   renderMatchRanking();
+  renderFullKnockoutCalendar();
 };
 
 
@@ -1576,7 +1399,7 @@ window.syncResultsFromApi = async function() {
     renderAll();
 
     const checked = Array.isArray(data.checkedDates) ? data.checkedDates.join(", ") : "";
-    if (adminStatus) adminStatus.textContent = `✅ Football-data sincronizada. ${saved} resultados guardados. Fechas revisadas: ${checked}`;
+    if (adminStatus) adminStatus.textContent = `✅ Football-data sincronizada. Calendario completo cargado. ${saved} resultados guardados. Fechas revisadas: ${checked}`;
     if (dataStatus) dataStatus.textContent = `✅ Football-data: ${saved}`;
   } catch (err) {
     console.error(err);
@@ -1618,5 +1441,5 @@ setTimeout(() => {
 
 setTimeout(() => {
   const ds = document.getElementById("dataStatus");
-  if (ds) ds.textContent = `✅ Partidos anteriores ocultos. Mostrando solo desde sábado/domingo · v9.2`;
+  if (ds) ds.textContent = `✅ Calendario completo: grupos finales, Ronda de 32, Octavos, Cuartos, Semifinal y Final · v11`;
 }, 1800);

@@ -280,3 +280,5 @@ th{color:#946b00}
 .ft-badge{background:rgba(38,210,120,.18);border:1px solid rgba(38,210,120,.35);border-radius:999px;padding:5px 9px;white-space:nowrap}
 .time-badge{background:rgba(255,255,255,.12);border-radius:999px;padding:5px 9px;white-space:nowrap}
 @media(max-width:560px){.full-game{align-items:flex-start;flex-direction:column}.time-badge,.ft-badge{display:inline-block}}
+
+/* v11 calendar loaded */
