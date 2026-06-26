@@ -260,3 +260,12 @@ th{color:#946b00}
 }
 .bottom-nav a{text-decoration:none;color:var(--ink);text-align:center;font-weight:900;font-size:21px}
 .bottom-nav span{display:block;font-size:11px;margin-top:2px;color:var(--muted)}
+
+.bracket-summary{display:grid;gap:14px;margin-top:10px}
+.bracket-round{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:12px}
+.bracket-round h3{margin:0 0 8px;font-size:16px}
+.bracket-game{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:8px 0;border-top:1px solid rgba(255,255,255,.12);font-size:13px}
+.bracket-game:first-of-type{border-top:0}
+.mini-result{font-weight:800;background:rgba(40,210,120,.18);padding:4px 8px;border-radius:999px;white-space:nowrap}
+.mini-time{opacity:.85;white-space:nowrap}
+.small-note{font-size:12px;opacity:.82;margin-top:0}
