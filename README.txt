@@ -1,11 +1,12 @@
-WORLD CUP PREDICTION 2026 - VERSION 11.1 LOADING FIX
+WORLD CUP PREDICTION 2026 - VERSION 11.2 STABLE CALENDAR FIX
 
-CORRIGE:
-- La página quedaba en "Cargando calendario automático".
-- El error era una llamada incorrecta a setLang/syncOpenFootball dentro de un script module.
-- Ahora carga todas las fechas:
-  grupos finales, Ronda de 32, Octavos, Cuartos, Semifinal, tercer puesto y Final.
-- Mantiene API, Firebase, jugadores y apuestas.
+CORRECCIÓN FUERTE:
+- Reemplaza el JavaScript anterior por una versión estable.
+- La web ya no debe quedarse en "Cargando calendario automático".
+- Muestra todas las fechas:
+  grupos finales, Ronda de 32, Octavos, Cuartos, Semifinales, Tercer puesto y Final.
+- Mantiene Firebase, jugadores y apuestas.
+- El API ya no rompe la página si no trae resultados.
 
 SUBIR A GITHUB:
 api
@@ -20,5 +21,5 @@ NO SUBIR:
 package.json
 
 PROBAR:
-https://world-cup-prediction-2026-26ej.vercel.app/?v=111fix
-https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=111fix
+https://world-cup-prediction-2026-26ej.vercel.app/?v=112stable
+https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=112stable
