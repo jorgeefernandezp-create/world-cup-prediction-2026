@@ -1,11 +1,19 @@
-WORLD CUP PREDICTION 2026 - VERSION 10.0 KNOCKOUT BRACKET AUTO
+WORLD CUP PREDICTION 2026 - VERSION 10.1 FULL KNOCKOUT VISIBLE
 
-CAMBIO GRANDE:
-- Muestra últimos partidos de grupos desde 26/06 y toda la fase eliminatoria.
-- Agrega Round of 32, Round of 16, Quarterfinal, Semifinal, Third Place y Final.
-- Agrega sección "Camino al Campeonato".
-- Los ganadores avanzan automáticamente cuando existe resultado en Firebase/API.
-- Mantiene apuestas y jugadores existentes.
+CORRIGE:
+- Ahora se muestra un calendario completo de eliminatorias.
+- Ya no solo se ven sábado/domingo.
+- Aparecen:
+  Últimos partidos de grupos
+  Ronda de 32
+  Octavos
+  Cuartos
+  Semifinales
+  Tercer puesto
+  Final
+- Los equipos Por definir se reemplazan cuando Firebase/API tenga ganadores.
+- Mantiene football-data.org.
+- Mantiene apuestas y jugadores.
 - No borra Firebase.
 
 SUBIR A GITHUB:
@@ -21,10 +29,5 @@ NO SUBIR:
 package.json
 
 PROBAR:
-https://world-cup-prediction-2026-26ej.vercel.app/?v=100ko
-https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=100ko
-
-EN ADMIN:
-1. Actualizar resultados API.
-2. Recalcular ganador.
-3. Refrescar Firebase.
+https://world-cup-prediction-2026-26ej.vercel.app/?v=101full
+https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=101full

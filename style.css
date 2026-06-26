@@ -269,3 +269,14 @@ th{color:#946b00}
 .mini-result{font-weight:800;background:rgba(40,210,120,.18);padding:4px 8px;border-radius:999px;white-space:nowrap}
 .mini-time{opacity:.85;white-space:nowrap}
 .small-note{font-size:12px;opacity:.82;margin-top:0}
+
+.full-knockout-calendar{display:grid;gap:14px;margin-top:10px}
+.full-round{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:18px;padding:12px}
+.full-round h3{margin:0 0 10px;font-size:17px}
+.full-game{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-top:1px solid rgba(255,255,255,.12);font-size:13px}
+.full-game:first-of-type{border-top:0}
+.full-teams{font-weight:700}
+.full-teams span{opacity:.7;margin:0 5px}
+.ft-badge{background:rgba(38,210,120,.18);border:1px solid rgba(38,210,120,.35);border-radius:999px;padding:5px 9px;white-space:nowrap}
+.time-badge{background:rgba(255,255,255,.12);border-radius:999px;padding:5px 9px;white-space:nowrap}
+@media(max-width:560px){.full-game{align-items:flex-start;flex-direction:column}.time-badge,.ft-badge{display:inline-block}}
