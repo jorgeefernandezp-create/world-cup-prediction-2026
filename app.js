@@ -1,4 +1,4 @@
-const APP_VERSION = "9.0-football-data-final";
+const APP_VERSION = "9.2-hide-old-matches-final";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
   getFirestore, collection, serverTimestamp, query, orderBy, onSnapshot,
@@ -26,6 +26,15 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const JAPAN_TIMEZONE = "Asia/Tokyo";
+// MODO NUEVO: desde sábado 27/06/2026 en Japón.
+// Esto NO borra Firebase. Solo oculta partidos anteriores de la pantalla.
+const ACTIVE_FROM_JST_DATE = "2026-06-27";
+function jstDateKeyFromISO(iso) {
+  return new Date(iso).toLocaleDateString("sv-SE", { timeZone: JAPAN_TIMEZONE });
+}
+function isVisibleMatchByJst(iso) {
+  return jstDateKeyFromISO(iso) >= ACTIVE_FROM_JST_DATE;
+}
 
 const STATIC_MATCHES = [
   {
@@ -1046,9 +1055,9 @@ let stakeAmount = 100;
 let lastWinnerKey = "";
 let participantsOpen = false;
 
-let matches = STATIC_MATCHES.map(m => ({
+let allMatches = STATIC_MATCHES.map(m => ({
   id: m.id,
-  groupLetter: m.group.replace("Group ",""),
+  groupLetter: (m.group || "").replace("Group ",""),
   homeKey: m.homeKey,
   awayKey: m.awayKey,
   homeCode: m.homeCode,
@@ -1058,6 +1067,8 @@ let matches = STATIC_MATCHES.map(m => ({
   finalAway: m.finalAway,
   status: m.status || "scheduled"
 }));
+
+let matches = allMatches.filter(m => isVisibleMatchByJst(m.start));
 
 function safeId(name) {
   return name.toLowerCase().trim().replace(/[^a-z0-9áéíóúñãõç一-龯ぁ-んァ-ン]/gi, "_");
@@ -1195,9 +1206,8 @@ function countdownText(start) {
 }
 
 window.syncOpenFootball = function() {
-  document.getElementById("dataStatus").textContent = `✅ Calendario UTC/JST cargado: ${matches.length} partidos.`;
-  if (!selectedDayKey || !buildGroups()[selectedDayKey]) selectedDayKey = localDayKey(matches[0].start);
-  if (!selectedMatchId || !matches.find(m => m.id === selectedMatchId)) selectedMatchId = matches[0].id;
+  document.getElementById("dataStatus").textContent = `✅ Vista limpia desde sábado/domingo: ${matches.length} partidos visibles.`;
+  ensureVisibleSelection();
   saveSelectedPosition();
   renderAll();
 };
@@ -1236,6 +1246,7 @@ window.enterGame = async function() {
 };
 
 window.selectDateTab = function(dayKey) {
+  if (!buildGroups()[dayKey]) return;
   selectedDayKey = dayKey;
   const list = buildGroups()[dayKey] || [];
   selectedMatchId = list[0]?.id || selectedMatchId;
@@ -1252,7 +1263,24 @@ window.toggleParticipants = function() {
   renderMatchRanking();
 };
 
+
+function ensureVisibleSelection() {
+  const groups = buildGroups();
+  const keys = Object.keys(groups);
+  if (!keys.length) return;
+  if (!selectedDayKey || !groups[selectedDayKey]) {
+    selectedDayKey = keys[0];
+    selectedMatchId = groups[selectedDayKey][0]?.id || null;
+  }
+  if (!matches.find(m => String(m.id) === String(selectedMatchId))) {
+    selectedMatchId = groups[selectedDayKey]?.[0]?.id || matches[0]?.id || null;
+  }
+  localStorage.setItem("selectedDayKey", selectedDayKey || "");
+  localStorage.setItem("selectedMatchId", selectedMatchId || "");
+}
+
 function renderAll() {
+  ensureVisibleSelection();
   renderTabs();
   renderSelectedMatch();
   renderMatchRanking();
@@ -1261,6 +1289,13 @@ function renderAll() {
 function renderTabs() {
   const groups = buildGroups();
   const keys = Object.keys(groups);
+  if (!keys.length) {
+    document.getElementById("dateTabs").innerHTML = "<button class='active-date'>Sin partidos visibles</button>";
+    document.getElementById("matchTabs").innerHTML = "";
+    const box = document.getElementById("selectedMatchBox");
+    if (box) box.innerHTML = "<div class='selected-match'>No hay partidos activos desde sábado/domingo.</div>";
+    return;
+  }
   if (!selectedDayKey || !groups[selectedDayKey]) selectedDayKey = keys[0];
   if (!selectedMatchId || !matches.find(m => m.id === selectedMatchId)) selectedMatchId = groups[selectedDayKey]?.[0]?.id;
   document.getElementById("dateTabs").innerHTML = keys.map(k => {
@@ -1511,8 +1546,10 @@ window.syncResultsFromApi = async function() {
       return;
     }
 
+    const activeIds = new Set(matches.map(m => String(m.id)));
     let saved = 0;
     for (const item of data.results || []) {
+      if (!activeIds.has(String(item.matchId))) continue;
       const resultObj = {
         matchId: item.matchId,
         home: Number(item.home),
@@ -1578,3 +1615,8 @@ setTimeout(() => {
   const ds = document.getElementById("dataStatus");
   if (ds) ds.textContent = (ds.textContent || "Sistema listo") + " · v8.7";
 }, 2000);
+
+setTimeout(() => {
+  const ds = document.getElementById("dataStatus");
+  if (ds) ds.textContent = `✅ Partidos anteriores ocultos. Mostrando solo desde sábado/domingo · v9.2`;
+}, 1800);

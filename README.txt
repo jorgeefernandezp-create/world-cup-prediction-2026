@@ -1,18 +1,15 @@
-WORLD CUP PREDICTION 2026 - VERSION 9.1 SATURDAY FORWARD
+WORLD CUP PREDICTION 2026 - VERSION 9.2 HIDE OLD MATCHES FINAL
 
-OBJETIVO:
-- Limpiar la web para que ya no muestre partidos anteriores.
-- Mostrar solo partidos desde sábado 27/06/2026 en Japón en adelante.
-- Mantener API football-data.org.
-- Mantener Firebase.
-- Mantener jugadores, apuestas y resultados anteriores guardados.
-- NO borra nada de Firebase; solo oculta partidos antiguos de la pantalla pública.
-
-IMPORTANTE:
-- NO borra players.
-- NO borra predictions.
-- NO borra results.
-- package.json NO debe existir en GitHub.
+CORRECCIÓN FUERTE:
+- Oculta definitivamente partidos anteriores.
+- Solo muestra partidos cuya fecha en Japón sea desde 2026-06-27 en adelante.
+- Ignora selección antigua guardada en el celular o navegador.
+- Si localStorage tenía una fecha vieja, la reemplaza por la primera fecha visible.
+- No borra Firebase.
+- No elimina players.
+- No elimina predictions.
+- No elimina results.
+- Sigue usando football-data.org.
 
 SUBIR A GITHUB:
 api
@@ -26,18 +23,14 @@ vercel.json
 NO SUBIR:
 package.json
 
-VERCEL:
-Ya tienes FOOTBALL_DATA_API_KEY. Solo sube y espera Ready.
+DESPUÉS:
+1. Commit changes.
+2. Espera Vercel Ready.
+3. Abre:
+   https://world-cup-prediction-2026-26ej.vercel.app/?v=92hideold
+4. Admin:
+   https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=92hideold
 
-PROBAR:
-https://world-cup-prediction-2026-26ej.vercel.app/?v=91sat
-https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=91sat
-https://world-cup-prediction-2026-26ej.vercel.app/api/sync-results
-
-EN ADMIN:
-1. Actualizar resultados API.
-2. Recalcular ganador.
-3. Refrescar Firebase si hace falta.
-
-NOTA:
-Los partidos anteriores quedan guardados en Firebase, pero ya no se muestran en la vista principal.
+IMPORTANTE:
+Si sigues viendo partidos viejos, abre en incógnito o borra caché.
+Esta versión fuerza cache busting con app.js?v=92hideold.
