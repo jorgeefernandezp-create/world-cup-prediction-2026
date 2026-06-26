@@ -289,3 +289,9 @@ th{color:#946b00}
 .locked{margin-top:10px;font-weight:900;color:#7a1b1b;background:#ffe2e2;border-radius:12px;padding:8px 10px}
 .match-tabs button small{display:block;margin-top:4px;font-size:11px;opacity:.88;font-weight:800;line-height:1.25}
 .teams-line{font-weight:900}
+
+/* v12.1 mobile input + participants fix */
+#matchParticipantsList{margin-top:10px;max-height:220px;overflow-y:auto;display:none;pointer-events:auto}
+.participant-row{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.15);font-weight:700}
+#selected_home,#selected_away{font-size:22px;touch-action:manipulation}
+button{touch-action:manipulation}
