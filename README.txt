@@ -1,20 +1,11 @@
-WORLD CUP PREDICTION 2026 - VERSION 10.1 FULL KNOCKOUT VISIBLE
+WORLD CUP PREDICTION 2026 - VERSION 10.2 API CRASH FIX
 
 CORRIGE:
-- Ahora se muestra un calendario completo de eliminatorias.
-- Ya no solo se ven sábado/domingo.
-- Aparecen:
-  Últimos partidos de grupos
-  Ronda de 32
-  Octavos
-  Cuartos
-  Semifinales
-  Tercer puesto
-  Final
-- Los equipos Por definir se reemplazan cuando Firebase/API tenga ganadores.
+- Error 500 INTERNAL_SERVER_ERROR en /api/sync-results.
+- Faltaba una coma en api/sync-results.js antes de los partidos eliminatorios.
+- Mantiene calendario completo de eliminatorias visible.
 - Mantiene football-data.org.
-- Mantiene apuestas y jugadores.
-- No borra Firebase.
+- No borra Firebase ni apuestas.
 
 SUBIR A GITHUB:
 api
@@ -29,5 +20,6 @@ NO SUBIR:
 package.json
 
 PROBAR:
-https://world-cup-prediction-2026-26ej.vercel.app/?v=101full
-https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=101full
+https://world-cup-prediction-2026-26ej.vercel.app/api/sync-results
+https://world-cup-prediction-2026-26ej.vercel.app/?v=102fix
+https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=102fix

@@ -1,4 +1,4 @@
-const APP_VERSION = "9.2-hide-old-matches-final";
+const APP_VERSION = "10.2-api-crash-fix";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
   getFirestore, collection, serverTimestamp, query, orderBy, onSnapshot,

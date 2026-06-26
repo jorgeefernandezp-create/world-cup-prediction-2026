@@ -93,7 +93,7 @@ const LOCAL_MATCHES = [
   ["66456990","NZL","BEL","2026-06-27T03:00:00Z"],["66456992","EGY","IRI","2026-06-27T03:00:00Z"],
   ["66457050","PAN","ENG","2026-06-27T21:00:00Z"],["66457052","CRO","GHA","2026-06-27T21:00:00Z"],
   ["66457038","COL","POR","2026-06-27T23:30:00Z"],["66457040","COD","UZB","2026-06-27T23:30:00Z"],
-  ["66457026","JOR","ARG","2026-06-28T02:00:00Z"],["66457028","DZA","AUT","2026-06-28T02:00:00Z"]
+  ["66457026","JOR","ARG","2026-06-28T02:00:00Z"],["66457028","DZA","AUT","2026-06-28T02:00:00Z"],
   ["53452545","RSA","CAN","2026-06-28T19:00:00Z"],
   ["53452557","BRA","JPN","2026-06-29T17:00:00Z"],
   ["53452541","GER","TBD","2026-06-29T20:30:00Z"],
@@ -201,7 +201,7 @@ function convertFootballDataMatch(match) {
 
 function fallbackResultsObject() {
   return FALLBACK_RESULTS.map(([matchId, home, away]) => {
-    const m = LOCAL_MATCHES.find(x => x.id === matchId);
+    const m = LOCAL_MATCHES.find(x => String(x.id) === String(matchId)) || {};
     return {
       matchId,
       home,
