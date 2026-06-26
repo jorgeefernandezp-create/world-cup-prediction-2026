@@ -1,4 +1,4 @@
-const APP_VERSION = "11.2-stable-calendar-fix";
+const APP_VERSION = "12.0-final-countdown-clean";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
@@ -343,6 +343,19 @@ const TEAM_ES = {
   "Bosnia and Herzegovina":"Bosnia y Herzegovina", "Switzerland":"Suiza", "Australia":"Australia"
 };
 
+const TEAM_FLAGS = {
+  "Norway":"🇳🇴", "France":"🇫🇷", "Senegal":"🇸🇳", "Iraq":"🇮🇶",
+  "Uruguay":"🇺🇾", "Spain":"🇪🇸", "Cape Verde":"🇨🇻", "Saudi Arabia":"🇸🇦",
+  "New Zealand":"🇳🇿", "Belgium":"🇧🇪", "Egypt":"🇪🇬", "Iran":"🇮🇷",
+  "Panama":"🇵🇦", "England":"🏴", "Croatia":"🇭🇷", "Ghana":"🇬🇭",
+  "Colombia":"🇨🇴", "Portugal":"🇵🇹", "DR Congo":"🇨🇩", "Uzbekistan":"🇺🇿",
+  "Jordan":"🇯🇴", "Argentina":"🇦🇷", "Algeria":"🇩🇿", "Austria":"🇦🇹",
+  "South Africa":"🇿🇦", "Canada":"🇨🇦", "Brazil":"🇧🇷", "Japan":"🇯🇵",
+  "Germany":"🇩🇪", "Netherlands":"🇳🇱", "Morocco":"🇲🇦",
+  "Ivory Coast":"🇨🇮", "Mexico":"🇲🇽", "United States":"🇺🇸",
+  "Bosnia and Herzegovina":"🇧🇦", "Switzerland":"🇨🇭", "Australia":"🇦🇺"
+};
+
 let currentPlayerName = localStorage.getItem("playerName") || "";
 let selectedDayKey = localStorage.getItem("selectedDayKey") || "";
 let selectedMatchId = localStorage.getItem("selectedMatchId") || "";
@@ -351,6 +364,7 @@ let resultsCache = {};
 let stakeAmount = 100;
 let participantsOpen = false;
 let currentLang = "es";
+let countdownIntervalStarted = false;
 
 function $(id) { return document.getElementById(id); }
 function jstDateKey(iso) { return new Date(iso).toLocaleDateString("sv-SE", { timeZone: JAPAN_TIMEZONE }); }
@@ -361,6 +375,29 @@ function safeId(name) { return String(name).toLowerCase().trim().replace(/[^a-z0
 function teamName(k) { return TEAM_ES[k] || k || "Por definir"; }
 function isPlaceholder(k) { return /Ganador|Perdedor|Grupo|mejor|Octavos|Cuartos|Semifinal|^[123]\.º/i.test(String(k||"")); }
 function teamDisplay(k) { return isPlaceholder(k) ? k : teamName(k); }
+
+function flagFor(k) { return TEAM_FLAGS[k] || (isPlaceholder(k) ? "🏆" : "🏳️"); }
+function msToCountdown(ms) {
+  if (ms <= 0) return "00d 00h 00m 00s";
+  const total = Math.floor(ms / 1000);
+  const d = Math.floor(total / 86400);
+  const h = Math.floor((total % 86400) / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  return `${d}d ${String(h).padStart(2,"0")}h ${String(m).padStart(2,"0")}m ${String(s).padStart(2,"0")}s`;
+}
+function isMatchLocked(match) {
+  return Date.now() >= new Date(match.start).getTime() || !!resultFor(match.id);
+}
+function countdownText(match) {
+  const diff = new Date(match.start).getTime() - Date.now();
+  if (diff <= 0) return "🔒 Apuesta cerrada";
+  return `Cierra en ${msToCountdown(diff)}`;
+}
+function teamWithFlag(k) {
+  return `${flagFor(k)} ${teamDisplay(k)}`;
+}
+
 
 function resultFor(matchId) {
   const r = resultsCache[String(matchId)];
@@ -419,9 +456,10 @@ function renderTabs() {
   const list = groups[selectedDayKey] || [];
   $("matchTabs").innerHTML = list.map(m => {
     const r = resultFor(m.id);
-    const score = r ? ` · ${r.home}-${r.away}` : "";
+    const score = r ? ` · FT ${r.home}-${r.away}` : "";
+    const status = r ? "Finalizado" : (isMatchLocked(m) ? "Apuesta cerrada" : countdownText(m));
     return `<button class="${String(m.id) === String(selectedMatchId) ? "active-match" : ""}" onclick="selectMatchTab('${m.id}')">
-      ${timeJst(m.start)}<br>${teamDisplay(m.homeKey)} vs ${teamDisplay(m.awayKey)}${score}
+      ${timeJst(m.start)}<br>${teamWithFlag(m.homeKey)} vs ${teamWithFlag(m.awayKey)}${score}<br><small>${status}</small>
     </button>`;
   }).join("");
 }
@@ -429,14 +467,14 @@ function renderTabs() {
 function renderSelectedMatch() {
   const m = selectedMatch();
   const r = resultFor(m.id);
-  const locked = new Date() >= new Date(m.start) || !!r;
+  const locked = isMatchLocked(m);
   const saved = currentPredictionFor(m.id);
   $("selectedMatchBox").innerHTML = `
     <div class="selected-match">
-      <div class="teams-line">${teamDisplay(m.homeKey)} vs ${teamDisplay(m.awayKey)}</div>
+      <div class="teams-line">${teamWithFlag(m.homeKey)} vs ${teamWithFlag(m.awayKey)}</div>
       <div class="match-meta">📅 ${dateLong(m.start)} · 🕒 ${timeJst(m.start)} JST<br>${m.group}</div>
-      ${r ? `<span class="result-badge">Resultado final: ${r.home} - ${r.away}</span>` : `<div class="countdown">Fecha programada</div>`}
-      ${locked ? `<div class="locked">🔒 Cerrado</div>` : `<div class="score"><input id="selected_home" type="number" min="0" placeholder="0" value="${saved ? saved.predictedHome : ""}"><span>-</span><input id="selected_away" type="number" min="0" placeholder="0" value="${saved ? saved.predictedAway : ""}"></div>`}
+      ${r ? `<span class="result-badge">Resultado final: ${r.home} - ${r.away}</span>` : `<div class="countdown">${countdownText(m)}</div>`}
+      ${locked ? `<div class="locked">🔒 Apuesta cerrada</div>` : `<div class="score"><input id="selected_home" type="number" min="0" placeholder="0" value="${saved ? saved.predictedHome : ""}"><span>-</span><input id="selected_away" type="number" min="0" placeholder="0" value="${saved ? saved.predictedAway : ""}"></div>`}
     </div>`;
 }
 
@@ -463,28 +501,16 @@ function renderRanking() {
   $("matchRankingBody").innerHTML = ranked.map((p,i) => `<tr><td>${i+1}</td><td>${p.playerName}</td><td>${p.predictedHome} - ${p.predictedAway}</td><td>${p.points}</td></tr>`).join("");
 }
 
-function renderFullCalendar() {
-  const target = $("fullKnockoutCalendar");
-  if (!target) return;
-  const rounds = ["Grupo I","Grupo H","Grupo G","Grupo L","Grupo K","Grupo J","Ronda de 32","Octavos","Cuartos","Semifinal","Tercer puesto","Final"];
-  target.innerHTML = rounds.map(round => {
-    const list = MATCHES.filter(m => m.group === round);
-    if (!list.length) return "";
-    return `<div class="full-round"><h3>🏆 ${round}</h3>${list.map(m => {
-      const r = resultFor(m.id);
-      return `<div class="full-game"><div class="full-teams">${teamDisplay(m.homeKey)} <span>vs</span> ${teamDisplay(m.awayKey)}</div><div>${r ? `<strong class="ft-badge">FT ${r.home} - ${r.away}</strong>` : `<span class="time-badge">${dateShort(m.start)} · ${timeJst(m.start)} JST</span>`}</div></div>`;
-    }).join("")}</div>`;
-  }).join("");
-}
+function renderFullCalendar() {}
 
 function renderAll() {
   ensureSelection();
   renderTabs();
   renderSelectedMatch();
   renderRanking();
-  renderFullCalendar();
+  
   const ds = $("dataStatus");
-  if (ds) ds.textContent = `✅ Calendario cargado: ${MATCHES.length} partidos hasta la final · v11.2`;
+  if (ds) ds.textContent = `✅ Calendario cargado con cuenta regresiva: ${MATCHES.length} partidos · v12.0`;
   $("welcomeText").textContent = currentPlayerName ? `Bienvenido, ${currentPlayerName}!` : "";
 }
 
@@ -524,6 +550,7 @@ window.selectMatchTab = function(id) {
 window.saveSelectedPrediction = async function() {
   const m = selectedMatch();
   if (!currentPlayerName) { $("predictionStatus").textContent = "⚠️ Primero ingresa tu nombre."; return; }
+  if (isMatchLocked(m)) { $("predictionStatus").textContent = "🔒 La apuesta ya está cerrada para este partido."; return; }
   const h = $("selected_home")?.value;
   const a = $("selected_away")?.value;
   if (h === undefined || a === undefined) { $("predictionStatus").textContent = "🔒 Este partido está cerrado."; return; }
@@ -585,4 +612,11 @@ document.addEventListener("DOMContentLoaded", () => {
   listenPredictions();
   listenResults();
   setTimeout(() => window.syncResultsFromApi(), 500);
+  if (!countdownIntervalStarted) {
+    countdownIntervalStarted = true;
+    setInterval(() => {
+      renderTabs();
+      renderSelectedMatch();
+    }, 1000);
+  }
 });

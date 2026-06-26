@@ -283,6 +283,9 @@ th{color:#946b00}
 
 /* v11 calendar loaded */
 
+/* v12 clean countdown */
+.full-calendar-card,.full-knockout-calendar{display:none!important}
 .countdown{display:inline-block;margin-top:10px;background:#061326;color:#ffd24a;font-weight:900;border-radius:999px;padding:8px 14px}
 .locked{margin-top:10px;font-weight:900;color:#7a1b1b;background:#ffe2e2;border-radius:12px;padding:8px 10px}
-.match-tabs button small{display:block;margin-top:4px;font-size:11px;opacity:.85;font-weight:800}
+.match-tabs button small{display:block;margin-top:4px;font-size:11px;opacity:.88;font-weight:800;line-height:1.25}
+.teams-line{font-weight:900}

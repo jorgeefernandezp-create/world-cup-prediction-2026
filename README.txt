@@ -1,11 +1,13 @@
-WORLD CUP PREDICTION 2026 - VERSION 11.3 COUNTDOWN LOCK FIX
+WORLD CUP PREDICTION 2026 - VERSION 12.0 FINAL COUNTDOWN CLEAN
 
 CORRIGE:
-- Regresa la cuenta regresiva para cada partido.
-- Muestra "Cierra en 0d 00h 00m 00s".
-- Bloquea automáticamente cuando llega la hora de inicio del partido.
-- No permite guardar score después del inicio.
-- Mantiene fechas, Firebase, participantes y apuestas.
+- Borra/oculta la sección "Todas las fechas hasta el final".
+- Deja solo las fechas dentro del bloque Partido.
+- Regresa la cuenta regresiva "Cierra en..." para cada partido.
+- Actualiza la cuenta regresiva cada segundo.
+- Bloquea automáticamente el ingreso de scores cuando empieza el partido.
+- Agrega banderitas al nombre de cada equipo.
+- Mantiene Firebase, participantes, apuestas y resultados.
 
 SUBIR A GITHUB:
 api
@@ -20,4 +22,4 @@ NO SUBIR:
 package.json
 
 PROBAR:
-https://world-cup-prediction-2026-26ej.vercel.app/?v=113count
+https://world-cup-prediction-2026-26ej.vercel.app/?v=120clean
