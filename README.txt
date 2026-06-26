@@ -1,15 +1,13 @@
-WORLD CUP PREDICTION 2026 - VERSION 9.2 HIDE OLD MATCHES FINAL
+WORLD CUP PREDICTION 2026 - VERSION 9.3 KNOCKOUT AUTO
 
-CORRECCIÓN FUERTE:
-- Oculta definitivamente partidos anteriores.
-- Solo muestra partidos cuya fecha en Japón sea desde 2026-06-27 en adelante.
-- Ignora selección antigua guardada en el celular o navegador.
-- Si localStorage tenía una fecha vieja, la reemplaza por la primera fecha visible.
-- No borra Firebase.
-- No elimina players.
-- No elimina predictions.
-- No elimina results.
-- Sigue usando football-data.org.
+NUEVO:
+- Agrega partidos eliminatorios desde sábado/domingo en adelante.
+- Incluye Round of 32, Round of 16, Quarterfinal, Semifinal, Third Place y Final.
+- Los partidos anteriores siguen ocultos.
+- Los ganadores avanzan automáticamente a la siguiente llave cuando existe resultado en Firebase/API.
+- Los placeholders tipo Winner 53452545 se convierten en el equipo ganador.
+- Mantiene football-data.org.
+- No borra Firebase ni apuestas.
 
 SUBIR A GITHUB:
 api
@@ -23,14 +21,11 @@ vercel.json
 NO SUBIR:
 package.json
 
-DESPUÉS:
-1. Commit changes.
-2. Espera Vercel Ready.
-3. Abre:
-   https://world-cup-prediction-2026-26ej.vercel.app/?v=92hideold
-4. Admin:
-   https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=92hideold
+PROBAR:
+https://world-cup-prediction-2026-26ej.vercel.app/?v=93ko
+https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=93ko
 
-IMPORTANTE:
-Si sigues viendo partidos viejos, abre en incógnito o borra caché.
-Esta versión fuerza cache busting con app.js?v=92hideold.
+EN ADMIN:
+1. Actualizar resultados API.
+2. Recalcular ganador.
+3. Refrescar Firebase.
