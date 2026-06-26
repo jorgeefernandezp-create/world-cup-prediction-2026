@@ -1,4 +1,4 @@
-const APP_VERSION = "11.0-all-knockout-dates-visible";
+const APP_VERSION = "11.1-loading-fix";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
   getFirestore, collection, serverTimestamp, query, orderBy, onSnapshot,
@@ -931,7 +931,7 @@ function buildGroups() {
   for (const m of sorted) (g[localDayKey(m.start)] ||= []).push(m);
   return g;
 }
-function selectedMatch() { return matches.find(m => m.id === selectedMatchId) || matches[0]; }
+function selectedMatch() { return matches.find(m => String(m.id) === String(selectedMatchId)) || matches[0]; }
 
 function officialResultFor(match) {
   if (!match) return null;
@@ -1108,6 +1108,7 @@ function renderAll() {
   renderSelectedMatch();
   renderMatchRanking();
   renderAdminResults();
+  renderFullKnockoutCalendar();
 }
 function renderTabs() {
   const groups = buildGroups();
@@ -1120,14 +1121,14 @@ function renderTabs() {
     return;
   }
   if (!selectedDayKey || !groups[selectedDayKey]) selectedDayKey = keys[0];
-  if (!selectedMatchId || !matches.find(m => m.id === selectedMatchId)) selectedMatchId = groups[selectedDayKey]?.[0]?.id;
+  if (!selectedMatchId || !matches.find(m => String(m.id) === String(selectedMatchId))) selectedMatchId = groups[selectedDayKey]?.[0]?.id;
   document.getElementById("dateTabs").innerHTML = keys.map(k => {
     const list = groups[k], first = list[0];
     return `<button class="${k===selectedDayKey?"active-date":""}" onclick="selectDateTab('${k}')"><span class="tab-day">${weekday(first.start)}</span><span class="tab-date">${dateShort(first.start)}</span><span class="tab-count">${list.length} ${T[currentLang].matches}</span></button>`;
   }).join("");
   const list = groups[selectedDayKey] || [];
   document.getElementById("matchTabs").innerHTML = list.map(m =>
-    `<button class="${m.id===selectedMatchId?"active-match":""}" onclick="selectMatchTab('${m.id}')">${tabScoreLabel(m)}</button>`
+    `<button class="${String(m.id)===String(selectedMatchId)?"active-match":""}" onclick="selectMatchTab('${m.id}')">${tabScoreLabel(m)}</button>`
   ).join("");
 }
 function renderSelectedMatch() {
@@ -1426,13 +1427,13 @@ setInterval(() => {
 }, 1000);
 
 if (currentPlayerName) document.getElementById("welcomeText").textContent = `${T[currentLang].welcome}, ${currentPlayerName}!`;
-setLang("es");
+window.setLang("es");
 listenResults();
 listenPredictions();
 listenSettings();
-syncOpenFootball();
-setTimeout(() => syncResultsFromApi(), 1500);
-setInterval(() => syncResultsFromApi(), 15 * 60 * 1000);
+window.syncOpenFootball();
+setTimeout(() => window.syncResultsFromApi(), 1500);
+setInterval(() => window.syncResultsFromApi(), 15 * 60 * 1000);
 
 setTimeout(() => {
   const ds = document.getElementById("dataStatus");
