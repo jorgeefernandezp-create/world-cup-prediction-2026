@@ -295,3 +295,11 @@ th{color:#946b00}
 .participant-row{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.15);font-weight:700}
 #selected_home,#selected_away{font-size:22px;touch-action:manipulation}
 button{touch-action:manipulation}
+
+/* v12.2 final mobile stable */
+#matchParticipantsList{margin-top:10px;max-height:220px;overflow-y:auto;display:none!important;pointer-events:auto;position:relative;z-index:5}
+#matchParticipantsList[style*="block"]{display:block!important}
+.participant-row{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.15);font-weight:700}
+.score input,#selected_home,#selected_away{font-size:24px!important;line-height:1.2!important;min-height:48px!important;touch-action:manipulation}
+.score{position:relative;z-index:10}
+button{touch-action:manipulation}

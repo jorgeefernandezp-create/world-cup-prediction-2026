@@ -1,11 +1,13 @@
-WORLD CUP PREDICTION 2026 - VERSION 12.1 MOBILE INPUT PARTICIPANTS FIX
+WORLD CUP PREDICTION 2026 - VERSION 12.2 FINAL MOBILE STABLE
 
-CORRIGE:
-- El teclado del celular ya no se cierra al poner score.
-- La cuenta regresiva sigue actualizándose sin redibujar los inputs.
-- El botón Participantes vuelve a desplegar la lista.
-- La lista de participantes tiene scroll.
-- Mantiene fechas, banderas, Firebase, apuestas y bloqueo automático.
+CORRECCIÓN FINAL PARA SUBIR:
+- Participantes despliega correctamente.
+- El teclado del celular ya no se cierra al escribir scores.
+- Los valores escritos se mantienen aunque haya actualización de Firebase.
+- La cuenta regresiva sigue funcionando.
+- El bloqueo automático al inicio del partido se mantiene.
+- Se elimina/oculta la sección extra de todas las fechas.
+- Mantiene Firebase, apuestas, participantes, resultados y API.
 
 SUBIR A GITHUB:
 api
@@ -20,4 +22,4 @@ NO SUBIR:
 package.json
 
 PROBAR:
-https://world-cup-prediction-2026-26ej.vercel.app/?v=121mobile
+https://world-cup-prediction-2026-26ej.vercel.app/?v=122stable

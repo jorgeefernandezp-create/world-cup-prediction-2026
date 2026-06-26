@@ -1,4 +1,4 @@
-const APP_VERSION = "12.0-final-countdown-clean";
+const APP_VERSION = "12.2-final-mobile-stable";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
@@ -364,6 +364,7 @@ let resultsCache = {};
 let stakeAmount = 100;
 let participantsOpen = false;
 let currentLang = "es";
+let localDraftScores = {};
 let countdownIntervalStarted = false;
 
 function $(id) { return document.getElementById(id); }
@@ -459,7 +460,7 @@ function renderTabs() {
     const score = r ? ` · FT ${r.home}-${r.away}` : "";
     const status = r ? "Finalizado" : (isMatchLocked(m) ? "Apuesta cerrada" : countdownText(m));
     return `<button class="${String(m.id) === String(selectedMatchId) ? "active-match" : ""}" onclick="selectMatchTab('${m.id}')">
-      ${timeJst(m.start)}<br>${teamWithFlag(m.homeKey)} vs ${teamWithFlag(m.awayKey)}${score}<br><small>${status}</small>
+      ${timeJst(m.start)}<br>${teamWithFlag(m.homeKey)} vs ${teamWithFlag(m.awayKey)}${score}<br><small data-countdown-match="${m.id}">${status}</small>
     </button>`;
   }).join("");
 }
@@ -469,12 +470,13 @@ function renderSelectedMatch() {
   const r = resultFor(m.id);
   const locked = isMatchLocked(m);
   const saved = currentPredictionFor(m.id);
+  const draft = localDraftScores[String(m.id)] || null;
   $("selectedMatchBox").innerHTML = `
     <div class="selected-match">
       <div class="teams-line">${teamWithFlag(m.homeKey)} vs ${teamWithFlag(m.awayKey)}</div>
       <div class="match-meta">📅 ${dateLong(m.start)} · 🕒 ${timeJst(m.start)} JST<br>${m.group}</div>
-      ${r ? `<span class="result-badge">Resultado final: ${r.home} - ${r.away}</span>` : `<div class="countdown">${countdownText(m)}</div>`}
-      ${locked ? `<div class="locked">🔒 Apuesta cerrada</div>` : `<div class="score"><input id="selected_home" type="number" min="0" placeholder="0" value="${saved ? saved.predictedHome : ""}"><span>-</span><input id="selected_away" type="number" min="0" placeholder="0" value="${saved ? saved.predictedAway : ""}"></div>`}
+      ${r ? `<span class="result-badge">Resultado final: ${r.home} - ${r.away}</span>` : `<div id="selectedCountdown" class="countdown">${countdownText(m)}</div>`}
+      ${locked ? `<div class="locked">🔒 Apuesta cerrada</div>` : `<div class="score"><input id="selected_home" type="number" inputmode="numeric" pattern="[0-9]*" min="0" placeholder="0" autocomplete="off" oninput="saveDraftScore()" value="${draft ? draft.home : (saved ? saved.predictedHome : "")}"><span>-</span><input id="selected_away" type="number" inputmode="numeric" pattern="[0-9]*" min="0" placeholder="0" autocomplete="off" oninput="saveDraftScore()" value="${draft ? draft.away : (saved ? saved.predictedAway : "")}"></div>`}
     </div>`;
 }
 
@@ -491,7 +493,13 @@ function renderRanking() {
   const ranked = preds.map(p => ({...p, points: scorePoints(p, res)})).sort((a,b) => b.points - a.points || String(a.playerName).localeCompare(String(b.playerName)));
   $("potBox").textContent = `¥${preds.length * stakeAmount}`;
   $("matchParticipantsSummary").textContent = `${preds.length} participantes`;
-  $("matchParticipantsList").innerHTML = participantsOpen ? preds.map(p => `<div>${p.playerName}: ${p.predictedHome}-${p.predictedAway}</div>`).join("") : "";
+  const plist = $("matchParticipantsList");
+  if (plist) {
+    plist.style.display = participantsOpen ? "block" : "none";
+    plist.innerHTML = preds.length
+      ? preds.map(p => `<div class="participant-row">${p.playerName}: ${p.predictedHome}-${p.predictedAway}</div>`).join("")
+      : `<div class="participant-row">Aún no hay participantes para este partido.</div>`;
+  }
   if (!res) {
     $("winnerBox").textContent = "Aún no hay resultado final.";
   } else {
@@ -502,6 +510,29 @@ function renderRanking() {
 }
 
 function renderFullCalendar() {}
+
+
+function isScoreInputFocused() {
+  const a = document.activeElement;
+  return a && (a.id === "selected_home" || a.id === "selected_away");
+}
+function updateCountdownOnly() {
+  const m = selectedMatch();
+  const el = document.getElementById("selectedCountdown");
+  if (el && m && !resultFor(m.id)) el.textContent = countdownText(m);
+  document.querySelectorAll("[data-countdown-match]").forEach(node => {
+    const id = node.getAttribute("data-countdown-match");
+    const mm = MATCHES.find(x => String(x.id) === String(id));
+    if (!mm) return;
+    const r = resultFor(mm.id);
+    node.textContent = r ? "Finalizado" : (isMatchLocked(mm) ? "Apuesta cerrada" : countdownText(mm));
+  });
+  if (m && isMatchLocked(m) && !isScoreInputFocused()) {
+    const home = document.getElementById("selected_home");
+    const away = document.getElementById("selected_away");
+    if (home || away) renderSelectedMatch();
+  }
+}
 
 function renderAll() {
   ensureSelection();
@@ -547,6 +578,14 @@ window.selectMatchTab = function(id) {
   renderAll();
 };
 
+
+window.saveDraftScore = function() {
+  const m = selectedMatch();
+  const h = document.getElementById("selected_home")?.value ?? "";
+  const a = document.getElementById("selected_away")?.value ?? "";
+  if (m) localDraftScores[String(m.id)] = { home: h, away: a };
+};
+
 window.saveSelectedPrediction = async function() {
   const m = selectedMatch();
   if (!currentPlayerName) { $("predictionStatus").textContent = "⚠️ Primero ingresa tu nombre."; return; }
@@ -560,11 +599,14 @@ window.saveSelectedPrediction = async function() {
     playerId, playerName: currentPlayerName, matchId: m.id, homeKey: m.homeKey, awayKey: m.awayKey,
     predictedHome: Number(h), predictedAway: Number(a), updatedAt: serverTimestamp()
   }, { merge: true });
+  delete localDraftScores[String(m.id)];
   $("predictionStatus").textContent = "✅ Pronóstico guardado.";
 };
 
 window.toggleParticipants = function() {
   participantsOpen = !participantsOpen;
+  const list = document.getElementById("matchParticipantsList");
+  if (list) list.style.display = participantsOpen ? "block" : "none";
   renderRanking();
 };
 
@@ -592,14 +634,23 @@ window.saveResultsAndCalculate = function() { renderAll(); };
 function listenPredictions() {
   onSnapshot(collection(db, "predictions"), snap => {
     predictionsCache = snap.docs.map(d => d.data());
-    renderAll();
+    if (isScoreInputFocused()) {
+      renderRanking();
+    } else {
+      renderAll();
+    }
   });
 }
 function listenResults() {
   onSnapshot(collection(db, "results"), snap => {
     resultsCache = {};
     snap.docs.forEach(d => resultsCache[String(d.id)] = d.data());
-    renderAll();
+    if (isScoreInputFocused()) {
+      renderRanking();
+      updateCountdownOnly();
+    } else {
+      renderAll();
+    }
   });
 }
 
@@ -615,8 +666,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!countdownIntervalStarted) {
     countdownIntervalStarted = true;
     setInterval(() => {
-      renderTabs();
-      renderSelectedMatch();
+      updateCountdownOnly();
     }, 1000);
   }
 });
