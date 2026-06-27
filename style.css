@@ -304,3 +304,6 @@ button{touch-action:manipulation}
 .score{position:relative;z-index:10}
 .match-tabs button small{display:block;margin-top:4px;font-size:11px;opacity:.88;font-weight:800;line-height:1.25}
 button{touch-action:manipulation}
+
+/* v15 knockout crossing engine */
+#adminPanel button{margin:4px}

@@ -1,4 +1,4 @@
-const APP_VERSION = "13.1-final-teams-update";
+const APP_VERSION = "15.0-knockout-crossing-engine";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
@@ -433,7 +433,137 @@ function scorePoints(pred, res) {
   return predSign === realSign ? 3 : 0;
 }
 
+
+// ===== V15: MOTOR DE CRUCES ELIMINATORIOS =====
+// No toca API ni Firebase. Usa los resultados ya guardados en resultsCache.
+// Cada vez que Firebase trae un resultado final, el ganador se coloca en su siguiente partido.
+const KNOCKOUT_ADVANCE_MAP = {
+  // Ronda de 32 -> Octavos
+  "53452545": { nextMatchId: "53452511", slot: "home" },
+  "53452547": { nextMatchId: "53452511", slot: "away" },
+  "53452541": { nextMatchId: "53452509", slot: "home" },
+  "53452543": { nextMatchId: "53452509", slot: "away" },
+  "53452557": { nextMatchId: "53452517", slot: "home" },
+  "53452561": { nextMatchId: "53452517", slot: "away" },
+  "53452563": { nextMatchId: "53452519", slot: "home" },
+  "53452565": { nextMatchId: "53452519", slot: "away" },
+  "53452555": { nextMatchId: "53452515", slot: "home" },
+  "53452553": { nextMatchId: "53452515", slot: "away" },
+  "53452551": { nextMatchId: "53452513", slot: "home" },
+  "53452549": { nextMatchId: "53452513", slot: "away" },
+  "53452503": { nextMatchId: "53452521", slot: "home" },
+  "53452569": { nextMatchId: "53452521", slot: "away" },
+  "53452505": { nextMatchId: "53452523", slot: "home" },
+  "53452507": { nextMatchId: "53452523", slot: "away" },
+
+  // Octavos -> Cuartos
+  "53452511": { nextMatchId: "53452525", slot: "home" },
+  "53452509": { nextMatchId: "53452525", slot: "away" },
+  "53452517": { nextMatchId: "53452527", slot: "home" },
+  "53452519": { nextMatchId: "53452527", slot: "away" },
+  "53452515": { nextMatchId: "53452529", slot: "home" },
+  "53452513": { nextMatchId: "53452529", slot: "away" },
+  "53452521": { nextMatchId: "53452531", slot: "home" },
+  "53452523": { nextMatchId: "53452531", slot: "away" },
+
+  // Cuartos -> Semifinal
+  "53452525": { nextMatchId: "53452533", slot: "home" },
+  "53452527": { nextMatchId: "53452533", slot: "away" },
+  "53452529": { nextMatchId: "53452535", slot: "home" },
+  "53452531": { nextMatchId: "53452535", slot: "away" },
+
+  // Semifinal -> Final
+  "53452533": { nextMatchId: "53452539", slot: "home", loserMatchId: "53452537", loserSlot: "home" },
+  "53452535": { nextMatchId: "53452539", slot: "away", loserMatchId: "53452537", loserSlot: "away" }
+};
+
+function rememberOriginalTeams() {
+  MATCHES.forEach(m => {
+    if (!m.originalHomeKey) m.originalHomeKey = m.homeKey;
+    if (!m.originalAwayKey) m.originalAwayKey = m.awayKey;
+  });
+}
+
+function resetDynamicTeams() {
+  MATCHES.forEach(m => {
+    if (m.originalHomeKey) m.homeKey = m.originalHomeKey;
+    if (m.originalAwayKey) m.awayKey = m.originalAwayKey;
+  });
+}
+
+function winnerLoserForMatch(match) {
+  const res = resultFor(match.id);
+  if (!res) return null;
+  if (Number(res.home) > Number(res.away)) {
+    return { winner: match.homeKey, loser: match.awayKey };
+  }
+  if (Number(res.away) > Number(res.home)) {
+    return { winner: match.awayKey, loser: match.homeKey };
+  }
+  // Si hay empate en eliminatoria, normalmente football-data puede traer penales.
+  // Si no hay penales todavía, no se avanza para evitar error.
+  const raw = resultsCache[String(match.id)] || {};
+  const homePens = raw.homePenalty ?? raw.homePenalties ?? raw.penaltyHome;
+  const awayPens = raw.awayPenalty ?? raw.awayPenalties ?? raw.penaltyAway;
+  if (homePens != null && awayPens != null) {
+    if (Number(homePens) > Number(awayPens)) return { winner: match.homeKey, loser: match.awayKey };
+    if (Number(awayPens) > Number(homePens)) return { winner: match.awayKey, loser: match.homeKey };
+  }
+  return null;
+}
+
+function setTeamInMatch(matchId, slot, teamKey) {
+  if (!teamKey || isPlaceholder(teamKey)) return false;
+  const target = MATCHES.find(m => String(m.id) === String(matchId));
+  if (!target) return false;
+  if (slot === "home" && target.homeKey !== teamKey) {
+    target.homeKey = teamKey;
+    return true;
+  }
+  if (slot === "away" && target.awayKey !== teamKey) {
+    target.awayKey = teamKey;
+    return true;
+  }
+  return false;
+}
+
+function applyKnockoutCrossings() {
+  rememberOriginalTeams();
+  resetDynamicTeams();
+
+  let changed = true;
+  let loops = 0;
+  while (changed && loops < 10) {
+    changed = false;
+    loops++;
+
+    Object.entries(KNOCKOUT_ADVANCE_MAP).forEach(([sourceId, edge]) => {
+      const source = MATCHES.find(m => String(m.id) === String(sourceId));
+      if (!source) return;
+
+      const wl = winnerLoserForMatch(source);
+      if (!wl || !wl.winner) return;
+
+      if (setTeamInMatch(edge.nextMatchId, edge.slot, wl.winner)) changed = true;
+
+      if (edge.loserMatchId && wl.loser) {
+        if (setTeamInMatch(edge.loserMatchId, edge.loserSlot, wl.loser)) changed = true;
+      }
+    });
+  }
+}
+
+function knockoutStatusText() {
+  const updated = Object.entries(KNOCKOUT_ADVANCE_MAP).filter(([sourceId, edge]) => {
+    const source = MATCHES.find(m => String(m.id) === String(sourceId));
+    if (!source) return false;
+    return !!winnerLoserForMatch(source);
+  }).length;
+  return `${updated} cruces aplicados`;
+}
+
 function groupsByDate() {
+  applyKnockoutCrossings();
   const g = {};
   MATCHES.forEach(m => {
     const k = jstDateKey(m.start);
@@ -552,6 +682,7 @@ function updateCountdownOnly() {
 }
 
 function renderAll() {
+  applyKnockoutCrossings();
   ensureSelection();
   renderTabs();
   renderSelectedMatch();
@@ -694,6 +825,14 @@ function listenResults() {
     } else renderAll();
   });
 }
+
+
+window.rebuildKnockoutCrossings = function() {
+  applyKnockoutCrossings();
+  renderAll();
+  const ds = document.getElementById("dataStatus");
+  if (ds) ds.textContent = `✅ Cruces reconstruidos: ${knockoutStatusText()} · v15`;
+};
 
 document.addEventListener("DOMContentLoaded", () => {
   if (!location.search.includes("admin=jorge")) {
