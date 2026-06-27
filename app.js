@@ -1,4 +1,4 @@
-const APP_VERSION = "13.0-api-final-stable";
+const APP_VERSION = "13.1-final-teams-update";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
@@ -136,13 +136,13 @@ const MATCHES = [
     "id": "53452561",
     "group": "Ronda de 32",
     "homeKey": "Ivory Coast",
-    "awayKey": "2.º Grupo I",
+    "awayKey": "Norway",
     "start": "2026-06-30T17:00:00Z"
   },
   {
     "id": "53452543",
     "group": "Ronda de 32",
-    "homeKey": "1.º Grupo I",
+    "homeKey": "France",
     "awayKey": "3.º mejor C/D/F/G/H",
     "start": "2026-06-30T21:00:00Z"
   },
@@ -354,6 +354,23 @@ const TEAM_FLAGS = {
   "Germany":"🇩🇪", "Netherlands":"🇳🇱", "Morocco":"🇲🇦",
   "Ivory Coast":"🇨🇮", "Mexico":"🇲🇽", "United States":"🇺🇸",
   "Bosnia and Herzegovina":"🇧🇦", "Switzerland":"🇨🇭", "Australia":"🇦🇺"
+,
+  "3.º mejor A/B/C/D/F":"🏆",
+  "3.º mejor C/D/F/G/H":"🏆",
+  "3.º mejor C/E/F/H/I":"🏆",
+  "3.º mejor E/H/I/J/K":"🏆",
+  "3.º mejor A/E/H/I/J":"🏆",
+  "3.º mejor E/F/G/I/J":"🏆",
+  "3.º mejor D/E/I/J/L":"🏆",
+  "1.º Grupo L":"🏆",
+  "1.º Grupo G":"🏆",
+  "1.º Grupo H":"🏆",
+  "1.º Grupo K":"🏆",
+  "2.º Grupo J":"🥈",
+  "2.º Grupo K":"🥈",
+  "2.º Grupo L":"🥈",
+  "2.º Grupo G":"🥈",
+  "2.º Grupo H":"🥈",
 };
 
 let currentPlayerName = localStorage.getItem("playerName") || "";
@@ -541,7 +558,7 @@ function renderAll() {
   renderRanking();
   
   const ds = $("dataStatus");
-  if (ds) ds.textContent = `✅ Calendario cargado con cuenta regresiva: ${MATCHES.length} partidos · v13.0`;
+  if (ds) ds.textContent = `✅ Calendario cargado con cuenta regresiva: ${MATCHES.length} partidos · v13.1`;
   $("welcomeText").textContent = currentPlayerName ? `Bienvenido, ${currentPlayerName}!` : "";
 }
 
