@@ -1,13 +1,22 @@
-WORLD CUP PREDICTION 2026 - VERSION 12.2 FINAL MOBILE STABLE
+WORLD CUP PREDICTION 2026 - VERSION 13.0 API FINAL STABLE
 
-CORRECCIÓN FINAL PARA SUBIR:
+BASE:
+- Trabajado sobre la versión que subiste.
+
+CORRIGE / AGREGA:
+- sync-results.js consulta football-data.org.
+- La web guarda los resultados devueltos en Firebase/results.
+- Marcadores finales aparecen automáticamente cuando la API los entrega.
+- Ganador y puntos se recalculan con Firebase.
 - Participantes despliega correctamente.
-- El teclado del celular ya no se cierra al escribir scores.
-- Los valores escritos se mantienen aunque haya actualización de Firebase.
-- La cuenta regresiva sigue funcionando.
-- El bloqueo automático al inicio del partido se mantiene.
-- Se elimina/oculta la sección extra de todas las fechas.
-- Mantiene Firebase, apuestas, participantes, resultados y API.
+- El teclado del celular no se cierra al escribir scores.
+- Cuenta regresiva sin redibujar inputs.
+- Bloqueo automático al inicio del partido.
+- Mantiene jugadores, apuestas y Firebase.
+
+IMPORTANTE EN VERCEL:
+Debe existir Environment Variable:
+FOOTBALL_DATA_API_KEY = tu token de football-data.org
 
 SUBIR A GITHUB:
 api
@@ -22,4 +31,6 @@ NO SUBIR:
 package.json
 
 PROBAR:
-https://world-cup-prediction-2026-26ej.vercel.app/?v=122stable
+https://world-cup-prediction-2026-26ej.vercel.app/?v=130final
+https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=130final
+https://world-cup-prediction-2026-26ej.vercel.app/api/sync-results?v=130

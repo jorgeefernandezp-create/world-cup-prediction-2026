@@ -1,4 +1,4 @@
-const APP_VERSION = "12.2-final-mobile-stable";
+const APP_VERSION = "13.0-api-final-stable";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
@@ -476,7 +476,7 @@ function renderSelectedMatch() {
       <div class="teams-line">${teamWithFlag(m.homeKey)} vs ${teamWithFlag(m.awayKey)}</div>
       <div class="match-meta">📅 ${dateLong(m.start)} · 🕒 ${timeJst(m.start)} JST<br>${m.group}</div>
       ${r ? `<span class="result-badge">Resultado final: ${r.home} - ${r.away}</span>` : `<div id="selectedCountdown" class="countdown">${countdownText(m)}</div>`}
-      ${locked ? `<div class="locked">🔒 Apuesta cerrada</div>` : `<div class="score"><input id="selected_home" type="number" inputmode="numeric" pattern="[0-9]*" min="0" placeholder="0" autocomplete="off" oninput="saveDraftScore()" value="${draft ? draft.home : (saved ? saved.predictedHome : "")}"><span>-</span><input id="selected_away" type="number" inputmode="numeric" pattern="[0-9]*" min="0" placeholder="0" autocomplete="off" oninput="saveDraftScore()" value="${draft ? draft.away : (saved ? saved.predictedAway : "")}"></div>`}
+      ${locked ? `<div class="locked">🔒 Apuesta cerrada</div>` : `<div class="score"><input id="selected_home" type="number" inputmode="numeric" pattern="[0-9]*" min="0" placeholder="0" autocomplete="off" oninput="saveDraftScore()" autocomplete="off" oninput="saveDraftScore()" value="${draft ? draft.home : (saved ? saved.predictedHome : "")}"><span>-</span><input id="selected_away" type="number" inputmode="numeric" pattern="[0-9]*" min="0" placeholder="0" autocomplete="off" oninput="saveDraftScore()" autocomplete="off" oninput="saveDraftScore()" value="${draft ? draft.away : (saved ? saved.predictedAway : "")}"></div>`}
     </div>`;
 }
 
@@ -541,7 +541,7 @@ function renderAll() {
   renderRanking();
   
   const ds = $("dataStatus");
-  if (ds) ds.textContent = `✅ Calendario cargado con cuenta regresiva: ${MATCHES.length} partidos · v12.0`;
+  if (ds) ds.textContent = `✅ Calendario cargado con cuenta regresiva: ${MATCHES.length} partidos · v13.0`;
   $("welcomeText").textContent = currentPlayerName ? `Bienvenido, ${currentPlayerName}!` : "";
 }
 
@@ -612,15 +612,44 @@ window.toggleParticipants = function() {
 
 window.syncResultsFromApi = async function() {
   const ds = $("dataStatus");
+  const adminStatus = $("adminStatus");
   try {
-    const r = await fetch("/api/sync-results?v=112");
+    if (ds) ds.textContent = "⏳ Sincronizando resultados con football-data...";
+    const r = await fetch("/api/sync-results?v=130", { cache: "no-store" });
     const data = await r.json();
-    ds.textContent = data.ok ? `✅ API conectada. Resultados: ${data.count || 0} · v11.2` : "⚠️ API respondió sin resultados.";
+    if (!data.ok) {
+      const msg = data.message || "API respondió sin resultados.";
+      if (ds) ds.textContent = `⚠️ ${msg}`;
+      if (adminStatus) adminStatus.textContent = `⚠️ ${msg}`;
+      return;
+    }
+
+    let saved = 0;
+    for (const item of data.results || []) {
+      if (item.home == null || item.away == null || !item.matchId) continue;
+      await setDoc(doc(db, "results", String(item.matchId)), {
+        matchId: String(item.matchId),
+        home: Number(item.home),
+        away: Number(item.away),
+        status: item.status || "FT",
+        provider: item.provider || "football-data.org",
+        providerFixtureId: item.providerFixtureId || null,
+        providerHome: item.providerHome || "",
+        providerAway: item.providerAway || "",
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+      saved++;
+    }
+
+    const msg = `✅ API sincronizada. ${saved} resultados guardados. Revisados: ${data.apiMatchesFound || 0}`;
+    if (ds) ds.textContent = msg;
+    if (adminStatus) adminStatus.textContent = msg;
+    renderAll();
   } catch(e) {
-    console.warn(e);
-    ds.textContent = "✅ Calendario cargado. API pendiente.";
+    console.error(e);
+    if (ds) ds.textContent = "⚠️ Error sincronizando API.";
+    if (adminStatus) adminStatus.textContent = "⚠️ Error sincronizando API.";
   }
-  renderAll();
 };
 
 window.syncOpenFootball = function() { renderAll(); };
@@ -634,11 +663,8 @@ window.saveResultsAndCalculate = function() { renderAll(); };
 function listenPredictions() {
   onSnapshot(collection(db, "predictions"), snap => {
     predictionsCache = snap.docs.map(d => d.data());
-    if (isScoreInputFocused()) {
-      renderRanking();
-    } else {
-      renderAll();
-    }
+    if (isScoreInputFocused()) renderRanking();
+    else renderAll();
   });
 }
 function listenResults() {
@@ -648,9 +674,7 @@ function listenResults() {
     if (isScoreInputFocused()) {
       renderRanking();
       updateCountdownOnly();
-    } else {
-      renderAll();
-    }
+    } else renderAll();
   });
 }
 
