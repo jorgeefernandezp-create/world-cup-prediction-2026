@@ -1,20 +1,26 @@
-WORLD CUP PREDICTION 2026 - VERSION 17.1 ADMIN STAKE BUTTONS
+WORLD CUP PREDICTION 2026 - VERSION 18.0 FINAL TOURNAMENT ENGINE
 
-CAMBIO:
-- Agrega en Admin botones rápidos para cambiar el monto:
-  ¥100, ¥200, ¥500, ¥1000.
-- También mantiene campo manual.
-- El monto se guarda en Firebase:
-  settings/app/stakeAmount.
-- Todos verán el pozo calculado con el monto actual.
+VERSIÓN DEFINITIVA:
+- Mantiene todo lo bueno de v17.1.
+- Motor de torneo más robusto.
+- Ganadores avanzan automáticamente desde resultados guardados en Firebase.
+- Si cambia un resultado, el cuadro se reconstruye.
+- Admin puede cambiar monto de apuesta:
+  ¥100, ¥200, ¥500, ¥1000 o monto manual.
+- Admin tiene panel de estado:
+  API, última sincronización, resultados, cruces, partidos pendientes y apuesta actual.
+- Botón "Sincronizar API ahora".
+- Botón "Reconstruir torneo".
 
 MANTIENE:
-- Equipos cargados.
-- Cruces automáticos.
+- Equipos reales de Ronda de 32.
 - Cuenta regresiva.
-- Bloqueo.
+- Bloqueo automático.
 - Participantes.
-- Resultados y ganadores.
+- Ganador de apuesta.
+- Puntos.
+- Firebase.
+- API football-data.org.
 
 SUBIR:
 api
@@ -29,7 +35,7 @@ NO SUBIR:
 package.json
 
 PROBAR:
-https://world-cup-prediction-2026-26ej.vercel.app/?v=171stake
+https://world-cup-prediction-2026-26ej.vercel.app/?v=18final
 
 ADMIN:
-https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=171stake
+https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=18final

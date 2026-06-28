@@ -329,3 +329,10 @@ button{touch-action:manipulation}
 .stake-manual{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
 .stake-manual input{width:160px;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.35);font-size:18px;font-weight:900}
 .small-note{font-size:12px;opacity:.85;margin:8px 0 0}
+
+/* v18 final tournament engine */
+.admin-system-box{background:rgba(4,19,38,.78);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:14px;margin:12px 0}
+.system-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-top:8px}
+.system-grid div{background:rgba(255,255,255,.09);border-radius:12px;padding:10px;font-size:13px}
+.admin-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.admin-actions button{padding:10px 14px;border-radius:12px;font-weight:900}

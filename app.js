@@ -1,4 +1,4 @@
-const APP_VERSION = "17.1-admin-stake-buttons";
+const APP_VERSION = "18.0-final-tournament-engine";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
@@ -336,6 +336,9 @@ let stakeAmount = 100;
 let participantsOpen = false;
 let localDraftScores = {};
 let countdownIntervalStarted = false;
+let apiLastSync = localStorage.getItem("apiLastSync") || "";
+let apiLastStatus = localStorage.getItem("apiLastStatus") || "Pendiente";
+let lastApiCount = localStorage.getItem("lastApiCount") || "0";
 
 function $(id) { return document.getElementById(id); }
 function safeId(name) { return String(name).toLowerCase().trim().replace(/[^a-z0-9áéíóúñãõç一-龯ぁ-んァ-ン]/gi, "_"); }
@@ -512,6 +515,46 @@ function renderRanking() {
   $("matchRankingBody").innerHTML = ranked.map((p,i)=>`<tr><td>${i+1}</td><td>${p.playerName}</td><td>${p.predictedHome} - ${p.predictedAway}</td><td>${p.points}</td></tr>`).join("");
 }
 
+
+// ===== V18: MOTOR FINAL DEL TORNEO Y ESTADO ADMIN =====
+function rebuildTournamentFromResults() {
+  applyCrossings();
+  renderAll();
+  updateAdminSystemStatus();
+}
+
+function updateAdminSystemStatus() {
+  const box = document.getElementById("systemStatusBox");
+  if (!box) return;
+  const pending = visibleMatches().length;
+  const crosses = knockoutStatusText();
+  box.innerHTML = `
+    <div class="system-grid">
+      <div><b>Versión</b><br>v18.0</div>
+      <div><b>API</b><br>${apiLastStatus}</div>
+      <div><b>Última sync</b><br>${apiLastSync || "Pendiente"}</div>
+      <div><b>Resultados API</b><br>${lastApiCount}</div>
+      <div><b>Cruces</b><br>${crosses}</div>
+      <div><b>Partidos pendientes</b><br>${pending}</div>
+      <div><b>Apuesta actual</b><br>¥${stakeAmount}</div>
+    </div>`;
+}
+
+function showAdminMessage(msg) {
+  const st = document.getElementById("adminStatus");
+  if (st) st.textContent = msg;
+}
+
+function saveApiState(status, count) {
+  apiLastStatus = status;
+  lastApiCount = String(count ?? 0);
+  apiLastSync = new Date().toLocaleString("es-ES", { timeZone: JAPAN_TIMEZONE });
+  localStorage.setItem("apiLastStatus", apiLastStatus);
+  localStorage.setItem("lastApiCount", lastApiCount);
+  localStorage.setItem("apiLastSync", apiLastSync);
+  updateAdminSystemStatus();
+}
+
 function renderAll() {
   try {
     applyCrossings();
@@ -520,7 +563,8 @@ function renderAll() {
     renderSelectedMatch();
     renderRanking();
     $("welcomeText").textContent = currentPlayerName ? `Bienvenido, ${currentPlayerName}!` : "";
-    $("dataStatus").textContent = `✅ Equipos cargados · ${visibleMatches().length} partidos pendientes · apuesta ¥${stakeAmount} · ${knockoutStatusText()} · v17.1`;
+    $("dataStatus").textContent = `✅ Torneo listo · ${visibleMatches().length} partidos pendientes · apuesta ¥${stakeAmount} · ${knockoutStatusText()} · v18.0`;
+    updateAdminSystemStatus();
   } catch(e) {
     console.error(e);
     $("dataStatus").textContent = "⚠️ Error cargando calendario. Revisa consola.";
@@ -588,14 +632,28 @@ window.setQuickStakeAmount = async function(value) {
   const st = document.getElementById("adminStatus");
   if (st) st.textContent = `✅ Monto actualizado: ¥${stakeAmount}`;
   renderAll();
+  updateAdminSystemStatus();
 };
 
 window.syncResultsFromApi = async function() {
+  showAdminMessage("⏳ Sincronizando API...");
   try {
-    const r = await fetch("/api/sync-results?v=17");
+    const r = await fetch("/api/sync-results?v=18", { cache: "no-store" });
     const data = await r.json();
-    $("adminStatus").textContent = data.ok ? `✅ API actualizada: ${data.count || 0} resultados` : "⚠️ API sin cambios.";
-  } catch(e) { $("adminStatus").textContent = "⚠️ No se pudo sincronizar API."; }
+    const count = data.count ?? data.resultsUpdated ?? data.updated ?? 0;
+    if (data.ok) {
+      saveApiState("🟢 OK", count);
+      showAdminMessage(`✅ API actualizada: ${count} resultados`);
+    } else {
+      saveApiState("🟡 Sin cambios", count);
+      showAdminMessage("⚠️ API respondió sin cambios.");
+    }
+    rebuildTournamentFromResults();
+  } catch(e) {
+    console.warn(e);
+    saveApiState("🔴 Error", 0);
+    showAdminMessage("⚠️ No se pudo sincronizar API.");
+  }
 };
 window.syncOpenFootball = window.syncResultsFromApi;
 window.saveResultsAndCalculate = function() { renderAll(); };
@@ -619,6 +677,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   $("rulesBody").innerHTML = `<tr><td>Marcador exacto</td><td>+5</td></tr><tr><td>Ganador/empate correcto</td><td>+3</td></tr><tr><td>Fallo</td><td>0</td></tr>`;
   await loadSettings();
   renderAll();
+  updateAdminSystemStatus();
   listenFirebase();
   setTimeout(() => window.syncResultsFromApi(), 1000);
   if (!countdownIntervalStarted) {
