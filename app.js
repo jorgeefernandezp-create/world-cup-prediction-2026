@@ -1,4 +1,4 @@
-const APP_VERSION = "15.0-knockout-crossing-engine";
+const APP_VERSION = "15.0-final-complete";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
@@ -689,7 +689,7 @@ function renderAll() {
   renderRanking();
   
   const ds = $("dataStatus");
-  if (ds) ds.textContent = `✅ Calendario cargado con cuenta regresiva: ${MATCHES.length} partidos · v13.1`;
+  if (ds) ds.textContent = `✅ Calendario cargado con cuenta regresiva: ${MATCHES.length} partidos · v15.0`;
   $("welcomeText").textContent = currentPlayerName ? `Bienvenido, ${currentPlayerName}!` : "";
 }
 

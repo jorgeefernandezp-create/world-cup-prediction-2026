@@ -1,24 +1,17 @@
-WORLD CUP PREDICTION 2026 - VERSION 15.0 KNOCKOUT CROSSING ENGINE
+WORLD CUP PREDICTION 2026 - VERSION 15.0 FINAL COMPLETE
 
-OBJETIVO ÚNICO:
-- Agrega motor de cruces eliminatorios.
-- No toca la API ni Firebase porque ya funcionan.
-- Cuando un partido eliminatorio tiene resultado final, el ganador pasa automáticamente al siguiente partido.
-- Semifinales también envían:
-  ganador -> Final
-  perdedor -> Tercer puesto.
-- Si vuelves a sincronizar la API, los cruces se reconstruyen sin duplicar.
-- Agrega botón admin: Reconstruir cruces.
+IMPORTANTE:
+Esta versión debe mostrar arriba v15.0. Si aún ves v13.1, Vercel/GitHub no recibió app.js nuevo.
 
-MANTIENE:
-- Marcador final.
-- Ganador de la apuesta.
-- Puntos.
-- Participantes.
-- Cuenta regresiva.
-- Bloqueo de apuestas.
-- Banderas.
-- Firebase y API football-data.org.
+INCLUYE:
+- Motor de cruces eliminatorios.
+- Ganador de Ronda de 32 pasa a Octavos.
+- Ganador de Octavos pasa a Cuartos.
+- Ganador de Cuartos pasa a Semifinal.
+- Ganador de Semifinal pasa a Final.
+- Perdedor de Semifinal pasa a Tercer puesto.
+- Botón admin: Reconstruir cruces.
+- Mantiene API, Firebase, marcadores finales, puntos, ganador por apuesta, participantes, cuenta regresiva y bloqueo.
 
 SUBIR A GITHUB:
 api
@@ -33,9 +26,7 @@ NO SUBIR:
 package.json
 
 PROBAR:
-https://world-cup-prediction-2026-26ej.vercel.app/?v=150cross
-https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=150cross
+https://world-cup-prediction-2026-26ej.vercel.app/?v=150final
 
-EN ADMIN:
-1. Actualizar resultados API.
-2. Reconstruir cruces.
+ADMIN:
+https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=150final
