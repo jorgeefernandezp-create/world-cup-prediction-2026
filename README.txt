@@ -1,17 +1,13 @@
-WORLD CUP PREDICTION 2026 - VERSION 15.0 FINAL COMPLETE
+WORLD CUP PREDICTION 2026 - VERSION 16.0 KNOCKOUT ACTIVE + ADMIN STAKE
 
-IMPORTANTE:
-Esta versión debe mostrar arriba v15.0. Si aún ves v13.1, Vercel/GitHub no recibió app.js nuevo.
-
-INCLUYE:
-- Motor de cruces eliminatorios.
-- Ganador de Ronda de 32 pasa a Octavos.
-- Ganador de Octavos pasa a Cuartos.
-- Ganador de Cuartos pasa a Semifinal.
-- Ganador de Semifinal pasa a Final.
-- Perdedor de Semifinal pasa a Tercer puesto.
-- Botón admin: Reconstruir cruces.
-- Mantiene API, Firebase, marcadores finales, puntos, ganador por apuesta, participantes, cuenta regresiva y bloqueo.
+CAMBIOS:
+- Oculta partidos ya jugados.
+- Oculta fase de grupos.
+- La web empieza desde el siguiente partido pendiente de fase eliminatoria.
+- Mantiene cuenta regresiva, bloqueo, participantes, API y Firebase.
+- Mantiene motor de cruces.
+- Agrega edición del monto de apuesta desde Admin.
+- El monto se guarda en Firebase: settings/app/stakeAmount.
 
 SUBIR A GITHUB:
 api
@@ -26,7 +22,7 @@ NO SUBIR:
 package.json
 
 PROBAR:
-https://world-cup-prediction-2026-26ej.vercel.app/?v=150final
+https://world-cup-prediction-2026-26ej.vercel.app/?v=160active
 
 ADMIN:
-https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=150final
+https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=160active

@@ -310,3 +310,6 @@ button{touch-action:manipulation}
 
 /* v15 FINAL */
 #adminPanel button{margin:4px}
+
+/* v16 active knockout + admin stake */
+#stakeAmount{font-size:18px;font-weight:800;max-width:160px}

@@ -1,4 +1,4 @@
-const APP_VERSION = "15.0-final-complete";
+const APP_VERSION = "16.0-knockout-active-admin-stake";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
@@ -562,10 +562,32 @@ function knockoutStatusText() {
   return `${updated} cruces aplicados`;
 }
 
-function groupsByDate() {
+
+// ===== V16: SOLO ELIMINATORIAS PENDIENTES =====
+const KNOCKOUT_ROUNDS = ["Ronda de 32","Octavos","Cuartos","Semifinal","Tercer puesto","Final"];
+function isKnockoutMatch(m) {
+  return KNOCKOUT_ROUNDS.includes(m.group || m.roundName || "");
+}
+function isMatchFinishedOrStarted(m) {
+  return Date.now() >= new Date(m.start).getTime() || !!resultFor(m.id);
+}
+function visibleActiveMatches() {
   applyKnockoutCrossings();
+  return MATCHES
+    .filter(m => isKnockoutMatch(m))
+    .filter(m => !isMatchFinishedOrStarted(m))
+    .sort((a,b) => new Date(a.start) - new Date(b.start));
+}
+function allKnockoutMatches() {
+  return MATCHES.filter(m => isKnockoutMatch(m)).sort((a,b)=>new Date(a.start)-new Date(b.start));
+}
+function firstActiveMatch() {
+  return visibleActiveMatches()[0] || allKnockoutMatches()[0] || MATCHES[0];
+}
+
+function groupsByDate() {
   const g = {};
-  MATCHES.forEach(m => {
+  visibleActiveMatches().forEach(m => {
     const k = jstDateKey(m.start);
     (g[k] ||= []).push(m);
   });
@@ -577,7 +599,8 @@ function ensureSelection() {
   const keys = Object.keys(groups).sort();
   if (!keys.length) return;
   if (!selectedDayKey || !groups[selectedDayKey]) selectedDayKey = keys[0];
-  if (!selectedMatchId || !MATCHES.find(m => String(m.id) === String(selectedMatchId))) {
+  const currentVisible = (groups[selectedDayKey] || []).find(m => String(m.id) === String(selectedMatchId));
+  if (!selectedMatchId || !currentVisible) {
     selectedMatchId = groups[selectedDayKey][0].id;
   }
   localStorage.setItem("selectedDayKey", selectedDayKey);
@@ -586,7 +609,8 @@ function ensureSelection() {
 
 function selectedMatch() {
   ensureSelection();
-  return MATCHES.find(m => String(m.id) === String(selectedMatchId)) || MATCHES[0];
+  const active = visibleActiveMatches();
+  return active.find(m => String(m.id) === String(selectedMatchId)) || firstActiveMatch();
 }
 
 function renderTabs() {
@@ -689,7 +713,7 @@ function renderAll() {
   renderRanking();
   
   const ds = $("dataStatus");
-  if (ds) ds.textContent = `✅ Calendario cargado con cuenta regresiva: ${MATCHES.length} partidos · v15.0`;
+  if (ds) ds.textContent = `✅ Calendario cargado con cuenta regresiva: ${MATCHES.length} partidos · v16.0`;
   $("welcomeText").textContent = currentPlayerName ? `Bienvenido, ${currentPlayerName}!` : "";
 }
 
@@ -801,11 +825,37 @@ window.syncResultsFromApi = async function() {
 };
 
 window.syncOpenFootball = function() { renderAll(); };
-window.saveStakeAmount = function() {
-  const v = Number($("stakeAmount")?.value || 100);
-  stakeAmount = v;
+
+async function loadAppSettings() {
+  try {
+    const snap = await getDoc(doc(db, "settings", "app"));
+    if (snap.exists()) {
+      const data = snap.data();
+      if (data.stakeAmount != null) stakeAmount = Number(data.stakeAmount) || 100;
+    }
+  } catch (e) {
+    console.warn("No se pudo leer settings/app", e);
+  }
+}
+
+window.saveStakeAmount = async function() {
+  const input = document.getElementById("stakeAmount");
+  const value = Number(input?.value || stakeAmount || 100);
+  if (!value || value < 0) {
+    const st = document.getElementById("adminStatus");
+    if (st) st.textContent = "⚠️ Ingresa un monto válido.";
+    return;
+  }
+  stakeAmount = value;
+  await setDoc(doc(db, "settings", "app"), {
+    stakeAmount: value,
+    updatedAt: serverTimestamp()
+  }, { merge: true });
+  const st = document.getElementById("adminStatus");
+  if (st) st.textContent = `✅ Monto actualizado: ¥${value}`;
   renderAll();
 };
+
 window.saveResultsAndCalculate = function() { renderAll(); };
 
 function listenPredictions() {
@@ -834,7 +884,10 @@ window.rebuildKnockoutCrossings = function() {
   if (ds) ds.textContent = `✅ Cruces reconstruidos: ${knockoutStatusText()} · v15`;
 };
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  await loadAppSettings();
+  const stakeInput = document.getElementById("stakeAmount");
+  if (stakeInput) stakeInput.value = stakeAmount;
   if (!location.search.includes("admin=jorge")) {
     const admin = $("adminPanel"); if (admin) admin.style.display = "none";
   }
