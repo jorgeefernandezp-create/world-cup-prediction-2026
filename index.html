@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>World Cup Prediction 2026</title>
-  <link rel="stylesheet" href="style.css?v=17clean" />
+  <link rel="stylesheet" href="style.css?v=171stake" />
 </head>
 <body>
   <div id="confettiLayer"></div>
@@ -73,6 +73,22 @@
 
     <section class="card admin-card" id="adminPanel">
       <h2>👨‍💼 Panel administrador</h2>
+
+      <div class="admin-stake-box">
+        <h3>💴 Monto de apuesta</h3>
+        <div class="stake-buttons">
+          <button type="button" onclick="setQuickStakeAmount(100)">¥100</button>
+          <button type="button" onclick="setQuickStakeAmount(200)">¥200</button>
+          <button type="button" onclick="setQuickStakeAmount(500)">¥500</button>
+          <button type="button" onclick="setQuickStakeAmount(1000)">¥1000</button>
+        </div>
+        <div class="stake-manual">
+          <input id="stakeAmount" type="number" inputmode="numeric" min="0" step="100" placeholder="100">
+          <button type="button" onclick="saveStakeAmount()">Guardar monto</button>
+        </div>
+        <p class="small-note">Este monto se usará para calcular el pozo de cada partido.</p>
+      </div>
+
       <p class="small">Admin: agrega <strong>?admin=jorge</strong> al final del enlace.</p>
       <label>Fase de grupos / monto por participante</label>
       <input id="stakeAmount" type="number" inputmode="numeric" min="0" step="100" value="100" />
@@ -93,6 +109,6 @@
     <a href="#potTitle">👥<span>Lista</span></a>
   </nav>
 
-  <script type="module" src="app.js?v=17clean"></script>
+  <script type="module" src="app.js?v=171stake"></script>
 </body>
 </html>

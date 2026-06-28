@@ -1,12 +1,20 @@
-WORLD CUP PREDICTION 2026 - VERSION 17.0 CLEAN STABLE APP
+WORLD CUP PREDICTION 2026 - VERSION 17.1 ADMIN STAKE BUTTONS
 
-CAMBIO GRANDE:
-- app.js fue reemplazado por una versión limpia y estable.
-- Ya no depende de parches acumulados.
-- Equipos de Ronda de 32 salen cargados desde el inicio.
-- No debe quedarse en "Cargando calendario automático".
-- Mantiene Firebase, participantes, apuestas, resultados, ganador, puntos, cuenta regresiva, bloqueo y monto admin.
-- Cruces avanzan con resultados guardados en Firebase.
+CAMBIO:
+- Agrega en Admin botones rápidos para cambiar el monto:
+  ¥100, ¥200, ¥500, ¥1000.
+- También mantiene campo manual.
+- El monto se guarda en Firebase:
+  settings/app/stakeAmount.
+- Todos verán el pozo calculado con el monto actual.
+
+MANTIENE:
+- Equipos cargados.
+- Cruces automáticos.
+- Cuenta regresiva.
+- Bloqueo.
+- Participantes.
+- Resultados y ganadores.
 
 SUBIR:
 api
@@ -21,7 +29,7 @@ NO SUBIR:
 package.json
 
 PROBAR:
-https://world-cup-prediction-2026-26ej.vercel.app/?v=17clean
+https://world-cup-prediction-2026-26ej.vercel.app/?v=171stake
 
 ADMIN:
-https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=17clean
+https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=171stake

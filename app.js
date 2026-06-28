@@ -1,4 +1,4 @@
-const APP_VERSION = "17.0-clean-stable-app";
+const APP_VERSION = "17.1-admin-stake-buttons";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
@@ -520,7 +520,7 @@ function renderAll() {
     renderSelectedMatch();
     renderRanking();
     $("welcomeText").textContent = currentPlayerName ? `Bienvenido, ${currentPlayerName}!` : "";
-    $("dataStatus").textContent = `✅ Equipos cargados · ${visibleMatches().length} partidos pendientes · apuesta ¥${stakeAmount} · ${knockoutStatusText()} · v17.0`;
+    $("dataStatus").textContent = `✅ Equipos cargados · ${visibleMatches().length} partidos pendientes · apuesta ¥${stakeAmount} · ${knockoutStatusText()} · v17.1`;
   } catch(e) {
     console.error(e);
     $("dataStatus").textContent = "⚠️ Error cargando calendario. Revisa consola.";
@@ -576,9 +576,20 @@ window.saveStakeAmount = async function() {
   const v = Number($("stakeAmount")?.value || stakeAmount || 100);
   stakeAmount = v;
   await setDoc(doc(db,"settings","app"), { stakeAmount:v, updatedAt:serverTimestamp() }, { merge:true });
-  $("adminStatus").textContent = `✅ Monto actualizado: ¥${v}`;
+  if ($("adminStatus")) $("adminStatus").textContent = `✅ Monto actualizado: ¥${v}`;
   renderAll();
 };
+
+window.setQuickStakeAmount = async function(value) {
+  const input = document.getElementById("stakeAmount");
+  if (input) input.value = value;
+  stakeAmount = Number(value) || 100;
+  await setDoc(doc(db,"settings","app"), { stakeAmount, updatedAt:serverTimestamp() }, { merge:true });
+  const st = document.getElementById("adminStatus");
+  if (st) st.textContent = `✅ Monto actualizado: ¥${stakeAmount}`;
+  renderAll();
+};
+
 window.syncResultsFromApi = async function() {
   try {
     const r = await fetch("/api/sync-results?v=17");

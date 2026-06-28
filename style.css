@@ -321,3 +321,11 @@ button{touch-action:manipulation}
 .participant-row{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.15);font-weight:700}
 #matchParticipantsList{max-height:220px;overflow-y:auto}
 .score input,#selected_home,#selected_away{font-size:24px!important;min-height:48px!important}
+
+/* v17.1 admin stake */
+.admin-stake-box{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:14px;margin:12px 0}
+.stake-buttons{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.stake-buttons button,.stake-manual button{padding:10px 14px;border-radius:12px;font-weight:900}
+.stake-manual{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.stake-manual input{width:160px;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.35);font-size:18px;font-weight:900}
+.small-note{font-size:12px;opacity:.85;margin:8px 0 0}
