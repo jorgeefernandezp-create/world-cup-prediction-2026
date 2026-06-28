@@ -1,4 +1,4 @@
-const APP_VERSION = "16.0-knockout-active-admin-stake";
+const APP_VERSION = "16.1-best-thirds-resolver-final";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
@@ -122,7 +122,7 @@ const MATCHES = [
     "id": "53452541",
     "group": "Ronda de 32",
     "homeKey": "Germany",
-    "awayKey": "3.º mejor A/B/C/D/F",
+    "awayKey": "Sweden",
     "start": "2026-06-29T20:30:00Z"
   },
   {
@@ -143,28 +143,28 @@ const MATCHES = [
     "id": "53452543",
     "group": "Ronda de 32",
     "homeKey": "France",
-    "awayKey": "3.º mejor C/D/F/G/H",
+    "awayKey": "Tunisia",
     "start": "2026-06-30T21:00:00Z"
   },
   {
     "id": "53452563",
     "group": "Ronda de 32",
     "homeKey": "Mexico",
-    "awayKey": "3.º mejor C/E/F/H/I",
+    "awayKey": "Saudi Arabia",
     "start": "2026-07-01T01:00:00Z"
   },
   {
     "id": "53452565",
     "group": "Ronda de 32",
-    "homeKey": "1.º Grupo L",
-    "awayKey": "3.º mejor E/H/I/J/K",
+    "homeKey": "England",
+    "awayKey": "Austria",
     "start": "2026-07-01T16:00:00Z"
   },
   {
     "id": "53452555",
     "group": "Ronda de 32",
-    "homeKey": "1.º Grupo G",
-    "awayKey": "3.º mejor A/E/H/I/J",
+    "homeKey": "Belgium",
+    "awayKey": "Uruguay",
     "start": "2026-07-01T20:00:00Z"
   },
   {
@@ -177,43 +177,43 @@ const MATCHES = [
   {
     "id": "53452551",
     "group": "Ronda de 32",
-    "homeKey": "1.º Grupo H",
-    "awayKey": "2.º Grupo J",
+    "homeKey": "Spain",
+    "awayKey": "Austria",
     "start": "2026-07-02T19:00:00Z"
   },
   {
     "id": "53452549",
     "group": "Ronda de 32",
-    "homeKey": "2.º Grupo K",
-    "awayKey": "2.º Grupo L",
+    "homeKey": "Colombia",
+    "awayKey": "Croatia",
     "start": "2026-07-02T23:00:00Z"
   },
   {
     "id": "53452505",
     "group": "Ronda de 32",
     "homeKey": "Switzerland",
-    "awayKey": "3.º mejor E/F/G/I/J",
+    "awayKey": "Algeria",
     "start": "2026-07-03T03:00:00Z"
   },
   {
     "id": "53452503",
     "group": "Ronda de 32",
     "homeKey": "Australia",
-    "awayKey": "2.º Grupo G",
+    "awayKey": "Egypt",
     "start": "2026-07-03T18:00:00Z"
   },
   {
     "id": "53452569",
     "group": "Ronda de 32",
     "homeKey": "Argentina",
-    "awayKey": "2.º Grupo H",
+    "awayKey": "Cape Verde",
     "start": "2026-07-03T22:00:00Z"
   },
   {
     "id": "53452507",
     "group": "Ronda de 32",
-    "homeKey": "1.º Grupo K",
-    "awayKey": "3.º mejor D/E/I/J/L",
+    "homeKey": "Portugal",
+    "awayKey": "Croatia",
     "start": "2026-07-04T01:30:00Z"
   },
   {
@@ -341,6 +341,9 @@ const TEAM_ES = {
   "Germany":"Alemania", "Netherlands":"Países Bajos", "Morocco":"Marruecos",
   "Ivory Coast":"Costa de Marfil", "Mexico":"México", "United States":"Estados Unidos",
   "Bosnia and Herzegovina":"Bosnia y Herzegovina", "Switzerland":"Suiza", "Australia":"Australia"
+,
+  "Sweden":"Suecia",
+  "Tunisia":"Túnez",
 };
 
 const TEAM_FLAGS = {
@@ -371,6 +374,9 @@ const TEAM_FLAGS = {
   "2.º Grupo L":"🥈",
   "2.º Grupo G":"🥈",
   "2.º Grupo H":"🥈",
+,
+  "Sweden":"🇸🇪",
+  "Tunisia":"🇹🇳",
 };
 
 let currentPlayerName = localStorage.getItem("playerName") || "";
@@ -530,6 +536,7 @@ function setTeamInMatch(matchId, slot, teamKey) {
 function applyKnockoutCrossings() {
   rememberOriginalTeams();
   resetDynamicTeams();
+  applyBestThirdResolvers();
 
   let changed = true;
   let loops = 0;
@@ -583,6 +590,51 @@ function allKnockoutMatches() {
 }
 function firstActiveMatch() {
   return visibleActiveMatches()[0] || allKnockoutMatches()[0] || MATCHES[0];
+}
+
+
+// ===== V16.1: RESOLVER DE MEJORES TERCEROS / PLACEHOLDERS =====
+// Convierte textos como "3.º mejor A/B/C/D/F" en equipos reales cuando ya están definidos.
+// Si alguna plaza aún no está confirmada, se deja el texto genérico hasta que se actualice.
+const BEST_THIRD_RESOLVER = {
+  "3.º mejor A/B/C/D/F": "Sweden",
+  "3.º mejor C/D/F/G/H": "Tunisia",
+  "3.º mejor C/E/F/H/I": "Saudi Arabia",
+  "3.º mejor E/H/I/J/K": "Austria",
+  "3.º mejor A/E/H/I/J": "Uruguay",
+  "3.º mejor E/F/G/I/J": "Algeria",
+  "3.º mejor D/E/I/J/L": "Croatia",
+
+  "1.º Grupo G": "Belgium",
+  "2.º Grupo G": "Egypt",
+  "1.º Grupo H": "Spain",
+  "2.º Grupo H": "Cape Verde",
+  "1.º Grupo I": "France",
+  "2.º Grupo I": "Norway",
+  "1.º Grupo J": "Argentina",
+  "2.º Grupo J": "Austria",
+  "1.º Grupo K": "Portugal",
+  "2.º Grupo K": "Colombia",
+  "1.º Grupo L": "England",
+  "2.º Grupo L": "Croatia"
+};
+
+function resolveStaticPlaceholderTeam(teamKey) {
+  const key = String(teamKey || "");
+  return BEST_THIRD_RESOLVER[key] || key;
+}
+
+function applyBestThirdResolvers() {
+  rememberOriginalTeams?.();
+  MATCHES.forEach(m => {
+    if (!m.originalHomeKey) m.originalHomeKey = m.homeKey;
+    if (!m.originalAwayKey) m.originalAwayKey = m.awayKey;
+
+    const h = resolveStaticPlaceholderTeam(m.homeKey);
+    const a = resolveStaticPlaceholderTeam(m.awayKey);
+    if (h !== m.homeKey) m.homeKey = h;
+    if (a !== m.awayKey) m.awayKey = a;
+  });
 }
 
 function groupsByDate() {
@@ -707,13 +759,14 @@ function updateCountdownOnly() {
 
 function renderAll() {
   applyKnockoutCrossings();
+  applyBestThirdResolvers();
   ensureSelection();
   renderTabs();
   renderSelectedMatch();
   renderRanking();
   
   const ds = $("dataStatus");
-  if (ds) ds.textContent = `✅ Calendario cargado con cuenta regresiva: ${MATCHES.length} partidos · v16.0`;
+  if (ds) ds.textContent = `✅ Calendario cargado con cuenta regresiva: ${MATCHES.length} partidos · v16.1`;
   $("welcomeText").textContent = currentPlayerName ? `Bienvenido, ${currentPlayerName}!` : "";
 }
 
