@@ -1,11 +1,12 @@
-WORLD CUP PREDICTION 2026 - VERSION 16.3 TEAMS LOADING STABLE
+WORLD CUP PREDICTION 2026 - VERSION 17.0 CLEAN STABLE APP
 
-CORRIGE:
-- Equipos vuelven a cargar.
-- Quita el bucle que dejaba la página en "Cargando calendario automático".
-- Mantiene equipos reales en Ronda de 32.
-- Mantiene motor de cruces.
-- Mantiene cuenta regresiva, Firebase, API, participantes y monto admin.
+CAMBIO GRANDE:
+- app.js fue reemplazado por una versión limpia y estable.
+- Ya no depende de parches acumulados.
+- Equipos de Ronda de 32 salen cargados desde el inicio.
+- No debe quedarse en "Cargando calendario automático".
+- Mantiene Firebase, participantes, apuestas, resultados, ganador, puntos, cuenta regresiva, bloqueo y monto admin.
+- Cruces avanzan con resultados guardados en Firebase.
 
 SUBIR:
 api
@@ -16,8 +17,11 @@ style.css
 README.txt
 vercel.json
 
+NO SUBIR:
+package.json
+
 PROBAR:
-https://world-cup-prediction-2026-26ej.vercel.app/?v=163teams
+https://world-cup-prediction-2026-26ej.vercel.app/?v=17clean
 
 ADMIN:
-https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=163teams
+https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=17clean

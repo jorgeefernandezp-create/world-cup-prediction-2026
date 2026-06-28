@@ -313,3 +313,11 @@ button{touch-action:manipulation}
 
 /* v16 active knockout + admin stake */
 #stakeAmount{font-size:18px;font-weight:800;max-width:160px}
+
+/* v17 clean stable */
+.countdown{display:inline-block;margin-top:10px;background:#061326;color:#ffd24a;font-weight:900;border-radius:999px;padding:8px 14px}
+.locked{margin-top:10px;font-weight:900;color:#7a1b1b;background:#ffe2e2;border-radius:12px;padding:8px 10px}
+.match-tabs button small{display:block;margin-top:4px;font-size:11px;opacity:.9;font-weight:800;line-height:1.25}
+.participant-row{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.15);font-weight:700}
+#matchParticipantsList{max-height:220px;overflow-y:auto}
+.score input,#selected_home,#selected_away{font-size:24px!important;min-height:48px!important}
