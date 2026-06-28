@@ -1,26 +1,11 @@
-WORLD CUP PREDICTION 2026 - VERSION 16.1 BEST THIRDS RESOLVER FINAL
+WORLD CUP PREDICTION 2026 - VERSION 16.2 LOADING SAFE FINAL
 
 CORRIGE:
-- Reemplaza placeholders tipo "3.º mejor A/B/C/D/F" por equipos reales.
-- Actualiza cruces visibles de Ronda de 32.
-- Mantiene motor de cruces v15 para avanzar ganadores a Octavos, Cuartos, Semifinal y Final.
-- Mantiene cuenta regresiva, bloqueo, Firebase, API, participantes y monto admin.
+- Evita que se quede en "Cargando calendario automático".
+- Si falla el motor de cruces, carga calendario en modo seguro.
+- Mantiene equipos definidos, cuenta regresiva, API, Firebase y admin.
 
-EQUIPOS RESUELTOS:
-- Alemania vs Suecia
-- Francia vs Túnez
-- México vs Arabia Saudita
-- Inglaterra vs Austria
-- Bélgica vs Uruguay
-- España vs Austria
-- Colombia vs Croacia
-- Suiza vs Argelia
-- Australia vs Egipto
-- Argentina vs Cabo Verde
-- Portugal vs Croacia
-- Costa de Marfil vs Noruega
-
-SUBIR A GITHUB:
+SUBIR:
 api
 assets
 app.js
@@ -29,11 +14,8 @@ style.css
 README.txt
 vercel.json
 
-NO SUBIR:
-package.json
-
 PROBAR:
-https://world-cup-prediction-2026-26ej.vercel.app/?v=161final
+https://world-cup-prediction-2026-26ej.vercel.app/?v=162safe
 
 ADMIN:
-https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=161final
+https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=162safe
