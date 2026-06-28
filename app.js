@@ -1,4 +1,4 @@
-const APP_VERSION = "16.2-loading-safe-final";
+const APP_VERSION = "16.3-teams-loading-stable";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
@@ -390,40 +390,6 @@ let currentLang = "es";
 let localDraftScores = {};
 let countdownIntervalStarted = false;
 
-
-// ===== V16.2 SAFE LOADING =====
-function safeApplyCrossings() {
-  try { if (typeof applyKnockoutCrossings === "function") safeApplyCrossings(); } catch (e) { console.warn(e); }
-  try { if (typeof applyBestThirdResolvers === "function") safeApplyCrossings(); } catch (e) { console.warn(e); }
-}
-function safeKnockoutStatusText() {
-  try { if (typeof knockoutStatusText === "function") return knockoutStatusText(); } catch (e) {}
-  return "";
-}
-function renderFallbackCalendar(errorMessage) {
-  console.warn("Fallback calendar:", errorMessage);
-  const ds = document.getElementById("dataStatus");
-  if (ds) ds.textContent = "✅ Calendario cargado en modo seguro · v16.2";
-  try {
-    const groups = {};
-    MATCHES
-      .filter(m => ["Ronda de 32","Octavos","Cuartos","Semifinal","Tercer puesto","Final"].includes(m.group || m.roundName || ""))
-      .sort((a,b) => new Date(a.start) - new Date(b.start))
-      .forEach(m => {
-        const k = jstDateKey(m.start);
-        (groups[k] ||= []).push(m);
-      });
-    const keys = Object.keys(groups).sort();
-    if (keys.length) {
-      selectedDayKey = keys[0];
-      selectedMatchId = groups[keys[0]][0].id;
-      renderTabs();
-      renderSelectedMatch();
-      renderRanking();
-    }
-  } catch (e) { console.error(e); }
-}
-
 function $(id) { return document.getElementById(id); }
 function jstDateKey(iso) { return new Date(iso).toLocaleDateString("sv-SE", { timeZone: JAPAN_TIMEZONE }); }
 function dateShort(iso) { return new Date(iso).toLocaleDateString("es-ES", { weekday:"short", day:"2-digit", month:"short", timeZone:JAPAN_TIMEZONE }).replace(".",""); }
@@ -570,7 +536,7 @@ function setTeamInMatch(matchId, slot, teamKey) {
 function applyKnockoutCrossings() {
   rememberOriginalTeams();
   resetDynamicTeams();
-  safeApplyCrossings();
+  applyBestThirdResolvers();
 
   let changed = true;
   let loops = 0;
@@ -613,7 +579,8 @@ function isMatchFinishedOrStarted(m) {
   return Date.now() >= new Date(m.start).getTime() || !!resultFor(m.id);
 }
 function visibleActiveMatches() {
-  safeApplyCrossings();
+  safeBuildTeamsAndCrossings();
+
   return MATCHES
     .filter(m => isKnockoutMatch(m))
     .filter(m => !isMatchFinishedOrStarted(m))
@@ -671,7 +638,22 @@ function applyBestThirdResolvers() {
   });
 }
 
+
+function safeBuildTeamsAndCrossings() {
+  try {
+    if (typeof applyBestThirdResolvers === "function") applyBestThirdResolvers();
+  } catch (e) {
+    console.warn("Resolver terceros falló:", e);
+  }
+  try {
+    if (typeof applyKnockoutCrossings === "function") applyKnockoutCrossings();
+  } catch (e) {
+    console.warn("Cruces fallaron:", e);
+  }
+}
+
 function groupsByDate() {
+  safeBuildTeamsAndCrossings();
   const g = {};
   visibleActiveMatches().forEach(m => {
     const k = jstDateKey(m.start);
@@ -792,15 +774,14 @@ function updateCountdownOnly() {
 }
 
 function renderAll() {
-  safeApplyCrossings();
-  safeApplyCrossings();
+  safeBuildTeamsAndCrossings();
   ensureSelection();
   renderTabs();
   renderSelectedMatch();
   renderRanking();
   
   const ds = $("dataStatus");
-  if (ds) ds.textContent = `✅ Calendario cargado con cuenta regresiva: ${MATCHES.length} partidos · v16.2`;
+  if (ds) ds.textContent = `✅ Calendario cargado con cuenta regresiva: ${MATCHES.length} partidos · v16.3`;
   $("welcomeText").textContent = currentPlayerName ? `Bienvenido, ${currentPlayerName}!` : "";
 }
 
@@ -808,7 +789,7 @@ window.setLang = function(lang) {
   currentLang = lang;
   document.querySelectorAll(".langs button").forEach(b => b.classList.remove("active"));
   const b = $("btn-" + lang); if (b) b.classList.add("active");
-  try { renderAll(); } catch (e) { renderFallbackCalendar(e); }
+  renderAll();
 };
 
 window.enterGame = async function() {
@@ -965,7 +946,7 @@ function listenResults() {
 
 
 window.rebuildKnockoutCrossings = function() {
-  safeApplyCrossings();
+  applyKnockoutCrossings();
   renderAll();
   const ds = document.getElementById("dataStatus");
   if (ds) ds.textContent = `✅ Cruces reconstruidos: ${knockoutStatusText()} · v15`;
