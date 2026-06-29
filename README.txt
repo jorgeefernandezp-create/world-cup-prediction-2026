@@ -1,12 +1,19 @@
-WORLD CUP PREDICTION 2026 - VERSION 18.1 R32 VISIBLE + 300 YEN
+WORLD CUP PREDICTION 2026 - VERSION 18.2 API SCORE + WINNER FIX
 
-CAMBIOS:
-- Mantiene todos los partidos de Ronda de 32 visibles hasta que termine toda la ronda.
-- Los partidos finalizados siguen visibles con resultado y ganador.
-- Brasil vs Japón y todos los 16avos quedan a ¥300 por apuesta.
-- Las apuestas existentes NO se borran.
-- El pozo se recalcula con ¥300 por participante.
-- Admin puede fijar Ronda de 32 en ¥300.
+CORRIGE EXACTAMENTE:
+- Botón Admin "Sincronizar API ahora" consulta football-data.org.
+- /api/sync-results devuelve marcadores con matchId local.
+- La web guarda esos marcadores en Firebase collection: results.
+- La web muestra el score final del partido.
+- La web muestra ganador del partido.
+- La web calcula y muestra ganador de la polla.
+- Mantiene Ronda de 32 visible hasta terminar toda la ronda.
+- Mantiene ¥300 para 16avos.
+- No borra apuestas existentes.
+
+IMPORTANTE EN VERCEL:
+Debe existir Environment Variable:
+FOOTBALL_DATA_API_KEY = tu token de football-data.org
 
 SUBIR:
 api
@@ -21,7 +28,12 @@ NO SUBIR:
 package.json
 
 PROBAR:
-https://world-cup-prediction-2026-26ej.vercel.app/?v=181r32
+https://world-cup-prediction-2026-26ej.vercel.app/?v=182apiwinner
 
 ADMIN:
-https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=181r32
+https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=182apiwinner
+
+EN ADMIN:
+1. Presiona "Sincronizar API ahora".
+2. Debe guardar resultados en Firebase.
+3. Luego se verá score final y ganador de la polla.

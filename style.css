@@ -340,3 +340,7 @@ button{touch-action:manipulation}
 /* v18.1 keep R32 visible + 300 yen */
 .admin-r32-box{background:rgba(255,210,74,.12);border:1px solid rgba(255,210,74,.35);border-radius:16px;padding:14px;margin:12px 0}
 .admin-r32-box button{padding:10px 14px;border-radius:12px;font-weight:900;margin:4px}
+
+/* v18.2 API score + winner fix */
+.winner-final{margin-top:8px;font-weight:900;background:rgba(40,210,120,.16);border:1px solid rgba(40,210,120,.35);border-radius:12px;padding:8px 10px}
+.poll-winner-final{margin-top:8px;font-weight:900;background:rgba(255,210,74,.16);border:1px solid rgba(255,210,74,.35);border-radius:12px;padding:8px 10px}

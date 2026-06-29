@@ -1,4 +1,4 @@
-const APP_VERSION = "18.1-r32-visible-300yen";
+const APP_VERSION = "18.2-api-score-winner-fix";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
@@ -518,7 +518,7 @@ function renderSelectedMatch() {
     <div class="selected-match">
       <div class="teams-line">${teamWithFlag(m.homeKey)} vs ${teamWithFlag(m.awayKey)}</div>
       <div class="match-meta">🗓️ ${dateLong(m.start)} · 🕒 ${timeJst(m.start)} JST<br>${m.group} · Apuesta: ¥${stakeForMatch(m)}</div>
-      ${r ? `<span class="result-badge">Resultado final: ${r.home} - ${r.away}</span>` : `<div id="selectedCountdown" class="countdown">${countdownText(m)}</div>`}
+      ${r ? `<span class="result-badge">Resultado final: ${r.home} - ${r.away}</span><div class="winner-final">${winnerTextForMatch(m)}</div><div class="poll-winner-final">${pollWinnerText(m)}</div>` : `<div id="selectedCountdown" class="countdown">${countdownText(m)}</div>`}
       ${locked ? `<div class="locked">🔒 Apuesta cerrada</div>` : `<div class="score"><input id="selected_home" type="number" inputmode="numeric" pattern="[0-9]*" min="0" autocomplete="off" placeholder="0" oninput="saveDraftScore()" value="${draft ? draft.home : (saved ? saved.predictedHome : "")}"><span>-</span><input id="selected_away" type="number" inputmode="numeric" pattern="[0-9]*" min="0" autocomplete="off" placeholder="0" oninput="saveDraftScore()" value="${draft ? draft.away : (saved ? saved.predictedAway : "")}"></div>`}
     </div>`;
 }
@@ -537,11 +537,7 @@ function renderRanking() {
     list.innerHTML = preds.length ? preds.map(p => `<div class="participant-row">${p.playerName}: ${p.predictedHome}-${p.predictedAway}</div>`).join("") : `<div class="participant-row">Aún no hay participantes.</div>`;
   }
   if (!r) $("winnerBox").textContent = "Aún no hay resultado final.";
-  else {
-    const top = ranked[0]?.points || 0;
-    const winners = ranked.filter(p => p.points === top && top > 0);
-    $("winnerBox").innerHTML = winners.length ? `🏆 ${winners.map(w=>w.playerName).join(", ")}` : "Sin ganador con puntos.";
-  }
+  else $("winnerBox").innerHTML = pollWinnerText(m);
   $("matchRankingBody").innerHTML = ranked.map((p,i)=>`<tr><td>${i+1}</td><td>${p.playerName}</td><td>${p.predictedHome} - ${p.predictedAway}</td><td>${p.points}</td></tr>`).join("");
 }
 
@@ -560,7 +556,7 @@ function updateAdminSystemStatus() {
   const crosses = knockoutStatusText();
   box.innerHTML = `
     <div class="system-grid">
-      <div><b>Versión</b><br>v18.1</div>
+      <div><b>Versión</b><br>v18.2</div>
       <div><b>API</b><br>${apiLastStatus}</div>
       <div><b>Última sync</b><br>${apiLastSync || "Pendiente"}</div>
       <div><b>Resultados API</b><br>${lastApiCount}</div>
@@ -585,6 +581,62 @@ function saveApiState(status, count) {
   updateAdminSystemStatus();
 }
 
+
+// ===== V18.2: API -> FIREBASE -> SCORE FINAL -> GANADOR POLLA =====
+async function saveApiResultsToFirebase(apiData) {
+  const list = apiData?.results || apiData?.matches || apiData?.data || [];
+  if (!Array.isArray(list) || !list.length) return 0;
+
+  let saved = 0;
+  for (const item of list) {
+    const matchId = String(item.matchId || item.id || item.localId || item.gameId || "");
+    if (!matchId) continue;
+
+    const home = item.home ?? item.homeScore ?? item.finalHome ?? item.scoreHome ?? item.homeGoals;
+    const away = item.away ?? item.awayScore ?? item.finalAway ?? item.scoreAway ?? item.awayGoals;
+    const status = item.status || item.state || item.matchStatus || "FINISHED";
+    if (home === undefined || away === undefined || home === null || away === null) continue;
+
+    await setDoc(doc(db, "results", matchId), {
+      home: Number(home),
+      away: Number(away),
+      status,
+      provider: apiData.provider || "football-data",
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+    saved++;
+  }
+  return saved;
+}
+
+function winnerTextForMatch(match) {
+  const r = resultFor(match.id);
+  if (!r) return "";
+  if (r.home > r.away) return `🏆 Ganador: ${teamName(match.homeKey)}`;
+  if (r.away > r.home) return `🏆 Ganador: ${teamName(match.awayKey)}`;
+  const raw = r.raw || {};
+  const hp = raw.homePenalty ?? raw.homePenalties ?? raw.penaltyHome;
+  const ap = raw.awayPenalty ?? raw.awayPenalties ?? raw.penaltyAway;
+  if (hp != null && ap != null) {
+    if (Number(hp) > Number(ap)) return `🏆 Ganador: ${teamName(match.homeKey)} (penales)`;
+    if (Number(ap) > Number(hp)) return `🏆 Ganador: ${teamName(match.awayKey)} (penales)`;
+  }
+  return "Empate";
+}
+
+function pollWinnerText(match) {
+  const r = resultFor(match.id);
+  if (!r) return "Aún no hay resultado final.";
+  const preds = predictionsCache.filter(p => String(p.matchId) === String(match.id));
+  if (!preds.length) return "Sin participantes.";
+  const ranked = preds.map(p => ({ ...p, points: scorePoints(p, r) }))
+    .sort((a,b) => b.points - a.points || String(a.playerName).localeCompare(String(b.playerName)));
+  const top = ranked[0]?.points || 0;
+  if (top <= 0) return "Sin ganador con puntos.";
+  const winners = ranked.filter(p => p.points === top);
+  return `🏆 Ganador de la polla: ${winners.map(w => w.playerName).join(", ")} (${top} pts)`;
+}
+
 function renderAll() {
   try {
     applyCrossings();
@@ -593,7 +645,7 @@ function renderAll() {
     renderSelectedMatch();
     renderRanking();
     $("welcomeText").textContent = currentPlayerName ? `Bienvenido, ${currentPlayerName}!` : "";
-    $("dataStatus").textContent = `✅ ${activeRoundStatusText()} · apuesta ¥${stakeForMatch(selectedMatch())} · ${knockoutStatusText()} · v18.1`;
+    $("dataStatus").textContent = `✅ ${activeRoundStatusText()} · apuesta ¥${stakeForMatch(selectedMatch())} · ${knockoutStatusText()} · v18.2`;
     updateAdminSystemStatus();
   } catch(e) {
     console.error(e);
@@ -693,16 +745,20 @@ window.setR32Stake300 = async function() {
 window.syncResultsFromApi = async function() {
   showAdminMessage("⏳ Sincronizando API...");
   try {
-    const r = await fetch("/api/sync-results?v=18", { cache: "no-store" });
+    const r = await fetch("/api/sync-results?v=182", { cache: "no-store" });
     const data = await r.json();
-    const count = data.count ?? data.resultsUpdated ?? data.updated ?? 0;
+
+    const saved = await saveApiResultsToFirebase(data);
+    const count = saved || data.count || data.resultsUpdated || data.updated || 0;
+
     if (data.ok) {
       saveApiState("🟢 OK", count);
-      showAdminMessage(`✅ API actualizada: ${count} resultados`);
+      showAdminMessage(`✅ API sincronizada. Resultados guardados: ${count}`);
     } else {
       saveApiState("🟡 Sin cambios", count);
-      showAdminMessage("⚠️ API respondió sin cambios.");
+      showAdminMessage("⚠️ API respondió sin resultados nuevos.");
     }
+
     rebuildTournamentFromResults();
   } catch(e) {
     console.warn(e);
