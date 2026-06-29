@@ -1,11 +1,17 @@
-WORLD CUP PREDICTION 2026 - VERSION 18.4 ADMIN + LANGUAGE FIX
+WORLD CUP PREDICTION 2026 - VERSION 19.0 FINAL STABLE LANGUAGE COMPLETE
 
-CORRIGE:
-- Panel admin visible con ?admin=jorge.
-- Botones de idioma vuelven a funcionar:
-  Español, Japonés, Inglés, Portugués.
-- Mantiene sincronizar API, reconstruir torneo y fijar 16avos en ¥300.
-- Mantiene Ronda de 32 visible, resultados, ganador y polla.
+BASE:
+- Creada sobre la versión estable subida por Jorge: v18.4.
+- NO reemplaza motor de equipos, apuestas, API, Firebase ni cruces.
+
+INCLUYE:
+- Equipos y apuestas existentes se mantienen.
+- Panel admin se mantiene.
+- API, resultados y ganador de polla se mantienen.
+- Ronda de 32 visible y monto ¥300 se mantiene si ya estaba en la base.
+- Idioma completo de toda la página:
+  Español, japonés, inglés y portugués.
+- Traduce botones, reglas, estados, admin, apuestas, cuenta regresiva, ganadores y equipos.
 
 SUBIR:
 api
@@ -20,7 +26,7 @@ NO SUBIR:
 package.json
 
 USUARIO:
-https://world-cup-prediction-2026-26ej.vercel.app/?v=184lang
+https://world-cup-prediction-2026-26ej.vercel.app/?v=19final
 
 ADMIN:
-https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=184lang
+https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=19final

@@ -1,4 +1,4 @@
-const APP_VERSION = "18.4-admin-language-fix";
+const APP_VERSION = "19.0-final-stable-language-complete";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
@@ -558,7 +558,7 @@ function updateAdminSystemStatus() {
   const crosses = knockoutStatusText();
   box.innerHTML = `
     <div class="system-grid">
-      <div><b>Versión</b><br>v18.4</div>
+      <div><b>Versión</b><br>v19.0</div>
       <div><b>API</b><br>${apiLastStatus}</div>
       <div><b>Última sync</b><br>${apiLastSync || "Pendiente"}</div>
       <div><b>Resultados API</b><br>${lastApiCount}</div>
@@ -647,7 +647,8 @@ function renderAll() {
     renderSelectedMatch();
     renderRanking();
     $("welcomeText").textContent = currentPlayerName ? `Bienvenido, ${currentPlayerName}!` : "";
-    $("dataStatus").textContent = `✅ ${activeRoundStatusText()} · apuesta ¥${stakeForMatch(selectedMatch())} · ${knockoutStatusText()} · v18.4`;
+    $("dataStatus").textContent = `✅ ${activeRoundStatusText()} · apuesta ¥${stakeForMatch(selectedMatch())} · ${knockoutStatusText()} · v19.0`;
+    if (typeof v19TranslatePage === "function") v19TranslatePage();
     updateAdminSystemStatus();
   } catch(e) {
     console.error(e);
@@ -838,104 +839,192 @@ window.adminRebuildNow = function() {
 };
 
 
-// ===== V18.4 LANGUAGE FIX =====
-const UI_LANG = {
+
+// ===== V19 FINAL: IDIOMAS COMPLETOS SIN TOCAR DATOS =====
+// Esta capa traduce la interfaz visible después de cada render.
+// No modifica Firebase, API, equipos, apuestas, participantes ni cruces.
+const V19_I18N = {
   es: {
-    title: "Polla Mundial 2026",
-    enter: "Ingresar",
-    namePlaceholder: "Tu nombre",
-    savePrediction: "Guardar pronóstico",
-    participants: "Participantes",
-    rules: "Reglas",
-    exact: "Marcador exacto",
-    winner: "Ganador/empate correcto",
-    fail: "Fallo",
-    pot: "Pozo",
-    admin: "Panel administrador"
+    title:"Polla Mundial 2026", subtitle:"Marca tu score antes de que empiece el partido.",
+    namePlaceholder:"Tu nombre", enter:"Ingresar", savePrediction:"Guardar pronóstico",
+    participants:"Participantes", rules:"Reglas", exact:"Marcador exacto",
+    correct:"Ganador/empate correcto", fail:"Fallo", admin:"Panel administrador",
+    quick:"Control rápido", sync:"Sincronizar API ahora", rebuild:"Reconstruir torneo",
+    set300:"Fijar 16avos en ¥300", r32Amount:"Monto Ronda de 32 / 16avos",
+    r32Note:"Las apuestas existentes se mantienen. Solo cambia el monto para calcular el pozo.",
+    saveR32:"Guardar Ronda de 32", generalAmount:"Monto general", saveAmount:"Guardar monto",
+    pot:"Pozo", finalResult:"Resultado final", winner:"Ganador", pollWinner:"Ganador de la polla",
+    noFinal:"Aún no hay resultado final.", noParticipants:"Aún no hay participantes.",
+    noPoints:"Sin ganador con puntos.", closed:"Apuesta cerrada", closesIn:"Cierra en",
+    bet:"Apuesta", welcome:"Bienvenido", system:"Estado del sistema",
+    apiSaved:"API sincronizada", apiError:"No se pudo sincronizar API"
   },
   ja: {
-    title: "ワールドカップ予想 2026",
-    enter: "入る",
-    namePlaceholder: "名前",
-    savePrediction: "予想を保存",
-    participants: "参加者",
-    rules: "ルール",
-    exact: "スコア的中",
-    winner: "勝敗/引き分け的中",
-    fail: "はずれ",
-    pot: "賞金",
-    admin: "管理パネル"
+    title:"ワールドカップ予想 2026", subtitle:"試合開始前にスコアを入力してください。",
+    namePlaceholder:"名前", enter:"入る", savePrediction:"予想を保存",
+    participants:"参加者", rules:"ルール", exact:"スコア完全的中",
+    correct:"勝敗/引き分け的中", fail:"不的中", admin:"管理パネル",
+    quick:"クイック操作", sync:"APIを今すぐ同期", rebuild:"トーナメント再計算",
+    set300:"ベスト32を¥300に設定", r32Amount:"ベスト32 / 16強の参加費",
+    r32Note:"既存の予想はそのままです。賞金計算の金額だけ変更します。",
+    saveR32:"ベスト32の金額を保存", generalAmount:"基本参加費", saveAmount:"金額を保存",
+    pot:"賞金", finalResult:"最終スコア", winner:"勝者", pollWinner:"賭けの勝者",
+    noFinal:"まだ最終結果はありません。", noParticipants:"まだ参加者はいません。",
+    noPoints:"ポイント獲得者はいません。", closed:"受付終了", closesIn:"締切まで",
+    bet:"参加費", welcome:"ようこそ", system:"システム状態",
+    apiSaved:"API同期完了", apiError:"APIを同期できませんでした"
   },
   en: {
-    title: "World Cup Prediction 2026",
-    enter: "Enter",
-    namePlaceholder: "Your name",
-    savePrediction: "Save prediction",
-    participants: "Participants",
-    rules: "Rules",
-    exact: "Exact score",
-    winner: "Correct winner/draw",
-    fail: "Miss",
-    pot: "Pot",
-    admin: "Admin panel"
+    title:"World Cup Prediction 2026", subtitle:"Enter your score before the match starts.",
+    namePlaceholder:"Your name", enter:"Enter", savePrediction:"Save prediction",
+    participants:"Participants", rules:"Rules", exact:"Exact score",
+    correct:"Correct winner/draw", fail:"Miss", admin:"Admin panel",
+    quick:"Quick control", sync:"Sync API now", rebuild:"Rebuild tournament",
+    set300:"Set Round of 32 to ¥300", r32Amount:"Round of 32 amount",
+    r32Note:"Existing predictions stay. Only the pot amount changes.",
+    saveR32:"Save Round of 32", generalAmount:"General amount", saveAmount:"Save amount",
+    pot:"Pot", finalResult:"Final score", winner:"Winner", pollWinner:"Pool winner",
+    noFinal:"No final result yet.", noParticipants:"No participants yet.",
+    noPoints:"No winner with points.", closed:"Betting closed", closesIn:"Closes in",
+    bet:"Bet", welcome:"Welcome", system:"System status",
+    apiSaved:"API synced", apiError:"Could not sync API"
   },
   pt: {
-    title: "Bolão Copa do Mundo 2026",
-    enter: "Entrar",
-    namePlaceholder: "Seu nome",
-    savePrediction: "Salvar palpite",
-    participants: "Participantes",
-    rules: "Regras",
-    exact: "Placar exato",
-    winner: "Vencedor/empate correto",
-    fail: "Erro",
-    pot: "Prêmio",
-    admin: "Painel admin"
+    title:"Bolão Copa do Mundo 2026", subtitle:"Marque seu placar antes do jogo começar.",
+    namePlaceholder:"Seu nome", enter:"Entrar", savePrediction:"Salvar palpite",
+    participants:"Participantes", rules:"Regras", exact:"Placar exato",
+    correct:"Vencedor/empate correto", fail:"Erro", admin:"Painel admin",
+    quick:"Controle rápido", sync:"Sincronizar API agora", rebuild:"Reconstruir torneio",
+    set300:"Fixar 16avos em ¥300", r32Amount:"Valor Rodada de 32 / 16avos",
+    r32Note:"Os palpites existentes continuam. Só muda o valor para calcular o prêmio.",
+    saveR32:"Salvar Rodada de 32", generalAmount:"Valor geral", saveAmount:"Salvar valor",
+    pot:"Prêmio", finalResult:"Resultado final", winner:"Vencedor", pollWinner:"Vencedor do bolão",
+    noFinal:"Ainda não há resultado final.", noParticipants:"Ainda não há participantes.",
+    noPoints:"Sem vencedor com pontos.", closed:"Aposta fechada", closesIn:"Fecha em",
+    bet:"Aposta", welcome:"Bem-vindo", system:"Estado do sistema",
+    apiSaved:"API sincronizada", apiError:"Não foi possível sincronizar a API"
   }
 };
 
-let currentLang = localStorage.getItem("currentLang") || "es";
+const V19_TEAM_NAMES = {
+  "South Africa":{es:"Sudáfrica",ja:"南アフリカ",en:"South Africa",pt:"África do Sul"},
+  "Canada":{es:"Canadá",ja:"カナダ",en:"Canada",pt:"Canadá"},
+  "Brazil":{es:"Brasil",ja:"ブラジル",en:"Brazil",pt:"Brasil"},
+  "Japan":{es:"Japón",ja:"日本",en:"Japan",pt:"Japão"},
+  "Germany":{es:"Alemania",ja:"ドイツ",en:"Germany",pt:"Alemanha"},
+  "Paraguay":{es:"Paraguay",ja:"パラグアイ",en:"Paraguay",pt:"Paraguai"},
+  "Sweden":{es:"Suecia",ja:"スウェーデン",en:"Sweden",pt:"Suécia"},
+  "Netherlands":{es:"Países Bajos",ja:"オランダ",en:"Netherlands",pt:"Países Baixos"},
+  "Morocco":{es:"Marruecos",ja:"モロッコ",en:"Morocco",pt:"Marrocos"},
+  "Ivory Coast":{es:"Costa de Marfil",ja:"コートジボワール",en:"Ivory Coast",pt:"Costa do Marfim"},
+  "Norway":{es:"Noruega",ja:"ノルウェー",en:"Norway",pt:"Noruega"},
+  "France":{es:"Francia",ja:"フランス",en:"France",pt:"França"},
+  "Tunisia":{es:"Túnez",ja:"チュニジア",en:"Tunisia",pt:"Tunísia"},
+  "Mexico":{es:"México",ja:"メキシコ",en:"Mexico",pt:"México"},
+  "Ecuador":{es:"Ecuador",ja:"エクアドル",en:"Ecuador",pt:"Equador"},
+  "Saudi Arabia":{es:"Arabia Saudita",ja:"サウジアラビア",en:"Saudi Arabia",pt:"Arábia Saudita"},
+  "England":{es:"Inglaterra",ja:"イングランド",en:"England",pt:"Inglaterra"},
+  "DR Congo":{es:"RD Congo",ja:"コンゴ民主共和国",en:"DR Congo",pt:"RD Congo"},
+  "Austria":{es:"Austria",ja:"オーストリア",en:"Austria",pt:"Áustria"},
+  "Belgium":{es:"Bélgica",ja:"ベルギー",en:"Belgium",pt:"Bélgica"},
+  "Senegal":{es:"Senegal",ja:"セネガル",en:"Senegal",pt:"Senegal"},
+  "United States":{es:"Estados Unidos",ja:"アメリカ",en:"United States",pt:"Estados Unidos"},
+  "Bosnia and Herzegovina":{es:"Bosnia y Herzegovina",ja:"ボスニア・ヘルツェゴビナ",en:"Bosnia and Herzegovina",pt:"Bósnia e Herzegovina"},
+  "Spain":{es:"España",ja:"スペイン",en:"Spain",pt:"Espanha"},
+  "Colombia":{es:"Colombia",ja:"コロンビア",en:"Colombia",pt:"Colômbia"},
+  "Croatia":{es:"Croacia",ja:"クロアチア",en:"Croatia",pt:"Croácia"},
+  "Portugal":{es:"Portugal",ja:"ポルトガル",en:"Portugal",pt:"Portugal"},
+  "Switzerland":{es:"Suiza",ja:"スイス",en:"Switzerland",pt:"Suíça"},
+  "Algeria":{es:"Argelia",ja:"アルジェリア",en:"Algeria",pt:"Argélia"},
+  "Australia":{es:"Australia",ja:"オーストラリア",en:"Australia",pt:"Austrália"},
+  "Egypt":{es:"Egipto",ja:"エジプト",en:"Egypt",pt:"Egito"},
+  "Argentina":{es:"Argentina",ja:"アルゼンチン",en:"Argentina",pt:"Argentina"},
+  "Cape Verde":{es:"Cabo Verde",ja:"カーボベルデ",en:"Cape Verde",pt:"Cabo Verde"},
+  "Ghana":{es:"Ghana",ja:"ガーナ",en:"Ghana",pt:"Gana"},
+  "Uruguay":{es:"Uruguay",ja:"ウルグアイ",en:"Uruguay",pt:"Uruguai"}
+};
 
-function applyLanguageLabels() {
-  const t = UI_LANG[currentLang] || UI_LANG.es;
-  document.documentElement.lang = currentLang;
-  document.querySelectorAll(".langs button, .language-btn").forEach(b => b.classList.remove("active"));
-  const active = document.getElementById("btn-" + currentLang);
+let v19Lang = localStorage.getItem("currentLang") || "es";
+function v19t(k){ return (V19_I18N[v19Lang] && V19_I18N[v19Lang][k]) || V19_I18N.es[k] || k; }
+function v19Team(name){ return (V19_TEAM_NAMES[name] && V19_TEAM_NAMES[name][v19Lang]) || name; }
+
+function v19ReplaceText(from, to) {
+  if (!from || !to || from === to || !document.body) return;
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  const nodes = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach(n => {
+    if (n.nodeValue && n.nodeValue.includes(from)) n.nodeValue = n.nodeValue.split(from).join(to);
+  });
+}
+
+function v19TranslatePage() {
+  document.documentElement.lang = v19Lang;
+  document.querySelectorAll(".langs button,.language-switcher button").forEach(b => b.classList.remove("active"));
+  const active = document.getElementById("btn-" + v19Lang);
   if (active) active.classList.add("active");
 
-  const title = document.querySelector("[data-i18n='title'], .app-title, h1");
-  if (title) title.textContent = t.title;
-
   const nameInput = document.getElementById("playerName");
-  if (nameInput) nameInput.placeholder = t.namePlaceholder;
+  if (nameInput) nameInput.placeholder = v19t("namePlaceholder");
 
-  const enterBtn = document.querySelector("[onclick='enterGame()']");
-  if (enterBtn) enterBtn.textContent = t.enter;
+  const pairs = [
+    ["Polla Mundial 2026", v19t("title")],
+    ["Marca tu score antes de que empiece el partido.", v19t("subtitle")],
+    ["Ingresar", v19t("enter")],
+    ["Guardar pronóstico", v19t("savePrediction")],
+    ["Participantes", v19t("participants")],
+    ["Reglas", v19t("rules")],
+    ["Marcador exacto", v19t("exact")],
+    ["Ganador/empate correcto", v19t("correct")],
+    ["Fallo", v19t("fail")],
+    ["Panel administrador", v19t("admin")],
+    ["Control rápido", v19t("quick")],
+    ["Sincronizar API ahora", v19t("sync")],
+    ["Reconstruir torneo", v19t("rebuild")],
+    ["Fijar 16avos en ¥300", v19t("set300")],
+    ["Monto Ronda de 32 / 16avos", v19t("r32Amount")],
+    ["Las apuestas existentes se mantienen. Solo cambia el monto para calcular el pozo.", v19t("r32Note")],
+    ["Guardar Ronda de 32", v19t("saveR32")],
+    ["Monto general", v19t("generalAmount")],
+    ["Guardar monto", v19t("saveAmount")],
+    ["Pozo", v19t("pot")],
+    ["Resultado final", v19t("finalResult")],
+    ["Ganador de la polla", v19t("pollWinner")],
+    ["Ganador", v19t("winner")],
+    ["Aún no hay resultado final.", v19t("noFinal")],
+    ["Aún no hay participantes.", v19t("noParticipants")],
+    ["Sin ganador con puntos.", v19t("noPoints")],
+    ["Apuesta cerrada", v19t("closed")],
+    ["Cierra en", v19t("closesIn")],
+    ["Apuesta", v19t("bet")],
+    ["Bienvenido", v19t("welcome")],
+    ["Estado del sistema", v19t("system")]
+  ];
+  pairs.forEach(([a,b]) => v19ReplaceText(a,b));
 
-  const saveBtn = document.querySelector("[onclick='saveSelectedPrediction()']");
-  if (saveBtn) saveBtn.textContent = t.savePrediction;
-
-  const participantsBtn = document.querySelector("[onclick='toggleParticipants()']");
-  if (participantsBtn) participantsBtn.textContent = t.participants;
-
-  const rulesTitle = document.querySelector(".rules-card h2");
-  if (rulesTitle) rulesTitle.textContent = "📌 " + t.rules;
-
-  const adminTitle = document.querySelector("#adminPanel h2");
-  if (adminTitle) adminTitle.textContent = "🔐 " + t.admin;
-
-  const potLabel = document.querySelector("[data-i18n='pot']");
-  if (potLabel) potLabel.textContent = t.pot;
+  Object.keys(V19_TEAM_NAMES).forEach(team => {
+    const translated = v19Team(team);
+    if (translated !== team) v19ReplaceText(team, translated);
+  });
 }
 
 window.setLang = function(lang) {
-  currentLang = UI_LANG[lang] ? lang : "es";
-  localStorage.setItem("currentLang", currentLang);
-  applyLanguageLabels();
-  try { renderAll(); } catch(e) { console.warn("renderAll after lang failed", e); }
+  v19Lang = V19_I18N[lang] ? lang : "es";
+  localStorage.setItem("currentLang", v19Lang);
+  try { if (typeof renderAll === "function") renderAll(); } catch(e) {}
+  setTimeout(v19TranslatePage, 0);
+  setTimeout(v19TranslatePage, 120);
+  setTimeout(v19TranslatePage, 400);
 };
 
+function v19ScheduleTranslate() {
+  setTimeout(v19TranslatePage, 0);
+  setTimeout(v19TranslatePage, 120);
+  setTimeout(v19TranslatePage, 400);
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
+  v19ScheduleTranslate();
   forceAdminPanelVisibility();
   $("rulesBody").innerHTML = `<tr><td>Marcador exacto</td><td>+5</td></tr><tr><td>Ganador/empate correcto</td><td>+3</td></tr><tr><td>Fallo</td><td>0</td></tr>`;
   await loadSettings();

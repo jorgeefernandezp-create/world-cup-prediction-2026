@@ -359,3 +359,8 @@ button{touch-action:manipulation}
 .language-switcher button,.langs button{padding:8px 12px;border-radius:999px;font-weight:900;cursor:pointer}
 .language-switcher button.active,.langs button.active{outline:3px solid rgba(255,210,74,.75);background:rgba(255,210,74,.18)}
 .admin-panel.admin-visible{display:block!important}
+
+/* v19 final stable language complete */
+.language-switcher,.langs{display:flex!important;gap:8px;flex-wrap:wrap;justify-content:center;margin:10px 0}
+.language-switcher button,.langs button{padding:8px 12px;border-radius:999px;font-weight:900;cursor:pointer}
+.language-switcher button.active,.langs button.active{outline:3px solid rgba(255,210,74,.75);background:rgba(255,210,74,.18)}
