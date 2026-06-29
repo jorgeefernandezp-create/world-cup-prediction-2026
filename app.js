@@ -1,4 +1,4 @@
-const APP_VERSION = "18.0-final-tournament-engine";
+const APP_VERSION = "18.1-r32-visible-300yen";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
@@ -336,6 +336,38 @@ let stakeAmount = 100;
 let participantsOpen = false;
 let localDraftScores = {};
 let countdownIntervalStarted = false;
+
+// ===== V18.1: mantener Ronda de 32 visible y monto por fase =====
+const ROUND_ORDER = ["Ronda de 32","Octavos","Cuartos","Semifinal","Tercer puesto","Final"];
+const DEFAULT_ROUND_STAKES = {"Ronda de 32":300,"Octavos":300,"Cuartos":500,"Semifinal":1000,"Tercer puesto":1000,"Final":1000};
+let roundStakes = {...DEFAULT_ROUND_STAKES};
+
+function isRoundComplete(roundName) {
+  const list = MATCHES.filter(m => m.group === roundName);
+  if (!list.length) return true;
+  return list.every(m => !!resultFor(m.id));
+}
+function activeRoundName() {
+  for (const r of ROUND_ORDER) {
+    if (!isRoundComplete(r)) return r;
+  }
+  return "Final";
+}
+function matchesForActiveRound() {
+  applyCrossings();
+  const round = activeRoundName();
+  return MATCHES.filter(m => m.group === round).sort((a,b)=>new Date(a.start)-new Date(b.start));
+}
+function stakeForMatch(match) {
+  if (!match) return stakeAmount || 100;
+  return Number(roundStakes[match.group] ?? stakeAmount ?? 100);
+}
+function activeRoundStatusText() {
+  const round = activeRoundName();
+  const list = MATCHES.filter(m => m.group === round);
+  const done = list.filter(m => !!resultFor(m.id)).length;
+  return `${round}: ${done}/${list.length} finalizados`;
+}
 let apiLastSync = localStorage.getItem("apiLastSync") || "";
 let apiLastStatus = localStorage.getItem("apiLastStatus") || "Pendiente";
 let lastApiCount = localStorage.getItem("lastApiCount") || "0";
@@ -411,9 +443,7 @@ function knockoutStatusText() {
 
 function isStartedOrFinished(m) { return Date.now() >= new Date(m.start).getTime() || !!resultFor(m.id); }
 function visibleMatches() {
-  applyCrossings();
-  const pending = MATCHES.filter(m => !isStartedOrFinished(m));
-  return (pending.length ? pending : MATCHES).sort((a,b) => new Date(a.start) - new Date(b.start));
+  return matchesForActiveRound();
 }
 function groupsByDate() {
   const groups = {};
@@ -487,7 +517,7 @@ function renderSelectedMatch() {
   $("selectedMatchBox").innerHTML = `
     <div class="selected-match">
       <div class="teams-line">${teamWithFlag(m.homeKey)} vs ${teamWithFlag(m.awayKey)}</div>
-      <div class="match-meta">🗓️ ${dateLong(m.start)} · 🕒 ${timeJst(m.start)} JST<br>${m.group}</div>
+      <div class="match-meta">🗓️ ${dateLong(m.start)} · 🕒 ${timeJst(m.start)} JST<br>${m.group} · Apuesta: ¥${stakeForMatch(m)}</div>
       ${r ? `<span class="result-badge">Resultado final: ${r.home} - ${r.away}</span>` : `<div id="selectedCountdown" class="countdown">${countdownText(m)}</div>`}
       ${locked ? `<div class="locked">🔒 Apuesta cerrada</div>` : `<div class="score"><input id="selected_home" type="number" inputmode="numeric" pattern="[0-9]*" min="0" autocomplete="off" placeholder="0" oninput="saveDraftScore()" value="${draft ? draft.home : (saved ? saved.predictedHome : "")}"><span>-</span><input id="selected_away" type="number" inputmode="numeric" pattern="[0-9]*" min="0" autocomplete="off" placeholder="0" oninput="saveDraftScore()" value="${draft ? draft.away : (saved ? saved.predictedAway : "")}"></div>`}
     </div>`;
@@ -499,7 +529,7 @@ function renderRanking() {
   const preds = predictionsCache.filter(p => String(p.matchId) === String(m.id));
   const r = resultFor(m.id);
   const ranked = preds.map(p => ({...p, points:scorePoints(p,r)})).sort((a,b)=>b.points-a.points || String(a.playerName).localeCompare(String(b.playerName)));
-  $("potBox").textContent = `¥${preds.length * stakeAmount}`;
+  $("potBox").textContent = `¥${preds.length * stakeForMatch(m)}`;
   $("matchParticipantsSummary").textContent = `${preds.length} participantes`;
   const list = $("matchParticipantsList");
   if (list) {
@@ -530,7 +560,7 @@ function updateAdminSystemStatus() {
   const crosses = knockoutStatusText();
   box.innerHTML = `
     <div class="system-grid">
-      <div><b>Versión</b><br>v18.0</div>
+      <div><b>Versión</b><br>v18.1</div>
       <div><b>API</b><br>${apiLastStatus}</div>
       <div><b>Última sync</b><br>${apiLastSync || "Pendiente"}</div>
       <div><b>Resultados API</b><br>${lastApiCount}</div>
@@ -563,7 +593,7 @@ function renderAll() {
     renderSelectedMatch();
     renderRanking();
     $("welcomeText").textContent = currentPlayerName ? `Bienvenido, ${currentPlayerName}!` : "";
-    $("dataStatus").textContent = `✅ Torneo listo · ${visibleMatches().length} partidos pendientes · apuesta ¥${stakeAmount} · ${knockoutStatusText()} · v18.0`;
+    $("dataStatus").textContent = `✅ ${activeRoundStatusText()} · apuesta ¥${stakeForMatch(selectedMatch())} · ${knockoutStatusText()} · v18.1`;
     updateAdminSystemStatus();
   } catch(e) {
     console.error(e);
@@ -635,6 +665,31 @@ window.setQuickStakeAmount = async function(value) {
   updateAdminSystemStatus();
 };
 
+
+window.saveRoundStake = async function(roundName, inputId) {
+  const input = document.getElementById(inputId);
+  const value = Number(input?.value || roundStakes[roundName] || 300);
+  if (!value || value < 0) {
+    showAdminMessage("⚠️ Ingresa un monto válido.");
+    return;
+  }
+  roundStakes[roundName] = value;
+  stakeAmount = value;
+  await setDoc(doc(db,"settings","app"), { stakeAmount:value, roundStakes, updatedAt:serverTimestamp() }, { merge:true });
+  showAdminMessage(`✅ ${roundName} actualizado a ¥${value}`);
+  renderAll();
+};
+
+window.setR32Stake300 = async function() {
+  roundStakes["Ronda de 32"] = 300;
+  stakeAmount = 300;
+  const input = document.getElementById("stakeR32"); if (input) input.value = 300;
+  const main = document.getElementById("stakeAmount"); if (main) main.value = 300;
+  await setDoc(doc(db,"settings","app"), { stakeAmount:300, roundStakes, updatedAt:serverTimestamp() }, { merge:true });
+  showAdminMessage("✅ Ronda de 32 configurada a ¥300 por apuesta.");
+  renderAll();
+};
+
 window.syncResultsFromApi = async function() {
   showAdminMessage("⏳ Sincronizando API...");
   try {
@@ -662,14 +717,26 @@ window.rebuildKnockoutCrossings = function() { renderAll(); $("adminStatus").tex
 async function loadSettings() {
   try {
     const s = await getDoc(doc(db,"settings","app"));
-    if (s.exists() && s.data().stakeAmount != null) stakeAmount = Number(s.data().stakeAmount) || 100;
+    if (s.exists()) {
+    const data = s.data();
+    if (data.stakeAmount != null) stakeAmount = Number(data.stakeAmount) || 100;
+    if (data.roundStakes) roundStakes = { ...DEFAULT_ROUND_STAKES, ...data.roundStakes };
+  }
     if ($("stakeAmount")) $("stakeAmount").value = stakeAmount;
+  const r32Input = document.getElementById("stakeR32"); if (r32Input) r32Input.value = roundStakes["Ronda de 32"];
   } catch(e) {}
 }
 function listenFirebase() {
   onSnapshot(collection(db,"predictions"), snap => { predictionsCache = snap.docs.map(d=>d.data()); renderAll(); });
   onSnapshot(collection(db,"results"), snap => { resultsCache = {}; snap.docs.forEach(d => resultsCache[String(d.id)] = d.data()); renderAll(); });
-  onSnapshot(doc(db,"settings","app"), snap => { if (snap.exists() && snap.data().stakeAmount != null) { stakeAmount=Number(snap.data().stakeAmount)||100; if($("stakeAmount")) $("stakeAmount").value=stakeAmount; renderAll(); } });
+  onSnapshot(doc(db,"settings","app"), snap => { if (snap.exists()) {
+    const data = snap.data();
+    if (data.stakeAmount != null) stakeAmount=Number(data.stakeAmount)||100;
+    if (data.roundStakes) roundStakes = { ...DEFAULT_ROUND_STAKES, ...data.roundStakes };
+    if($("stakeAmount")) $("stakeAmount").value=stakeAmount;
+    const r32 = document.getElementById("stakeR32"); if (r32) r32.value = roundStakes["Ronda de 32"];
+    renderAll();
+  } });
 }
 
 document.addEventListener("DOMContentLoaded", async () => {

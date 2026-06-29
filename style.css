@@ -336,3 +336,7 @@ button{touch-action:manipulation}
 .system-grid div{background:rgba(255,255,255,.09);border-radius:12px;padding:10px;font-size:13px}
 .admin-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .admin-actions button{padding:10px 14px;border-radius:12px;font-weight:900}
+
+/* v18.1 keep R32 visible + 300 yen */
+.admin-r32-box{background:rgba(255,210,74,.12);border:1px solid rgba(255,210,74,.35);border-radius:16px;padding:14px;margin:12px 0}
+.admin-r32-box button{padding:10px 14px;border-radius:12px;font-weight:900;margin:4px}

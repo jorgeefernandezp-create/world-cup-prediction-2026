@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>World Cup Prediction 2026</title>
-  <link rel="stylesheet" href="style.css?v=18final" />
+  <link rel="stylesheet" href="style.css?v=181r32" />
 </head>
 <body>
   <div id="confettiLayer"></div>
@@ -84,6 +84,17 @@
         </div>
       </div>
 
+      
+      <div class="admin-r32-box">
+        <h3>🏆 Monto Ronda de 32 / 16avos</h3>
+        <p class="small-note">Los partidos de 16avos permanecen visibles hasta que termine toda la ronda.</p>
+        <button type="button" onclick="setR32Stake300()">Fijar Ronda de 32 en ¥300</button>
+        <div class="stake-manual">
+          <input id="stakeR32" type="number" inputmode="numeric" min="0" step="100" placeholder="300">
+          <button type="button" onclick="saveRoundStake('Ronda de 32','stakeR32')">Guardar Ronda de 32</button>
+        </div>
+      </div>
+
       <div class="admin-stake-box">
         <h3>💴 Monto de apuesta</h3>
         <div class="stake-buttons">
@@ -118,6 +129,6 @@
     <a href="#potTitle">👥<span>Lista</span></a>
   </nav>
 
-  <script type="module" src="app.js?v=18final"></script>
+  <script type="module" src="app.js?v=181r32"></script>
 </body>
 </html>

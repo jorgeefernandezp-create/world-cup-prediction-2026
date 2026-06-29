@@ -1,26 +1,12 @@
-WORLD CUP PREDICTION 2026 - VERSION 18.0 FINAL TOURNAMENT ENGINE
+WORLD CUP PREDICTION 2026 - VERSION 18.1 R32 VISIBLE + 300 YEN
 
-VERSIÓN DEFINITIVA:
-- Mantiene todo lo bueno de v17.1.
-- Motor de torneo más robusto.
-- Ganadores avanzan automáticamente desde resultados guardados en Firebase.
-- Si cambia un resultado, el cuadro se reconstruye.
-- Admin puede cambiar monto de apuesta:
-  ¥100, ¥200, ¥500, ¥1000 o monto manual.
-- Admin tiene panel de estado:
-  API, última sincronización, resultados, cruces, partidos pendientes y apuesta actual.
-- Botón "Sincronizar API ahora".
-- Botón "Reconstruir torneo".
-
-MANTIENE:
-- Equipos reales de Ronda de 32.
-- Cuenta regresiva.
-- Bloqueo automático.
-- Participantes.
-- Ganador de apuesta.
-- Puntos.
-- Firebase.
-- API football-data.org.
+CAMBIOS:
+- Mantiene todos los partidos de Ronda de 32 visibles hasta que termine toda la ronda.
+- Los partidos finalizados siguen visibles con resultado y ganador.
+- Brasil vs Japón y todos los 16avos quedan a ¥300 por apuesta.
+- Las apuestas existentes NO se borran.
+- El pozo se recalcula con ¥300 por participante.
+- Admin puede fijar Ronda de 32 en ¥300.
 
 SUBIR:
 api
@@ -35,7 +21,7 @@ NO SUBIR:
 package.json
 
 PROBAR:
-https://world-cup-prediction-2026-26ej.vercel.app/?v=18final
+https://world-cup-prediction-2026-26ej.vercel.app/?v=181r32
 
 ADMIN:
-https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=18final
+https://world-cup-prediction-2026-26ej.vercel.app/?admin=jorge&v=181r32
