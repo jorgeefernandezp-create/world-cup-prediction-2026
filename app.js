@@ -1,4 +1,4 @@
-const APP_VERSION = "18.4-admin-language-fix";
+const APP_VERSION = "18.5-full-language-fix";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
@@ -472,7 +472,7 @@ function msToCountdown(ms) {
 }
 function countdownText(m) {
   const diff = new Date(m.start).getTime() - Date.now();
-  return diff <= 0 ? "🔒 Apuesta cerrada" : `Cierra en ${msToCountdown(diff)}`;
+  return diff <= 0 ? tr("betClosed") : `${tr("closesIn")} ${msToCountdown(diff)}`;
 }
 function scorePoints(p,r) {
   if (!r) return 0;
@@ -517,8 +517,8 @@ function renderSelectedMatch() {
   $("selectedMatchBox").innerHTML = `
     <div class="selected-match">
       <div class="teams-line">${teamWithFlag(m.homeKey)} vs ${teamWithFlag(m.awayKey)}</div>
-      <div class="match-meta">🗓️ ${dateLong(m.start)} · 🕒 ${timeJst(m.start)} JST<br>${m.group} · Apuesta: ¥${stakeForMatch(m)}</div>
-      ${r ? `<span class="result-badge">Resultado final: ${r.home} - ${r.away}</span><div class="winner-final">${winnerTextForMatch(m)}</div><div class="poll-winner-final">${pollWinnerText(m)}</div>` : `<div id="selectedCountdown" class="countdown">${countdownText(m)}</div>`}
+      <div class="match-meta">🗓️ ${dateLong(m.start)} · 🕒 ${timeJst(m.start)} JST<br>${m.group} · ${tr("bet")}: ¥${stakeForMatch(m)}</div>
+      ${r ? `<span class="result-badge">${tr("finalResult")}: ${r.home} - ${r.away}</span><div class="winner-final">${winnerTextForMatch(m)}</div><div class="poll-winner-final">${pollWinnerText(m)}</div>` : `<div id="selectedCountdown" class="countdown">${countdownText(m)}</div>`}
       ${locked ? `<div class="locked">🔒 Apuesta cerrada</div>` : `<div class="score"><input id="selected_home" type="number" inputmode="numeric" pattern="[0-9]*" min="0" autocomplete="off" placeholder="0" oninput="saveDraftScore()" value="${draft ? draft.home : (saved ? saved.predictedHome : "")}"><span>-</span><input id="selected_away" type="number" inputmode="numeric" pattern="[0-9]*" min="0" autocomplete="off" placeholder="0" oninput="saveDraftScore()" value="${draft ? draft.away : (saved ? saved.predictedAway : "")}"></div>`}
     </div>`;
 }
@@ -536,7 +536,7 @@ function renderRanking() {
     list.style.display = participantsOpen ? "block" : "none";
     list.innerHTML = preds.length ? preds.map(p => `<div class="participant-row">${p.playerName}: ${p.predictedHome}-${p.predictedAway}</div>`).join("") : `<div class="participant-row">Aún no hay participantes.</div>`;
   }
-  if (!r) $("winnerBox").textContent = "Aún no hay resultado final.";
+  if (!r) $("winnerBox").textContent = tr("noFinal");
   else $("winnerBox").innerHTML = pollWinnerText(m);
   $("matchRankingBody").innerHTML = ranked.map((p,i)=>`<tr><td>${i+1}</td><td>${p.playerName}</td><td>${p.predictedHome} - ${p.predictedAway}</td><td>${p.points}</td></tr>`).join("");
 }
@@ -545,6 +545,7 @@ function renderRanking() {
 // ===== V18: MOTOR FINAL DEL TORNEO Y ESTADO ADMIN =====
 function rebuildTournamentFromResults() {
   applyCrossings();
+  applyLanguageLabels();
   applyLanguageLabels();
   renderAll();
   updateAdminSystemStatus();
@@ -558,7 +559,7 @@ function updateAdminSystemStatus() {
   const crosses = knockoutStatusText();
   box.innerHTML = `
     <div class="system-grid">
-      <div><b>Versión</b><br>v18.4</div>
+      <div><b>Versión</b><br>v18.5</div>
       <div><b>API</b><br>${apiLastStatus}</div>
       <div><b>Última sync</b><br>${apiLastSync || "Pendiente"}</div>
       <div><b>Resultados API</b><br>${lastApiCount}</div>
@@ -614,29 +615,29 @@ async function saveApiResultsToFirebase(apiData) {
 function winnerTextForMatch(match) {
   const r = resultFor(match.id);
   if (!r) return "";
-  if (r.home > r.away) return `🏆 Ganador: ${teamName(match.homeKey)}`;
-  if (r.away > r.home) return `🏆 Ganador: ${teamName(match.awayKey)}`;
+  if (r.home > r.away) return `${tr("matchWinner")}: ${teamName(match.homeKey)}`;
+  if (r.away > r.home) return `${tr("matchWinner")}: ${teamName(match.awayKey)}`;
   const raw = r.raw || {};
   const hp = raw.homePenalty ?? raw.homePenalties ?? raw.penaltyHome;
   const ap = raw.awayPenalty ?? raw.awayPenalties ?? raw.penaltyAway;
   if (hp != null && ap != null) {
-    if (Number(hp) > Number(ap)) return `🏆 Ganador: ${teamName(match.homeKey)} (penales)`;
-    if (Number(ap) > Number(hp)) return `🏆 Ganador: ${teamName(match.awayKey)} (penales)`;
+    if (Number(hp) > Number(ap)) return `${tr("matchWinner")}: ${teamName(match.homeKey)} (PK)`;
+    if (Number(ap) > Number(hp)) return `${tr("matchWinner")}: ${teamName(match.awayKey)} (PK)`;
   }
   return "Empate";
 }
 
 function pollWinnerText(match) {
   const r = resultFor(match.id);
-  if (!r) return "Aún no hay resultado final.";
+  if (!r) return tr("noFinal");
   const preds = predictionsCache.filter(p => String(p.matchId) === String(match.id));
-  if (!preds.length) return "Sin participantes.";
+  if (!preds.length) return tr("noParticipants");
   const ranked = preds.map(p => ({ ...p, points: scorePoints(p, r) }))
     .sort((a,b) => b.points - a.points || String(a.playerName).localeCompare(String(b.playerName)));
   const top = ranked[0]?.points || 0;
-  if (top <= 0) return "Sin ganador con puntos.";
+  if (top <= 0) return tr("noPoints");
   const winners = ranked.filter(p => p.points === top);
-  return `🏆 Ganador de la polla: ${winners.map(w => w.playerName).join(", ")} (${top} pts)`;
+  return `${tr("pollWinner")}: ${winners.map(w => w.playerName).join(", ")} (${top} pts)`;
 }
 
 function renderAll() {
@@ -646,8 +647,8 @@ function renderAll() {
     renderTabs();
     renderSelectedMatch();
     renderRanking();
-    $("welcomeText").textContent = currentPlayerName ? `Bienvenido, ${currentPlayerName}!` : "";
-    $("dataStatus").textContent = `✅ ${activeRoundStatusText()} · apuesta ¥${stakeForMatch(selectedMatch())} · ${knockoutStatusText()} · v18.4`;
+    $("welcomeText").textContent = currentPlayerName ? `${tr("welcome")}, ${currentPlayerName}!` : "";
+    $("dataStatus").textContent = `✅ ${tr("teamsLoaded")} · ${visibleMatches().length} ${tr("pendingMatches")} · ${tr("bet")} ¥${stakeForMatch(selectedMatch())} · ${knockoutStatusText()} · v18.5`;
     updateAdminSystemStatus();
   } catch(e) {
     console.error(e);
@@ -677,17 +678,17 @@ window.saveDraftScore = function() {
 };
 window.saveSelectedPrediction = async function() {
   const m=selectedMatch();
-  if (!currentPlayerName) { $("predictionStatus").textContent="⚠️ Primero ingresa tu nombre."; return; }
-  if (isStartedOrFinished(m)) { $("predictionStatus").textContent="🔒 La apuesta ya está cerrada."; return; }
+  if (!currentPlayerName) { $("predictionStatus").textContent=tr("nameRequired"); return; }
+  if (isStartedOrFinished(m)) { $("predictionStatus").textContent=tr("closedBet"); return; }
   const h=$("selected_home")?.value, a=$("selected_away")?.value;
-  if (h==="" || a==="") { $("predictionStatus").textContent="⚠️ Completa el marcador."; return; }
+  if (h==="" || a==="") { $("predictionStatus").textContent=tr("completeScore"); return; }
   const playerId=safeId(currentPlayerName);
   await setDoc(doc(db,"predictions",`${playerId}_${m.id}`), {
     playerId, playerName:currentPlayerName, matchId:m.id, homeKey:m.homeKey, awayKey:m.awayKey,
     predictedHome:Number(h), predictedAway:Number(a), updatedAt:serverTimestamp()
   }, { merge:true });
   delete localDraftScores[String(m.id)];
-  $("predictionStatus").textContent="✅ Pronóstico guardado.";
+  $("predictionStatus").textContent=tr("predictionSaved");
 };
 window.toggleParticipants = function() { participantsOpen=!participantsOpen; renderRanking(); };
 window.saveStakeAmount = async function() {
@@ -735,7 +736,7 @@ window.setR32Stake300 = async function() {
 };
 
 window.syncResultsFromApi = async function() {
-  showAdminMessage("⏳ Sincronizando API...");
+  showAdminMessage(tr("apiSyncing"));
   try {
     const r = await fetch("/api/sync-results?v=182", { cache: "no-store" });
     const data = await r.json();
@@ -745,17 +746,17 @@ window.syncResultsFromApi = async function() {
 
     if (data.ok) {
       saveApiState("🟢 OK", count);
-      showAdminMessage(`✅ API sincronizada. Resultados guardados: ${count}`);
+      showAdminMessage(`${tr("apiSaved")}: ${count}`);
     } else {
       saveApiState("🟡 Sin cambios", count);
-      showAdminMessage("⚠️ API respondió sin resultados nuevos.");
+      showAdminMessage(tr("apiNoChange"));
     }
 
     rebuildTournamentFromResults();
   } catch(e) {
     console.warn(e);
     saveApiState("🔴 Error", 0);
-    showAdminMessage("⚠️ No se pudo sincronizar API.");
+    showAdminMessage(tr("apiError"));
   }
 };
 window.syncOpenFootball = window.syncResultsFromApi;
@@ -823,7 +824,7 @@ window.forceSetR32To300 = async function() {
   }, { merge: true });
 
   const status = document.getElementById("adminStatus");
-  if (status) status.textContent = "✅ Ronda de 32 fijada a ¥300.";
+  if (status) status.textContent = tr("r32Set");
   renderAll();
 };
 
@@ -838,101 +839,193 @@ window.adminRebuildNow = function() {
 };
 
 
-// ===== V18.4 LANGUAGE FIX =====
+
+// ===== V18.5 FULL PAGE LANGUAGE FIX =====
 const UI_LANG = {
   es: {
-    title: "Polla Mundial 2026",
-    enter: "Ingresar",
-    namePlaceholder: "Tu nombre",
-    savePrediction: "Guardar pronóstico",
-    participants: "Participantes",
-    rules: "Reglas",
-    exact: "Marcador exacto",
-    winner: "Ganador/empate correcto",
-    fail: "Fallo",
-    pot: "Pozo",
-    admin: "Panel administrador"
+    title:"Polla Mundial 2026", subtitle:"Marca tu score antes de que empiece el partido.",
+    enter:"Ingresar", namePlaceholder:"Tu nombre", welcome:"Bienvenido",
+    savePrediction:"Guardar pronóstico", participants:"Participantes", participantsEmpty:"Aún no hay participantes.",
+    rules:"Reglas", exact:"Marcador exacto", correctWinner:"Ganador/empate correcto", fail:"Fallo",
+    pot:"Pozo", predictionSaved:tr("predictionSaved"), nameRequired:tr("nameRequired"),
+    completeScore:tr("completeScore"), closedBet:tr("closedBet"),
+    finalResult:"Resultado final", matchWinner:"Ganador", pollWinner:"Ganador de la polla",
+    noFinal:tr("noFinal"), noPoints:tr("noPoints"), noParticipants:tr("noParticipants"),
+    closesIn:"Cierra en", betClosed:tr("betClosed"), bet:"Apuesta", admin:"Panel administrador",
+    quickControl:"Control rápido", syncApi:"Sincronizar API ahora", rebuild:"Reconstruir torneo",
+    setR32:"Fijar 16avos en ¥300", r32Amount:"Monto Ronda de 32 / 16avos",
+    r32Note:"Las apuestas existentes se mantienen. Solo cambia el monto para calcular el pozo.",
+    saveR32:"Guardar Ronda de 32", generalAmount:"Monto general", saveAmount:"Guardar monto",
+    systemReady:"Torneo listo", teamsLoaded:"Equipos cargados", apiSyncing:tr("apiSyncing"),
+    apiSaved:"✅ API sincronizada. Resultados guardados", apiNoChange:tr("apiNoChange"),
+    apiError:tr("apiError"), r32Set:tr("r32Set"),
+    exactPoints:"+5", winnerPoints:"+3", failPoints:"0", finalized:"finalizados",
+    pendingMatches:"partidos pendientes", crosses:"cruces aplicados"
   },
   ja: {
-    title: "ワールドカップ予想 2026",
-    enter: "入る",
-    namePlaceholder: "名前",
-    savePrediction: "予想を保存",
-    participants: "参加者",
-    rules: "ルール",
-    exact: "スコア的中",
-    winner: "勝敗/引き分け的中",
-    fail: "はずれ",
-    pot: "賞金",
-    admin: "管理パネル"
+    title:"ワールドカップ予想 2026", subtitle:"試合開始前にスコアを入力してください。",
+    enter:"入る", namePlaceholder:"名前", welcome:"ようこそ",
+    savePrediction:"予想を保存", participants:"参加者", participantsEmpty:"まだ参加者はいません。",
+    rules:"ルール", exact:"スコア完全的中", correctWinner:"勝敗/引き分け的中", fail:"不的中",
+    pot:"賞金", predictionSaved:"✅ 予想を保存しました。", nameRequired:"⚠️ 先に名前を入力してください。",
+    completeScore:"⚠️ スコアを入力してください。", closedBet:"🔒 この試合の予想受付は終了しました。",
+    finalResult:"最終スコア", matchWinner:"勝者", pollWinner:"賭けの勝者",
+    noFinal:"まだ最終結果はありません。", noPoints:"ポイント獲得者はいません。", noParticipants:"参加者はいません。",
+    closesIn:"締切まで", betClosed:"🔒 受付終了", bet:"参加費", admin:"管理パネル",
+    quickControl:"クイック操作", syncApi:"APIを今すぐ同期", rebuild:"トーナメント再計算",
+    setR32:"ベスト32を¥300に設定", r32Amount:"ベスト32 / 16強前の参加費",
+    r32Note:"既存の予想はそのままです。賞金計算の金額だけ変更します。",
+    saveR32:"ベスト32の金額を保存", generalAmount:"基本参加費", saveAmount:"金額を保存",
+    systemReady:"トーナメント準備完了", teamsLoaded:"チーム読み込み完了", apiSyncing:"⏳ API同期中...",
+    apiSaved:"✅ API同期完了。保存した結果", apiNoChange:"⚠️ APIに新しい結果はありません。",
+    apiError:"⚠️ APIを同期できませんでした。", r32Set:"✅ ベスト32を¥300に設定しました。",
+    exactPoints:"+5", winnerPoints:"+3", failPoints:"0", finalized:"試合終了",
+    pendingMatches:"試合予定", crosses:"組み合わせ反映"
   },
   en: {
-    title: "World Cup Prediction 2026",
-    enter: "Enter",
-    namePlaceholder: "Your name",
-    savePrediction: "Save prediction",
-    participants: "Participants",
-    rules: "Rules",
-    exact: "Exact score",
-    winner: "Correct winner/draw",
-    fail: "Miss",
-    pot: "Pot",
-    admin: "Admin panel"
+    title:"World Cup Prediction 2026", subtitle:"Enter your score before the match starts.",
+    enter:"Enter", namePlaceholder:"Your name", welcome:"Welcome",
+    savePrediction:"Save prediction", participants:"Participants", participantsEmpty:"No participants yet.",
+    rules:"Rules", exact:"Exact score", correctWinner:"Correct winner/draw", fail:"Miss",
+    pot:"Pot", predictionSaved:"✅ Prediction saved.", nameRequired:"⚠️ Enter your name first.",
+    completeScore:"⚠️ Complete the score.", closedBet:"🔒 Betting is closed for this match.",
+    finalResult:"Final score", matchWinner:"Winner", pollWinner:"Pool winner",
+    noFinal:"No final result yet.", noPoints:"No winner with points.", noParticipants:"No participants.",
+    closesIn:"Closes in", betClosed:"🔒 Betting closed", bet:"Bet", admin:"Admin panel",
+    quickControl:"Quick control", syncApi:"Sync API now", rebuild:"Rebuild tournament",
+    setR32:"Set Round of 32 to ¥300", r32Amount:"Round of 32 amount",
+    r32Note:"Existing predictions stay. Only the pot amount changes.",
+    saveR32:"Save Round of 32", generalAmount:"General amount", saveAmount:"Save amount",
+    systemReady:"Tournament ready", teamsLoaded:"Teams loaded", apiSyncing:"⏳ Syncing API...",
+    apiSaved:"✅ API synced. Results saved", apiNoChange:"⚠️ API returned no new results.",
+    apiError:"⚠️ Could not sync API.", r32Set:"✅ Round of 32 set to ¥300.",
+    exactPoints:"+5", winnerPoints:"+3", failPoints:"0", finalized:"finalized",
+    pendingMatches:"pending matches", crosses:"crosses applied"
   },
   pt: {
-    title: "Bolão Copa do Mundo 2026",
-    enter: "Entrar",
-    namePlaceholder: "Seu nome",
-    savePrediction: "Salvar palpite",
-    participants: "Participantes",
-    rules: "Regras",
-    exact: "Placar exato",
-    winner: "Vencedor/empate correto",
-    fail: "Erro",
-    pot: "Prêmio",
-    admin: "Painel admin"
+    title:"Bolão Copa do Mundo 2026", subtitle:"Marque seu placar antes do jogo começar.",
+    enter:"Entrar", namePlaceholder:"Seu nome", welcome:"Bem-vindo",
+    savePrediction:"Salvar palpite", participants:"Participantes", participantsEmpty:"Ainda não há participantes.",
+    rules:"Regras", exact:"Placar exato", correctWinner:"Vencedor/empate correto", fail:"Erro",
+    pot:"Prêmio", predictionSaved:"✅ Palpite salvo.", nameRequired:"⚠️ Primeiro digite seu nome.",
+    completeScore:"⚠️ Complete o placar.", closedBet:"🔒 A aposta já está fechada para este jogo.",
+    finalResult:"Resultado final", matchWinner:"Vencedor", pollWinner:"Vencedor do bolão",
+    noFinal:"Ainda não há resultado final.", noPoints:"Sem vencedor com pontos.", noParticipants:"Sem participantes.",
+    closesIn:"Fecha em", betClosed:"🔒 Aposta fechada", bet:"Aposta", admin:"Painel admin",
+    quickControl:"Controle rápido", syncApi:"Sincronizar API agora", rebuild:"Reconstruir torneio",
+    setR32:"Fixar 16avos em ¥300", r32Amount:"Valor Rodada de 32 / 16avos",
+    r32Note:"Os palpites existentes continuam. Só muda o valor para calcular o prêmio.",
+    saveR32:"Salvar Rodada de 32", generalAmount:"Valor geral", saveAmount:"Salvar valor",
+    systemReady:"Torneio pronto", teamsLoaded:"Times carregados", apiSyncing:tr("apiSyncing"),
+    apiSaved:"✅ API sincronizada. Resultados salvos", apiNoChange:"⚠️ API sem novos resultados.",
+    apiError:"⚠️ Não foi possível sincronizar a API.", r32Set:"✅ Rodada de 32 fixada em ¥300.",
+    exactPoints:"+5", winnerPoints:"+3", failPoints:"0", finalized:"finalizados",
+    pendingMatches:"jogos pendentes", crosses:"cruzamentos aplicados"
   }
 };
 
 let currentLang = localStorage.getItem("currentLang") || "es";
+function tr(key) { return (UI_LANG[currentLang] && UI_LANG[currentLang][key]) || UI_LANG.es[key] || key; }
+
+const TEAM_NAMES_I18N = {
+  Japan:{es:"Japón",ja:"日本",en:"Japan",pt:"Japão"},
+  Brazil:{es:"Brasil",ja:"ブラジル",en:"Brazil",pt:"Brasil"},
+  Germany:{es:"Alemania",ja:"ドイツ",en:"Germany",pt:"Alemanha"},
+  Sweden:{es:"Suecia",ja:"スウェーデン",en:"Sweden",pt:"Suécia"},
+  France:{es:"Francia",ja:"フランス",en:"France",pt:"França"},
+  Tunisia:{es:"Túnez",ja:"チュニジア",en:"Tunisia",pt:"Tunísia"},
+  Canada:{es:"Canadá",ja:"カナダ",en:"Canada",pt:"Canadá"},
+  "South Africa":{es:"Sudáfrica",ja:"南アフリカ",en:"South Africa",pt:"África do Sul"},
+  Netherlands:{es:"Países Bajos",ja:"オランダ",en:"Netherlands",pt:"Países Baixos"},
+  Morocco:{es:"Marruecos",ja:"モロッコ",en:"Morocco",pt:"Marrocos"},
+  "Ivory Coast":{es:"Costa de Marfil",ja:"コートジボワール",en:"Ivory Coast",pt:"Costa do Marfim"},
+  Norway:{es:"Noruega",ja:"ノルウェー",en:"Norway",pt:"Noruega"},
+  Mexico:{es:"México",ja:"メキシコ",en:"Mexico",pt:"México"},
+  "Saudi Arabia":{es:"Arabia Saudita",ja:"サウジアラビア",en:"Saudi Arabia",pt:"Arábia Saudita"},
+  England:{es:"Inglaterra",ja:"イングランド",en:"England",pt:"Inglaterra"},
+  Austria:{es:"Austria",ja:"オーストリア",en:"Austria",pt:"Áustria"},
+  Belgium:{es:"Bélgica",ja:"ベルギー",en:"Belgium",pt:"Bélgica"},
+  Uruguay:{es:"Uruguay",ja:"ウルグアイ",en:"Uruguay",pt:"Uruguai"},
+  "United States":{es:"Estados Unidos",ja:"アメリカ",en:"United States",pt:"Estados Unidos"},
+  "Bosnia and Herzegovina":{es:"Bosnia y Herzegovina",ja:"ボスニア・ヘルツェゴビナ",en:"Bosnia and Herzegovina",pt:"Bósnia e Herzegovina"},
+  Spain:{es:"España",ja:"スペイン",en:"Spain",pt:"Espanha"},
+  Colombia:{es:"Colombia",ja:"コロンビア",en:"Colombia",pt:"Colômbia"},
+  Croatia:{es:"Croacia",ja:"クロアチア",en:"Croatia",pt:"Croácia"},
+  Switzerland:{es:"Suiza",ja:"スイス",en:"Switzerland",pt:"Suíça"},
+  Algeria:{es:"Argelia",ja:"アルジェリア",en:"Algeria",pt:"Argélia"},
+  Australia:{es:"Australia",ja:"オーストラリア",en:"Australia",pt:"Austrália"},
+  Egypt:{es:"Egipto",ja:"エジプト",en:"Egypt",pt:"Egito"},
+  Argentina:{es:"Argentina",ja:"アルゼンチン",en:"Argentina",pt:"Argentina"},
+  "Cape Verde":{es:"Cabo Verde",ja:"カーボベルデ",en:"Cape Verde",pt:"Cabo Verde"},
+  Portugal:{es:"Portugal",ja:"ポルトガル",en:"Portugal",pt:"Portugal"}
+};
+
+function teamName(k) {
+  if (TEAM_NAMES_I18N[k] && TEAM_NAMES_I18N[k][currentLang]) return TEAM_NAMES_I18N[k][currentLang];
+  return (TEAM_ES && TEAM_ES[k]) || k || "Por definir";
+}
 
 function applyLanguageLabels() {
-  const t = UI_LANG[currentLang] || UI_LANG.es;
   document.documentElement.lang = currentLang;
-  document.querySelectorAll(".langs button, .language-btn").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".langs button, .language-switcher button").forEach(b => b.classList.remove("active"));
   const active = document.getElementById("btn-" + currentLang);
   if (active) active.classList.add("active");
 
-  const title = document.querySelector("[data-i18n='title'], .app-title, h1");
-  if (title) title.textContent = t.title;
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.getAttribute("data-i18n");
+    if (tr(key)) el.textContent = tr(key);
+  });
+
+  const h1 = document.querySelector("h1");
+  if (h1) h1.textContent = tr("title");
+  const subtitle = document.querySelector(".subtitle, .hero-subtitle");
+  if (subtitle) subtitle.textContent = tr("subtitle");
 
   const nameInput = document.getElementById("playerName");
-  if (nameInput) nameInput.placeholder = t.namePlaceholder;
+  if (nameInput) nameInput.placeholder = tr("namePlaceholder");
 
-  const enterBtn = document.querySelector("[onclick='enterGame()']");
-  if (enterBtn) enterBtn.textContent = t.enter;
+  const enterBtn = document.querySelector("button[onclick='enterGame()']");
+  if (enterBtn) enterBtn.textContent = tr("enter");
 
-  const saveBtn = document.querySelector("[onclick='saveSelectedPrediction()']");
-  if (saveBtn) saveBtn.textContent = t.savePrediction;
+  const saveBtn = document.querySelector("button[onclick='saveSelectedPrediction()']");
+  if (saveBtn) saveBtn.textContent = tr("savePrediction");
 
-  const participantsBtn = document.querySelector("[onclick='toggleParticipants()']");
-  if (participantsBtn) participantsBtn.textContent = t.participants;
-
-  const rulesTitle = document.querySelector(".rules-card h2");
-  if (rulesTitle) rulesTitle.textContent = "📌 " + t.rules;
+  const participantsBtn = document.querySelector("button[onclick='toggleParticipants()']");
+  if (participantsBtn) participantsBtn.textContent = tr("participants");
 
   const adminTitle = document.querySelector("#adminPanel h2");
-  if (adminTitle) adminTitle.textContent = "🔐 " + t.admin;
+  if (adminTitle) adminTitle.textContent = "🔐 " + tr("admin");
 
-  const potLabel = document.querySelector("[data-i18n='pot']");
-  if (potLabel) potLabel.textContent = t.pot;
+  const syncBtn = document.querySelector("button[onclick='adminSyncApiNow()']");
+  if (syncBtn) syncBtn.textContent = tr("syncApi");
+  const rebuildBtn = document.querySelector("button[onclick='adminRebuildNow()']");
+  if (rebuildBtn) rebuildBtn.textContent = tr("rebuild");
+  const setR32Btn = document.querySelector("button[onclick='forceSetR32To300()']");
+  if (setR32Btn) setR32Btn.textContent = tr("setR32");
+
+  const r32Title = document.querySelector(".admin-r32-box h3");
+  if (r32Title) r32Title.textContent = "🏆 " + tr("r32Amount");
+  const r32Note = document.querySelector(".admin-r32-box .small-note");
+  if (r32Note) r32Note.textContent = tr("r32Note");
+
+  const saveR32 = document.querySelector("button[onclick*='saveRoundStake']");
+  if (saveR32) saveR32.textContent = tr("saveR32");
+  const saveAmount = document.querySelector("button[onclick='saveStakeAmount()']");
+  if (saveAmount) saveAmount.textContent = tr("saveAmount");
+
+  const rulesTitle = document.querySelector(".rules-card h2");
+  if (rulesTitle) rulesTitle.textContent = "📌 " + tr("rules");
+  const rulesBody = document.getElementById("rulesBody");
+  if (rulesBody) {
+    rulesBody.innerHTML = `<tr><td>${tr("exact")}</td><td>${tr("exactPoints")}</td></tr><tr><td>${tr("correctWinner")}</td><td>${tr("winnerPoints")}</td></tr><tr><td>${tr("fail")}</td><td>${tr("failPoints")}</td></tr>`;
+  }
 }
 
 window.setLang = function(lang) {
   currentLang = UI_LANG[lang] ? lang : "es";
   localStorage.setItem("currentLang", currentLang);
   applyLanguageLabels();
-  try { renderAll(); } catch(e) { console.warn("renderAll after lang failed", e); }
+  try { renderAll(); } catch(e) { console.warn(e); }
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
