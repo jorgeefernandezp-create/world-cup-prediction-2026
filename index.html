@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>World Cup Prediction 2026</title>
-  <link rel="stylesheet" href="style.css?v=182apiwinner" />
+  <link rel="stylesheet" href="style.css?v=184lang" />
 </head>
 <body>
   <div id="confettiLayer"></div>
@@ -14,12 +14,14 @@
       <div class="badge">🏆 2026</div>
       <h1>WORLD CUP<br>PREDICTION</h1>
       <p id="subtitle">Polla Mundialista por partido</p>
-      <div class="langs">
-        <button onclick="setLang('es')" id="btn-es" class="active">🇪🇸 Español</button>
-        <button onclick="setLang('ja')" id="btn-ja">🇯🇵 日本語</button>
-        <button onclick="setLang('en')" id="btn-en">🇬🇧 English</button>
-        <button onclick="setLang('pt')" id="btn-pt">🇧🇷 Português</button>
-      </div>
+
+    <div class="langs language-switcher">
+      <button id="btn-es" type="button" onclick="setLang('es')">🇪🇸 Español</button>
+      <button id="btn-ja" type="button" onclick="setLang('ja')">🇯🇵 日本語</button>
+      <button id="btn-en" type="button" onclick="setLang('en')">🇺🇸 English</button>
+      <button id="btn-pt" type="button" onclick="setLang('pt')">🇧🇷 Português</button>
+    </div>
+
       <p class="small" id="dataStatus">Cargando calendario automático...</p>
     </section>
 
@@ -71,55 +73,45 @@
       <p class="small" id="lockInfo">Cada partido tiene su propio ganador.</p>
     </section>
 
-    <section class="card admin-card" id="adminPanel">
-      <h2>👨‍💼 Panel administrador</h2>
+    <section id="adminPanel" class="card admin-panel" style="display:none">
+      <h2>🔐 Panel administrador</h2>
 
-      
       <div class="admin-system-box">
-        <h3>🛠 Estado del sistema</h3>
-        <div id="systemStatusBox" class="system-status-box">Cargando estado...</div>
+        <h3>🛠 Control rápido</h3>
         <div class="admin-actions">
-          <button type="button" onclick="syncResultsFromApi()">Sincronizar API ahora</button>
-          <button type="button" onclick="rebuildKnockoutCrossings()">Reconstruir torneo</button>
+          <button type="button" onclick="adminSyncApiNow()">Sincronizar API ahora</button>
+          <button type="button" onclick="adminRebuildNow()">Reconstruir torneo</button>
+          <button type="button" onclick="forceSetR32To300()">Fijar 16avos en ¥300</button>
         </div>
       </div>
 
-      
       <div class="admin-r32-box">
         <h3>🏆 Monto Ronda de 32 / 16avos</h3>
-        <p class="small-note">Los partidos de 16avos permanecen visibles hasta que termine toda la ronda.</p>
-        <button type="button" onclick="setR32Stake300()">Fijar Ronda de 32 en ¥300</button>
+        <p class="small-note">Las apuestas existentes se mantienen. Solo cambia el monto para calcular el pozo.</p>
         <div class="stake-manual">
-          <input id="stakeR32" type="number" inputmode="numeric" min="0" step="100" placeholder="300">
-          <button type="button" onclick="saveRoundStake('Ronda de 32','stakeR32')">Guardar Ronda de 32</button>
+          <input id="stakeR32" type="number" inputmode="numeric" min="0" step="100" value="300" placeholder="300">
+          <button type="button" onclick="saveRoundStake ? saveRoundStake('Ronda de 32','stakeR32') : forceSetR32To300()">Guardar Ronda de 32</button>
         </div>
       </div>
 
       <div class="admin-stake-box">
-        <h3>💴 Monto de apuesta</h3>
+        <h3>💴 Monto general</h3>
         <div class="stake-buttons">
-          <button type="button" onclick="setQuickStakeAmount(100)">¥100</button>
-          <button type="button" onclick="setQuickStakeAmount(200)">¥200</button>
-          <button type="button" onclick="setQuickStakeAmount(500)">¥500</button>
-          <button type="button" onclick="setQuickStakeAmount(1000)">¥1000</button>
+          <button type="button" onclick="setQuickStakeAmount ? setQuickStakeAmount(100) : null">¥100</button>
+          <button type="button" onclick="setQuickStakeAmount ? setQuickStakeAmount(200) : null">¥200</button>
+          <button type="button" onclick="setQuickStakeAmount ? setQuickStakeAmount(500) : null">¥500</button>
+          <button type="button" onclick="setQuickStakeAmount ? setQuickStakeAmount(1000) : null">¥1000</button>
         </div>
         <div class="stake-manual">
-          <input id="stakeAmount" type="number" inputmode="numeric" min="0" step="100" placeholder="100">
+          <input id="stakeAmount" type="number" inputmode="numeric" min="0" step="100" placeholder="300">
           <button type="button" onclick="saveStakeAmount()">Guardar monto</button>
         </div>
-        <p class="small-note">Este monto se usará para calcular el pozo de cada partido.</p>
       </div>
 
-      <p class="small">Admin: agrega <strong>?admin=jorge</strong> al final del enlace.</p>
-      <label>Fase de grupos / monto por participante</label>
-      <input id="stakeAmount" type="number" inputmode="numeric" min="0" step="100" value="100" />
-      <button onclick="saveStakeAmount()">Guardar monto</button>
-      <div id="adminResults"></div>
-      <button onclick="saveResultsAndCalculate()">Guardar resultados</button>
-      <button onclick="syncOpenFootball()">Sincronizar calendario</button>
-      <button onclick="syncResultsFromApi()">Actualizar resultados API</button>
       <p class="status" id="adminStatus"></p>
+      <div id="systemStatusBox" class="system-status-box"></div>
     </section>
+
   </main>
 
   <nav class="bottom-nav">
@@ -129,6 +121,6 @@
     <a href="#potTitle">👥<span>Lista</span></a>
   </nav>
 
-  <script type="module" src="app.js?v=182apiwinner"></script>
+  <script type="module" src="app.js?v=184lang"></script>
 </body>
 </html>

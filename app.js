@@ -1,4 +1,4 @@
-const APP_VERSION = "18.2-api-score-winner-fix";
+const APP_VERSION = "18.4-admin-language-fix";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
@@ -545,8 +545,10 @@ function renderRanking() {
 // ===== V18: MOTOR FINAL DEL TORNEO Y ESTADO ADMIN =====
 function rebuildTournamentFromResults() {
   applyCrossings();
+  applyLanguageLabels();
   renderAll();
   updateAdminSystemStatus();
+    forceAdminPanelVisibility();
 }
 
 function updateAdminSystemStatus() {
@@ -556,7 +558,7 @@ function updateAdminSystemStatus() {
   const crosses = knockoutStatusText();
   box.innerHTML = `
     <div class="system-grid">
-      <div><b>Versión</b><br>v18.2</div>
+      <div><b>Versión</b><br>v18.4</div>
       <div><b>API</b><br>${apiLastStatus}</div>
       <div><b>Última sync</b><br>${apiLastSync || "Pendiente"}</div>
       <div><b>Resultados API</b><br>${lastApiCount}</div>
@@ -645,7 +647,7 @@ function renderAll() {
     renderSelectedMatch();
     renderRanking();
     $("welcomeText").textContent = currentPlayerName ? `Bienvenido, ${currentPlayerName}!` : "";
-    $("dataStatus").textContent = `✅ ${activeRoundStatusText()} · apuesta ¥${stakeForMatch(selectedMatch())} · ${knockoutStatusText()} · v18.2`;
+    $("dataStatus").textContent = `✅ ${activeRoundStatusText()} · apuesta ¥${stakeForMatch(selectedMatch())} · ${knockoutStatusText()} · v18.4`;
     updateAdminSystemStatus();
   } catch(e) {
     console.error(e);
@@ -666,17 +668,7 @@ function updateCountdownOnly() {
   });
 }
 
-window.setLang = function(lang) { renderAll(); };
-window.enterGame = async function() {
-  const name = $("playerName").value.trim();
-  if (!name) { $("saveStatus").textContent = "⚠️ Ingresa tu nombre."; return; }
-  currentPlayerName = name;
-  localStorage.setItem("playerName", name);
-  await setDoc(doc(db,"players",safeId(name)), { name, updatedAt:serverTimestamp() }, { merge:true });
-  $("playerName").value = "";
-  $("saveStatus").textContent = "✅ Participante guardado.";
-  renderAll();
-};
+
 window.selectDateTab = function(key) { selectedDayKey=key; selectedMatchId=(groupsByDate()[key]||[])[0]?.id || ""; localStorage.setItem("selectedDayKey",key); localStorage.setItem("selectedMatchId",selectedMatchId); renderAll(); };
 window.selectMatchTab = function(id) { selectedMatchId=id; localStorage.setItem("selectedMatchId",id); renderAll(); };
 window.saveDraftScore = function() {
@@ -795,8 +787,156 @@ function listenFirebase() {
   } });
 }
 
+
+// ===== V18.3 ADMIN PANEL VISIBLE =====
+function isAdminMode() {
+  return new URLSearchParams(window.location.search).get("admin") === "jorge";
+}
+
+function forceAdminPanelVisibility() {
+  const panel = document.getElementById("adminPanel");
+  if (!panel) return;
+  if (isAdminMode()) {
+    panel.style.display = "block";
+    panel.hidden = false;
+    panel.classList.add("admin-visible");
+  } else {
+    panel.style.display = "none";
+    panel.hidden = true;
+  }
+}
+
+window.forceSetR32To300 = async function() {
+  stakeAmount = 300;
+  if (typeof roundStakes !== "undefined") {
+    roundStakes["Ronda de 32"] = 300;
+  }
+  const stakeAmountInput = document.getElementById("stakeAmount");
+  if (stakeAmountInput) stakeAmountInput.value = 300;
+  const stakeR32Input = document.getElementById("stakeR32");
+  if (stakeR32Input) stakeR32Input.value = 300;
+
+  await setDoc(doc(db, "settings", "app"), {
+    stakeAmount: 300,
+    roundStakes: typeof roundStakes !== "undefined" ? roundStakes : { "Ronda de 32": 300 },
+    updatedAt: serverTimestamp()
+  }, { merge: true });
+
+  const status = document.getElementById("adminStatus");
+  if (status) status.textContent = "✅ Ronda de 32 fijada a ¥300.";
+  renderAll();
+};
+
+window.adminSyncApiNow = async function() {
+  if (typeof syncResultsFromApi === "function") return syncResultsFromApi();
+};
+
+window.adminRebuildNow = function() {
+  if (typeof rebuildKnockoutCrossings === "function") return rebuildKnockoutCrossings();
+  if (typeof rebuildTournamentFromResults === "function") return rebuildTournamentFromResults();
+  renderAll();
+};
+
+
+// ===== V18.4 LANGUAGE FIX =====
+const UI_LANG = {
+  es: {
+    title: "Polla Mundial 2026",
+    enter: "Ingresar",
+    namePlaceholder: "Tu nombre",
+    savePrediction: "Guardar pronóstico",
+    participants: "Participantes",
+    rules: "Reglas",
+    exact: "Marcador exacto",
+    winner: "Ganador/empate correcto",
+    fail: "Fallo",
+    pot: "Pozo",
+    admin: "Panel administrador"
+  },
+  ja: {
+    title: "ワールドカップ予想 2026",
+    enter: "入る",
+    namePlaceholder: "名前",
+    savePrediction: "予想を保存",
+    participants: "参加者",
+    rules: "ルール",
+    exact: "スコア的中",
+    winner: "勝敗/引き分け的中",
+    fail: "はずれ",
+    pot: "賞金",
+    admin: "管理パネル"
+  },
+  en: {
+    title: "World Cup Prediction 2026",
+    enter: "Enter",
+    namePlaceholder: "Your name",
+    savePrediction: "Save prediction",
+    participants: "Participants",
+    rules: "Rules",
+    exact: "Exact score",
+    winner: "Correct winner/draw",
+    fail: "Miss",
+    pot: "Pot",
+    admin: "Admin panel"
+  },
+  pt: {
+    title: "Bolão Copa do Mundo 2026",
+    enter: "Entrar",
+    namePlaceholder: "Seu nome",
+    savePrediction: "Salvar palpite",
+    participants: "Participantes",
+    rules: "Regras",
+    exact: "Placar exato",
+    winner: "Vencedor/empate correto",
+    fail: "Erro",
+    pot: "Prêmio",
+    admin: "Painel admin"
+  }
+};
+
+let currentLang = localStorage.getItem("currentLang") || "es";
+
+function applyLanguageLabels() {
+  const t = UI_LANG[currentLang] || UI_LANG.es;
+  document.documentElement.lang = currentLang;
+  document.querySelectorAll(".langs button, .language-btn").forEach(b => b.classList.remove("active"));
+  const active = document.getElementById("btn-" + currentLang);
+  if (active) active.classList.add("active");
+
+  const title = document.querySelector("[data-i18n='title'], .app-title, h1");
+  if (title) title.textContent = t.title;
+
+  const nameInput = document.getElementById("playerName");
+  if (nameInput) nameInput.placeholder = t.namePlaceholder;
+
+  const enterBtn = document.querySelector("[onclick='enterGame()']");
+  if (enterBtn) enterBtn.textContent = t.enter;
+
+  const saveBtn = document.querySelector("[onclick='saveSelectedPrediction()']");
+  if (saveBtn) saveBtn.textContent = t.savePrediction;
+
+  const participantsBtn = document.querySelector("[onclick='toggleParticipants()']");
+  if (participantsBtn) participantsBtn.textContent = t.participants;
+
+  const rulesTitle = document.querySelector(".rules-card h2");
+  if (rulesTitle) rulesTitle.textContent = "📌 " + t.rules;
+
+  const adminTitle = document.querySelector("#adminPanel h2");
+  if (adminTitle) adminTitle.textContent = "🔐 " + t.admin;
+
+  const potLabel = document.querySelector("[data-i18n='pot']");
+  if (potLabel) potLabel.textContent = t.pot;
+}
+
+window.setLang = function(lang) {
+  currentLang = UI_LANG[lang] ? lang : "es";
+  localStorage.setItem("currentLang", currentLang);
+  applyLanguageLabels();
+  try { renderAll(); } catch(e) { console.warn("renderAll after lang failed", e); }
+};
+
 document.addEventListener("DOMContentLoaded", async () => {
-  if (!location.search.includes("admin=jorge")) { const ad=$("adminPanel"); if(ad) ad.style.display="none"; }
+  forceAdminPanelVisibility();
   $("rulesBody").innerHTML = `<tr><td>Marcador exacto</td><td>+5</td></tr><tr><td>Ganador/empate correcto</td><td>+3</td></tr><tr><td>Fallo</td><td>0</td></tr>`;
   await loadSettings();
   renderAll();

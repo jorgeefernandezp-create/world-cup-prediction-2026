@@ -344,3 +344,18 @@ button{touch-action:manipulation}
 /* v18.2 API score + winner fix */
 .winner-final{margin-top:8px;font-weight:900;background:rgba(40,210,120,.16);border:1px solid rgba(40,210,120,.35);border-radius:12px;padding:8px 10px}
 .poll-winner-final{margin-top:8px;font-weight:900;background:rgba(255,210,74,.16);border:1px solid rgba(255,210,74,.35);border-radius:12px;padding:8px 10px}
+
+/* v18.3 admin visible fix */
+.admin-panel.admin-visible{display:block!important}
+.admin-panel{margin-top:16px}
+.admin-system-box,.admin-r32-box,.admin-stake-box{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:14px;margin:12px 0}
+.admin-actions,.stake-buttons,.stake-manual{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.admin-actions button,.stake-buttons button,.stake-manual button{padding:10px 14px;border-radius:12px;font-weight:900}
+.stake-manual input{width:160px;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.35);font-size:18px;font-weight:900}
+.small-note{font-size:12px;opacity:.85}
+
+/* v18.4 language/admin fix */
+.language-switcher,.langs{display:flex!important;gap:8px;flex-wrap:wrap;justify-content:center;margin:10px 0}
+.language-switcher button,.langs button{padding:8px 12px;border-radius:999px;font-weight:900;cursor:pointer}
+.language-switcher button.active,.langs button.active{outline:3px solid rgba(255,210,74,.75);background:rgba(255,210,74,.18)}
+.admin-panel.admin-visible{display:block!important}
