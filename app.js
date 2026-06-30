@@ -1,4 +1,4 @@
-const APP_VERSION = "19.0-final-stable-language-complete";
+const APP_VERSION = "19.1-correct-knockout-crosses";
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
@@ -42,7 +42,7 @@ const BASE_MATCHES = [
     "id": "53452541",
     "group": "Ronda de 32",
     "homeKey": "Germany",
-    "awayKey": "Sweden",
+    "awayKey": "Paraguay",
     "start": "2026-06-29T20:30:00Z",
     "nextMatchId": "53452509",
     "nextSlot": "home"
@@ -69,7 +69,7 @@ const BASE_MATCHES = [
     "id": "53452543",
     "group": "Ronda de 32",
     "homeKey": "France",
-    "awayKey": "Tunisia",
+    "awayKey": "Sweden",
     "start": "2026-06-30T21:00:00Z",
     "nextMatchId": "53452509",
     "nextSlot": "away"
@@ -78,7 +78,7 @@ const BASE_MATCHES = [
     "id": "53452563",
     "group": "Ronda de 32",
     "homeKey": "Mexico",
-    "awayKey": "Saudi Arabia",
+    "awayKey": "Ecuador",
     "start": "2026-07-01T01:00:00Z",
     "nextMatchId": "53452519",
     "nextSlot": "home"
@@ -87,7 +87,7 @@ const BASE_MATCHES = [
     "id": "53452565",
     "group": "Ronda de 32",
     "homeKey": "England",
-    "awayKey": "Austria",
+    "awayKey": "DR Congo",
     "start": "2026-07-01T16:00:00Z",
     "nextMatchId": "53452519",
     "nextSlot": "away"
@@ -96,7 +96,7 @@ const BASE_MATCHES = [
     "id": "53452555",
     "group": "Ronda de 32",
     "homeKey": "Belgium",
-    "awayKey": "Uruguay",
+    "awayKey": "Senegal",
     "start": "2026-07-01T20:00:00Z",
     "nextMatchId": "53452515",
     "nextSlot": "home"
@@ -168,7 +168,7 @@ const BASE_MATCHES = [
     "id": "53452511",
     "group": "Octavos",
     "homeKey": "Ganador Sudáfrica-Canadá",
-    "awayKey": "Ganador Países Bajos-Marruecos",
+    "awayKey": "Morocco",
     "start": "2026-07-04T17:00:00Z",
     "nextMatchId": "53452525",
     "nextSlot": "home"
@@ -176,8 +176,8 @@ const BASE_MATCHES = [
   {
     "id": "53452509",
     "group": "Octavos",
-    "homeKey": "Ganador Alemania-Suecia",
-    "awayKey": "Ganador Francia-Túnez",
+    "homeKey": "Paraguay",
+    "awayKey": "Ganador Francia-Suecia",
     "start": "2026-07-04T21:00:00Z",
     "nextMatchId": "53452525",
     "nextSlot": "away"
@@ -185,7 +185,7 @@ const BASE_MATCHES = [
   {
     "id": "53452517",
     "group": "Octavos",
-    "homeKey": "Ganador Brasil-Japón",
+    "homeKey": "Brazil",
     "awayKey": "Ganador Costa de Marfil-Noruega",
     "start": "2026-07-05T17:00:00Z",
     "nextMatchId": "53452527",
@@ -318,6 +318,14 @@ const TEAM_ES = {
   "Belgium":"Bélgica","Uruguay":"Uruguay","United States":"Estados Unidos","Bosnia and Herzegovina":"Bosnia y Herzegovina",
   "Spain":"España","Colombia":"Colombia","Croatia":"Croacia","Switzerland":"Suiza","Algeria":"Argelia","Australia":"Australia",
   "Egypt":"Egipto","Argentina":"Argentina","Cape Verde":"Cabo Verde","Portugal":"Portugal"
+,
+  "Paraguay":"Paraguay",
+  "Ecuador":"Ecuador",
+  "DR Congo":"RD Congo",
+  "Senegal":"Senegal",
+  "Ghana":"Ghana",
+  "Ganador Francia-Suecia":"Ganador Francia-Suecia",
+  "Ganador Costa de Marfil-Noruega":"Ganador Costa de Marfil-Noruega",
 };
 const TEAM_FLAGS = {
   "South Africa":"🇿🇦","Canada":"🇨🇦","Brazil":"🇧🇷","Japan":"🇯🇵","Germany":"🇩🇪","Sweden":"🇸🇪",
@@ -325,6 +333,12 @@ const TEAM_FLAGS = {
   "Mexico":"🇲🇽","Saudi Arabia":"🇸🇦","England":"🏴","Austria":"🇦🇹","Belgium":"🇧🇪","Uruguay":"🇺🇾",
   "United States":"🇺🇸","Bosnia and Herzegovina":"🇧🇦","Spain":"🇪🇸","Colombia":"🇨🇴","Croatia":"🇭🇷",
   "Switzerland":"🇨🇭","Algeria":"🇩🇿","Australia":"🇦🇺","Egypt":"🇪🇬","Argentina":"🇦🇷","Cape Verde":"🇨🇻","Portugal":"🇵🇹"
+,
+  "Paraguay":"🇵🇾",
+  "Ecuador":"🇪🇨",
+  "DR Congo":"🇨🇩",
+  "Senegal":"🇸🇳",
+  "Ghana":"🇬🇭",
 };
 
 let currentPlayerName = localStorage.getItem("playerName") || "";
@@ -354,6 +368,7 @@ function activeRoundName() {
   return "Final";
 }
 function matchesForActiveRound() {
+  applyOfficialFixtureCorrections();
   applyCrossings();
   const round = activeRoundName();
   return MATCHES.filter(m => m.group === round).sort((a,b)=>new Date(a.start)-new Date(b.start));
@@ -443,9 +458,11 @@ function knockoutStatusText() {
 
 function isStartedOrFinished(m) { return Date.now() >= new Date(m.start).getTime() || !!resultFor(m.id); }
 function visibleMatches() {
+  applyOfficialFixtureCorrections();
   return matchesForActiveRound();
 }
 function groupsByDate() {
+  applyOfficialFixtureCorrections();
   const groups = {};
   visibleMatches().forEach(m => {
     const key = jstDateKey(m.start);
@@ -558,7 +575,7 @@ function updateAdminSystemStatus() {
   const crosses = knockoutStatusText();
   box.innerHTML = `
     <div class="system-grid">
-      <div><b>Versión</b><br>v19.0</div>
+      <div><b>Versión</b><br>v19.1</div>
       <div><b>API</b><br>${apiLastStatus}</div>
       <div><b>Última sync</b><br>${apiLastSync || "Pendiente"}</div>
       <div><b>Resultados API</b><br>${lastApiCount}</div>
@@ -639,7 +656,50 @@ function pollWinnerText(match) {
   return `🏆 Ganador de la polla: ${winners.map(w => w.playerName).join(", ")} (${top} pts)`;
 }
 
+
+// ===== V19.1 CORRECCIÓN OFICIAL DE CRUCES =====
+// No borra apuestas ni participantes. Corrige solo equipos/llaves visibles según calendario oficial.
+const OFFICIAL_FIXTURE_CORRECTIONS = {
+  "53452545": { homeKey: "South Africa", awayKey: "Canada" },
+  "53452557": { homeKey: "Brazil", awayKey: "Japan" },
+  "53452541": { homeKey: "Germany", awayKey: "Paraguay" },
+  "53452547": { homeKey: "Netherlands", awayKey: "Morocco" },
+  "53452561": { homeKey: "Ivory Coast", awayKey: "Norway" },
+  "53452543": { homeKey: "France", awayKey: "Sweden" },
+  "53452563": { homeKey: "Mexico", awayKey: "Ecuador" },
+  "53452565": { homeKey: "England", awayKey: "DR Congo" },
+  "53452555": { homeKey: "Belgium", awayKey: "Senegal" },
+  "53452553": { homeKey: "United States", awayKey: "Bosnia and Herzegovina" },
+  "53452551": { homeKey: "Spain", awayKey: "Austria" },
+  "53452549": { homeKey: "Portugal", awayKey: "Croatia" },
+  "53452505": { homeKey: "Switzerland", awayKey: "Algeria" },
+  "53452503": { homeKey: "Australia", awayKey: "Egypt" },
+  "53452569": { homeKey: "Argentina", awayKey: "Cape Verde" },
+  "53452507": { homeKey: "Colombia", awayKey: "Ghana" },
+
+  "53452511": { homeKey: "Canada", awayKey: "Morocco" },
+  "53452509": { homeKey: "Paraguay", awayKey: "Ganador Francia-Suecia" },
+  "53452517": { homeKey: "Brazil", awayKey: "Ganador Costa de Marfil-Noruega" },
+  "53452519": { homeKey: "Ganador México-Ecuador", awayKey: "Ganador Inglaterra-RD Congo" },
+  "53452513": { homeKey: "Ganador Portugal-Croacia", awayKey: "Ganador España-Austria" },
+  "53452515": { homeKey: "Ganador Estados Unidos-Bosnia", awayKey: "Ganador Bélgica-Senegal" },
+  "53452521": { homeKey: "Ganador Argentina-Cabo Verde", awayKey: "Ganador Australia-Egipto" },
+  "53452523": { homeKey: "Ganador Suiza-Argelia", awayKey: "Ganador Colombia-Ghana" }
+};
+function applyOfficialFixtureCorrections() {
+  if (typeof MATCHES === "undefined" || !Array.isArray(MATCHES)) return;
+  MATCHES.forEach(m => {
+    const c = OFFICIAL_FIXTURE_CORRECTIONS[String(m.id)];
+    if (!c) return;
+    m.homeKey = c.homeKey;
+    m.awayKey = c.awayKey;
+    if ("home" in m) m.home = c.homeKey;
+    if ("away" in m) m.away = c.awayKey;
+  });
+}
+
 function renderAll() {
+  applyOfficialFixtureCorrections();
   try {
     applyCrossings();
     ensureSelection();
@@ -647,7 +707,7 @@ function renderAll() {
     renderSelectedMatch();
     renderRanking();
     $("welcomeText").textContent = currentPlayerName ? `Bienvenido, ${currentPlayerName}!` : "";
-    $("dataStatus").textContent = `✅ ${activeRoundStatusText()} · apuesta ¥${stakeForMatch(selectedMatch())} · ${knockoutStatusText()} · v19.0`;
+    $("dataStatus").textContent = `✅ ${activeRoundStatusText()} · apuesta ¥${stakeForMatch(selectedMatch())} · ${knockoutStatusText()} · v19.1`;
     if (typeof v19TranslatePage === "function") v19TranslatePage();
     updateAdminSystemStatus();
   } catch(e) {

@@ -5,20 +5,20 @@ export default async function handler(req, res) {
   const LOCAL_MATCHES = [
     ["53452545","South Africa","Canada","2026-06-28T19:00:00Z"],
     ["53452557","Brazil","Japan","2026-06-29T17:00:00Z"],
-    ["53452541","Germany","Sweden","2026-06-29T20:30:00Z"],
+    ["53452541","Germany","Paraguay","2026-06-29T20:30:00Z"],
     ["53452547","Netherlands","Morocco","2026-06-30T01:00:00Z"],
     ["53452561","Ivory Coast","Norway","2026-06-30T17:00:00Z"],
-    ["53452543","France","Tunisia","2026-06-30T21:00:00Z"],
-    ["53452563","Mexico","Saudi Arabia","2026-07-01T01:00:00Z"],
-    ["53452565","England","Austria","2026-07-01T16:00:00Z"],
-    ["53452555","Belgium","Uruguay","2026-07-01T20:00:00Z"],
+    ["53452543","France","Sweden","2026-06-30T21:00:00Z"],
+    ["53452563","Mexico","Ecuador","2026-07-01T01:00:00Z"],
+    ["53452565","England","DR Congo","2026-07-01T16:00:00Z"],
+    ["53452555","Belgium","Senegal","2026-07-01T20:00:00Z"],
     ["53452553","United States","Bosnia and Herzegovina","2026-07-02T00:00:00Z"],
     ["53452551","Spain","Austria","2026-07-02T19:00:00Z"],
     ["53452549","Colombia","Croatia","2026-07-02T23:00:00Z"],
     ["53452505","Switzerland","Algeria","2026-07-03T03:00:00Z"],
     ["53452503","Australia","Egypt","2026-07-03T18:00:00Z"],
     ["53452569","Argentina","Cape Verde","2026-07-03T22:00:00Z"],
-    ["53452507","Portugal","Croatia","2026-07-04T01:30:00Z"]
+    ["53452507","Colombia","Ghana","2026-07-04T01:30:00Z"]
   ].map(([id, home, away, startUtc]) => ({ id, home, away, startUtc }));
 
   function normalize(s) {
